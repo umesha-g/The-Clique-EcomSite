@@ -1,4 +1,5 @@
 package com.umesha_g.store_backend.service;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,5 +14,9 @@ public class UserService {
 
     public User findByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    public User findByUsername(String username) {
+        return userRepository.findByUserName(username);
     }
 }
