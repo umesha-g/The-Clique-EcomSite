@@ -48,7 +48,11 @@ export default function ProfilePage() {
   }
 
   if (!profile) {
-    return <div>Loading...</div>;
+    return (
+      <div className=" flex justify-items-center place-items-center">
+        Loading...
+      </div>
+    );
   }
 
   return (

@@ -25,82 +25,55 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSubmit, isLoading }) => {
   };
 
   return (
-    <div className="flex h-screen p-20 bg-transparent overflow-hidden">
+    <div className="lg:grid-rows-1 grid-cols-1 grid h-screen p-20  overflow-hidden relative">
       <div className="rounded-3xl flex w-full overflow-hidden bg-indigo-900">
+        <div className="w-1/2 flex items-center justify-center bg-white">
+          <SignInForm
+            email={email}
+            setEmail={setEmail}
+            password={password}
+            setPassword={setPassword}
+            handleSubmit={handleSubmit}
+            isLoading={isLoading}
+            isVisible={isSignIn}
+          />
+        </div>
+        <div className="w-1/2 flex items-center justify-center bg-white">
+          <SignUpForm
+            fullName={fullName}
+            setFullName={setFullName}
+            email={email}
+            setEmail={setEmail}
+            password={password}
+            setPassword={setPassword}
+            handleSubmit={handleSubmit}
+            isLoading={isLoading}
+            isVisible={!isSignIn}
+          />
+        </div>
         <motion.div
-          className="w-1/2 flex items-center  justify-center bg-indigo-900"
-          initial={{ x: "100%", opacity: 1 }}
-          animate={{ x: isSignIn ? "0%" : "100%", opacity: [1, 0, 1] }}
-          transition={{
-            type: "spring",
-            ease: "easeInOut",
-            duration: 1,
-            opacity: { duration: 0.1 },
-          }}
+          className="absolute p-20 top-0 left-0 w-1/2 h-full flex items-center overflow-hidden justify-center"
+          initial={false}
+          animate={{ x: isSignIn ? "0%" : "100%" }}
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
         >
-          <div className="w-full max-w-md p-8">
-            {isSignIn ? (
-              <SignInForm
-                email={email}
-                setEmail={setEmail}
-                password={password}
-                setPassword={setPassword}
-                handleSubmit={handleSubmit}
-                isLoading={isLoading}
-              />
-            ) : (
-              <div className="text-white text-center">
-                <h2 className="text-3xl font-bold mb-6">Welcome Back</h2>
-                <p className="mb-8 text-indigo-200">
-                  Already have an account? Sign in to continue your journey.
-                </p>
-                <button
-                  onClick={toggleForm}
-                  className="bg-white text-indigo-900 font-bold py-3 px-6 rounded-full hover:bg-indigo-100 transition duration-300"
-                >
-                  Sign In
-                </button>
-              </div>
-            )}
-          </div>
-        </motion.div>
-        <motion.div
-          className="w-1/2 flex items-center justify-center bg-purple-900"
-          initial={{ x: "-100%", opacity: 1 }}
-          animate={{ x: isSignIn ? "0%" : "-100%", opacity: [1, 0, 1] }}
-          transition={{
-            type: "spring",
-            ease: "easeInOut",
-            duration: 1,
-            opacity: { duration: 0.1 },
-          }}
-        >
-          <div className="w-full max-w-md p-8">
-            {isSignIn ? (
-              <div className="text-white text-center">
-                <h2 className="text-3xl font-bold mb-6">Join Us</h2>
-                <p className="mb-8 text-purple-200">
-                  Don t have an account? Sign up and start your adventure today.
-                </p>
-                <button
-                  onClick={toggleForm}
-                  className="bg-white text-purple-900 font-bold py-3 px-6 rounded-full hover:bg-purple-100 transition duration-300"
-                >
-                  Sign Up
-                </button>
-              </div>
-            ) : (
-              <SignUpForm
-                fullName={fullName}
-                setFullName={setFullName}
-                email={email}
-                setEmail={setEmail}
-                password={password}
-                setPassword={setPassword}
-                handleSubmit={handleSubmit}
-                isLoading={isLoading}
-              />
-            )}
+          <div className="place-items-center place-content-center flex-col rounded-3xl flex w-full h-full overflow-hidden bg-purple-600">
+            <div className=" max-w-md p-8 z-20 text-white text-center">
+              <h2 className="text-3xl font-bold mb-6">
+                {isSignIn ? "Welcome Back" : "Join Us"}
+              </h2>
+              <p className="mb-8 text-purple-200">
+                {isSignIn
+                  ? "Already have an account? Sign in to continue your journey."
+                  : "Don't have an account? Sign up and start your adventure today."}
+              </p>
+              <button
+                onClick={toggleForm}
+                className="bg-white text-purple-600 font-bold py-3 px-6 rounded-full hover:bg-purple-100 transition duration-300"
+              >
+                {isSignIn ? "Sign In" : "Sign Up"}
+              </button>
+            </div>
           </div>
         </motion.div>
       </div>
@@ -115,6 +88,7 @@ interface FormProps {
   setPassword: (value: string) => void;
   handleSubmit: (e: React.FormEvent) => void;
   isLoading: boolean;
+  isVisible: boolean;
 }
 
 interface SignUpFormProps extends FormProps {
@@ -129,39 +103,46 @@ const SignInForm: React.FC<FormProps> = ({
   setPassword,
   handleSubmit,
   isLoading,
+  isVisible,
 }) => (
-  <form className="w-full" onSubmit={handleSubmit}>
-    <h2 className="text-3xl font-bold text-white mb-6 text-center">Sign In</h2>
-    <div className="mb-6">
+  <motion.form
+    className="w-full max-w-md p-8"
+    initial={{ opacity: 0 }}
+    animate={{ opacity: isVisible ? 0 : 1 }}
+    transition={{ duration: 0.3 }}
+    onSubmit={handleSubmit}
+  >
+    <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
+      Sign In
+    </h2>
+    <div className="mb-4">
       <input
-        className="w-full bg-indigo-800 text-white border-2 border-indigo-700 rounded-lg py-3 px-4 placeholder-indigo-400 focus:outline-none focus:border-indigo-500 transition duration-300"
         type="email"
-        placeholder="Email"
-        onChange={(e) => setEmail(e.target.value)}
         value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="Email"
+        className="w-full px-3 py-2 border rounded text-gray-700"
         required
       />
     </div>
     <div className="mb-6">
       <input
-        className="w-full bg-indigo-800 text-white border-2 border-indigo-700 rounded-lg py-3 px-4 placeholder-indigo-400 focus:outline-none focus:border-indigo-500 transition duration-300"
         type="password"
-        placeholder="Password"
-        onChange={(e) => setPassword(e.target.value)}
         value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder="Password"
+        className="w-full px-3 py-2 border rounded text-gray-700"
         required
       />
     </div>
-    <div className="flex items-center justify-center">
-      <button
-        className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-full focus:outline-none focus:shadow-outline transition duration-300"
-        type="submit"
-        disabled={isLoading}
-      >
-        {isLoading ? "Loading..." : "Sign In"}
-      </button>
-    </div>
-  </form>
+    <button
+      type="submit"
+      className="w-full px-4 py-2 text-white bg-purple-600 rounded hover:bg-purple-700 transition duration-300"
+      disabled={isLoading}
+    >
+      {isLoading ? "Loading..." : "Sign In"}
+    </button>
+  </motion.form>
 );
 
 const SignUpForm: React.FC<SignUpFormProps> = ({
@@ -173,49 +154,56 @@ const SignUpForm: React.FC<SignUpFormProps> = ({
   setPassword,
   handleSubmit,
   isLoading,
+  isVisible,
 }) => (
-  <form className="w-full" onSubmit={handleSubmit}>
-    <h2 className="text-3xl font-bold text-white mb-6 text-center">Sign Up</h2>
-    <div className="mb-6">
+  <motion.form
+    className="w-full max-w-md p-8"
+    initial={{ opacity: 0 }}
+    animate={{ opacity: isVisible ? 0 : 1 }}
+    transition={{ duration: 0.3 }}
+    onSubmit={handleSubmit}
+  >
+    <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
+      Sign Up
+    </h2>
+    <div className="mb-4">
       <input
-        className="w-full bg-purple-800 text-white border-2 border-purple-700 rounded-lg py-3 px-4 placeholder-purple-400 focus:outline-none focus:border-purple-500 transition duration-300"
         type="text"
-        placeholder="Full Name"
         value={fullName}
         onChange={(e) => setFullName(e.target.value)}
+        placeholder="Full Name"
+        className="w-full px-3 py-2 border rounded text-gray-700"
         required
       />
     </div>
-    <div className="mb-6">
+    <div className="mb-4">
       <input
-        className="w-full bg-purple-800 text-white border-2 border-purple-700 rounded-lg py-3 px-4 placeholder-purple-400 focus:outline-none focus:border-purple-500 transition duration-300"
         type="email"
-        placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
+        placeholder="Email"
+        className="w-full px-3 py-2 border rounded text-gray-700"
         required
       />
     </div>
     <div className="mb-6">
       <input
-        className="w-full bg-purple-800 text-white border-2 border-purple-700 rounded-lg py-3 px-4 placeholder-purple-400 focus:outline-none focus:border-purple-500 transition duration-300"
         type="password"
-        placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
+        placeholder="Password"
+        className="w-full px-3 py-2 border rounded text-gray-700"
         required
       />
     </div>
-    <div className="flex items-center justify-center">
-      <button
-        className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-full focus:outline-none focus:shadow-outline transition duration-300"
-        type="submit"
-        disabled={isLoading}
-      >
-        {isLoading ? "Loading..." : "Sign Up"}
-      </button>
-    </div>
-  </form>
+    <button
+      type="submit"
+      className="w-full px-4 py-2 text-white bg-purple-600 rounded hover:bg-purple-700 transition duration-300"
+      disabled={isLoading}
+    >
+      {isLoading ? "Loading..." : "Sign Up"}
+    </button>
+  </motion.form>
 );
 
 export default AuthForm;
