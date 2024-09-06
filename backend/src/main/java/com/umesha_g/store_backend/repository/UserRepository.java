@@ -7,6 +7,5 @@ import com.umesha_g.store_backend.model.User;
 public interface UserRepository extends JpaRepository<User, Long> {
     User findByEmail(String email);
 
-    User findByUserName(String username);
-
+    User findByUsername(String username);
 }
