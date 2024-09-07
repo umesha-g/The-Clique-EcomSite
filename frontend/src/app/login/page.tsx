@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import AuthForm from "../components/AuthForm"; // Make sure the path is correct
+import MobileAuthForm from "../components/AuthFormMobile";
 
 export default function LoginPage() {
   const [error, setError] = useState("");
@@ -37,8 +38,14 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-indigo-950">
-      <AuthForm onSubmit={handleSubmit} isLoading={false} />
+    <div className="min-h-screen bg-gray-900">
+      <div className="lg:block hidden">
+        <AuthForm onSubmit={handleSubmit} isLoading={false} />
+      </div>
+
+      <div className="lg:hidden block">
+        <MobileAuthForm onSubmit={handleSubmit} isLoading={false} />
+      </div>
       {error && (
         <div className="mt-4 text-center">
           <p className="text-red-500">{error}</p>

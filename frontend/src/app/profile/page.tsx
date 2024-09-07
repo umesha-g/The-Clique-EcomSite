@@ -1,7 +1,7 @@
 "use client";
-
+import { IdCard, Mail, SquareArrowRight, User } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 interface UserProfile {
   username: string;
@@ -9,7 +9,7 @@ interface UserProfile {
   fullName: string;
 }
 
-export default function ProfilePage() {
+const DarkModernProfilePage: React.FC = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [error, setError] = useState("");
   const router = useRouter();
@@ -43,43 +43,70 @@ export default function ProfilePage() {
     fetchProfile();
   }, [router]);
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    router.push("/login");
+  };
+
   if (error) {
-    return <div className="text-red-500">{error}</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-900">
+        <div className="p-8 bg-gray-800 rounded-lg shadow-xl">
+          <p className="text-red-400">{error}</p>
+        </div>
+      </div>
+    );
   }
 
   if (!profile) {
     return (
-      <div className=" flex justify-items-center place-items-center">
-        Loading...
+      <div className="flex items-center justify-center min-h-screen bg-gray-900">
+        <div className="p-8 bg-gray-800 rounded-lg shadow-xl">
+          <p className="text-blue-400">Loading...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="p-8 bg-white rounded shadow-md">
-        <h1 className="mb-6 text-2xl font-bold text-center">User Profile</h1>
-        <div className="space-y-2">
-          <p>
-            <strong>Username:</strong> {profile.username}
-          </p>
-          <p>
-            <strong>Email:</strong> {profile.email}
-          </p>
-          <p>
-            <strong>Full Name:</strong> {profile.fullName}
-          </p>
+    <div className="flex items-center justify-center min-h-screen bg-gray-900">
+      <div className="w-full max-w-md p-8 bg-gray-800 rounded-lg shadow-xl">
+        <h1 className="mb-6 text-3xl font-bold text-center text-white">
+          Profile
+        </h1>
+        <div className="space-y-6">
+          <div className="flex items-center space-x-4 text-gray-300">
+            <User className="w-6 h-6" />
+            <div>
+              <p className="text-sm text-gray-500">Username</p>
+              <p className="font-medium">{profile.username}</p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-4 text-gray-300">
+            <Mail className="w-6 h-6" />
+            <div>
+              <p className="text-sm text-gray-500">Email</p>
+              <p className="font-medium">{profile.email}</p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-4 text-gray-300">
+            <IdCard className="w-6 h-6" />
+            <div>
+              <p className="text-sm text-gray-500">Full Name</p>
+              <p className="font-medium">{profile.fullName}</p>
+            </div>
+          </div>
         </div>
         <button
-          onClick={() => {
-            localStorage.removeItem("token");
-            router.push("/login");
-          }}
-          className="mt-4 px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600"
+          onClick={handleLogout}
+          className="flex items-center justify-center w-full mt-8 px-4 py-2 text-white bg-indigo-600 rounded-lg hover:bg-indigo-800 transition duration-300"
         >
+          <SquareArrowRight className="w-5 h-5 mr-2" />
           Logout
         </button>
       </div>
     </div>
   );
-}
+};
+
+export default DarkModernProfilePage;
