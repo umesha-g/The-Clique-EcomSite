@@ -32,6 +32,12 @@ public class User {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(name = "is_seller")
+    private boolean isSeller;
+
+    @Column(name = "seller_description")
+    private String sellerDescription;
+
     // Getters and Setters
 
     public Long getId() {
@@ -80,5 +86,21 @@ public class User {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public boolean isSeller() {
+        return isSeller;
+    }
+
+    public void setSeller(boolean seller) {
+        isSeller = seller;
+    }
+
+    public String getSellerDescription() {
+        return sellerDescription;
+    }
+
+    public void setSellerDescription(String sellerDescription) {
+        this.sellerDescription = sellerDescription;
     }
 }

@@ -5,13 +5,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.umesha_g.store_backend.model.User;
 import com.umesha_g.store_backend.service.UserService;
@@ -55,5 +49,48 @@ public class AuthController {
         } else {
             return ResponseEntity.badRequest().body("User not found");
         }
+    }
+
+    @PutMapping("/profile")
+    public ResponseEntity<?> updateProfile(@RequestHeader("Authorization") String token, @RequestBody Map<String, Object> updates) {
+        String email = token.replace("Bearer fake-jwt-token-", "");
+        User user = userService.findByEmail(email);
+        if (user != null) {
+            if (updates.containsKey("fullName")) {
+                user.setFullName((String) updates.get("fullName"));
+            }
+            if (updates.containsKey("isSeller")) {
+                user.setSeller((Boolean) updates.get("isSeller"));
+            }
+            if (updates.containsKey("sellerDescription")) {
+                user.setSellerDescription((String) updates.get("sellerDescription"));
+            }
+            userService.save(user);
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.badRequest().body("User not found");
+        }
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody User user) {
+        if (userService.existsByEmail(user.getEmail())) {
+            return ResponseEntity.badRequest().body("Email already exists");
+        }
+        if (userService.existsByUsername(user.getUsername())) {
+            return ResponseEntity.badRequest().body("Username already exists");
+        }
+
+        // In a real application, you should hash the password before saving
+        user.setCreatedAt(java.time.LocalDateTime.now());
+        User savedUser = userService.save(user);
+
+        // Generate token
+        String token = "fake-jwt-token-" + savedUser.getEmail();
+        Map<String, Object> response = new HashMap<>();
+        response.put("token", token);
+        response.put("user", savedUser);
+
+        return ResponseEntity.ok(response);
     }
 }
