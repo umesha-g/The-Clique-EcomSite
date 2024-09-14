@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 interface MobileAuthFormProps {
-  onSubmit: (email: string, password: string, isSignIn: boolean) => void;
+  onSubmit: (email: string, password: string,fullName:string, isSignIn: boolean) => void;
   isLoading: boolean;
 }
 
@@ -16,7 +16,7 @@ const MobileAuthForm: React.FC<MobileAuthFormProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(email, password, isSignIn);
+    onSubmit(email, password,fullName, isSignIn);
   };
 
   const toggleForm = () => {

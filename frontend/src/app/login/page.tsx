@@ -12,7 +12,8 @@ export default function LoginPage() {
   const handleSubmit = async (
     email: string,
     password: string,
-    isSignIn: boolean
+    fullName: string,
+    isSignUp: boolean
   ) => {
     setError("");
 
@@ -27,9 +28,10 @@ export default function LoginPage() {
         const data = await response.json();
         localStorage.setItem("token", data.token);
         router.push("/profile");
+
       } else {
         setError(
-          isSignIn ? "Invalid email or password" : "Failed to create account"
+          isSignUp ? "Failed to create account" : "Invalid email or password"
         );
       }
     } catch (err) {

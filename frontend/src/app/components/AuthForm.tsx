@@ -2,18 +2,18 @@ import { motion } from "framer-motion";
 import React, { useState } from "react";
 
 interface AuthFormProps {
-  onSubmit: (email: string, password: string, isSignUp: boolean) => void;
+  onSubmit: (email: string, password: string, fullName:string, isSignIn: boolean) => void;
   isLoading: boolean;
 }
 
 const AuthForm: React.FC<AuthFormProps> = ({ onSubmit, isLoading }) => {
-  const [isSignUp, setIsSignUp] = useState(false);
+  const [isSignIn, setIsSignIn] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
 
   const toggleForm = () => {
-    setIsSignUp(!isSignUp);
+    setIsSignIn(!isSignIn);
     setEmail("");
     setPassword("");
     setFullName("");
@@ -21,7 +21,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSubmit, isLoading }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(email, password, isSignUp);
+    onSubmit(email, password,fullName, isSignIn);
   };
 
   return (
@@ -35,7 +35,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSubmit, isLoading }) => {
             setPassword={setPassword}
             handleSubmit={handleSubmit}
             isLoading={isLoading}
-            isVisible={isSignUp}
+            isVisible={isSignIn}
           />
         </div>
         <div className="w-1/2 flex items-center pr-20 justify-center bg-gray-800">
@@ -48,22 +48,22 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSubmit, isLoading }) => {
             setPassword={setPassword}
             handleSubmit={handleSubmit}
             isLoading={isLoading}
-            isVisible={!isSignUp}
+            isVisible={!isSignIn}
           />
         </div>
         <motion.div
           className="absolute 2xl:p-40 xl:p-28 p-16 top-0 left-0 w-1/2 h-full flex items-center overflow-hidden justify-center"
           initial={false}
-          animate={{ x: isSignUp ? "0%" : "100%" }}
+          animate={{ x: isSignIn ? "0%" : "100%" }}
           transition={{ type: "spring", bounce: 0.1, duration: 0.4 }}
         >
           <div className="place-items-center place-content-center flex-col rounded-3xl flex w-full h-full overflow-hidden bg-indigo-600">
             <div className=" max-w-md p-8 z-20 text-white text-center">
               <h2 className="text-3xl font-bold mb-6">
-                {isSignUp ? "Join Us" : "Welcome Back"}
+                {isSignIn ? "Join Us" : "Welcome Back"}
               </h2>
               <p className="mb-8 text-purple-200">
-                {isSignUp
+                {isSignIn
                   ? "Already have an account? Sign in to continue your journey."
                   : "Don't have an account? Sign up and start your adventure today."}
               </p>
@@ -71,7 +71,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSubmit, isLoading }) => {
                 onClick={toggleForm}
                 className="bg-white text-indigo-800 font-bold py-3 px-6 rounded-full hover:bg-purple-100 transition duration-300"
               >
-                {isSignUp ? "Sign In" : "Sign Up"}
+                {isSignIn ? "Sign In" : "Sign Up"}
               </button>
             </div>
           </div>
@@ -109,7 +109,7 @@ const SignInForm: React.FC<FormProps> = ({
     className="w-full max-w-md p-8"
     initial={{ opacity: 0 }}
     animate={{ opacity: isVisible ? 0 : 1 }}
-    transition={{ duration: 0.3 }}
+    transition={{ duration: 0.1 }}
     onSubmit={handleSubmit}
   >
     <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
@@ -160,7 +160,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({
     className="w-full max-w-md p-8"
     initial={{ opacity: 0 }}
     animate={{ opacity: isVisible ? 0 : 1 }}
-    transition={{ duration: 0.3 }}
+    transition={{ duration: 0.1 }}
     onSubmit={handleSubmit}
   >
     <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
