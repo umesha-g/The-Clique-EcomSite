@@ -1,6 +1,8 @@
+"use client";
+
 import axios from "axios";
 import Image from "next/image";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { FaHeart, FaSearch, FaShoppingCart } from "react-icons/fa";
 
@@ -22,6 +24,7 @@ const Home: React.FC = () => {
   const [isNewUser, setIsNewUser] = useState(false);
   const [user, setUser] = useState<any>(null);
   const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -31,7 +34,7 @@ const Home: React.FC = () => {
       fetchUserProfile(token);
       fetchProducts();
     }
-  }, []);
+  }, [router]);
 
   const fetchUserProfile = async (token: string) => {
     try {
@@ -50,15 +53,26 @@ const Home: React.FC = () => {
   const fetchProducts = async () => {
     try {
       const response = await axios.get("http://localhost:8080/api/products");
+      console.log("Product response:", response);
       setProducts(response.data);
+      setError(null);
     } catch (error) {
       console.error("Error fetching products:", error);
+      if (axios.isAxiosError(error) && error.response) {
+        setError(
+          `Failed to load products: ${error.response.status} ${error.response.statusText}`
+        );
+      } else {
+        setError("Failed to load products. Please try again later.");
+      }
     }
   };
 
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  console.log("Filtered products:", filteredProducts);
 
   const toggleWishlist = (productId: number) => {
     setWishlist((prev) =>
@@ -99,7 +113,7 @@ const Home: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      <nav className="bg-gray-800 p-4">
+      <nav className="bg-gray-800 p-4 left-0 right-0 ">
         <div className="container mx-auto flex justify-between items-center">
           <h1 className="text-2xl font-bold">Our Store</h1>
           <div className="flex items-center space-x-4">
@@ -154,13 +168,15 @@ const Home: React.FC = () => {
               key={product.id}
               className="bg-gray-800 rounded-lg overflow-hidden shadow-lg"
             >
-              <div className="relative w-full h-48">
+              <div className="relative w-full h-48 overflow-hidden">
                 <Image
                   src={product.imageUrl}
                   alt={product.name}
-                  layout="fill"
+                  layout="responsive"
                   objectFit="cover"
-                  className="rounded-lg"
+                  width={1200}
+                  height={800}
+                  className="rounded-lg "
                 />
               </div>
               <div className="p-4">

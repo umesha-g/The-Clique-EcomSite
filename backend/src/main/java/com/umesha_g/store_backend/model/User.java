@@ -17,8 +17,8 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
-    private String username;
+    // @Column(unique = true, nullable = false)
+    // private String username;
 
     @Column(unique = true, nullable = false)
     private String email;
@@ -32,11 +32,11 @@ public class User {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @Column(name = "is_seller")
-    private boolean isSeller;
+    // @Column(name = "is_seller")
+    // private boolean isSeller;
 
-    @Column(name = "seller_description")
-    private String sellerDescription;
+    //@Column(name = "seller_description")
+    //private String sellerDescription;
 
     // Getters and Setters
 
@@ -48,13 +48,13 @@ public class User {
         this.id = id;
     }
 
-    public String getUsername() {
-        return username;
-    }
+    // public String getUsername() {
+    // return username;
+    // }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+    // public void setUsername(String username) {
+    // this.username = username;
+    // }
 
     public String getEmail() {
         return email;
@@ -88,19 +88,19 @@ public class User {
         this.createdAt = createdAt;
     }
 
-    public boolean isSeller() {
-        return isSeller;
-    }
+    // public boolean isSeller() {
+    // return isSeller;
+    // }
 
-    public void setSeller(boolean seller) {
-        isSeller = seller;
-    }
+    // public void setSeller(boolean seller) {
+    // isSeller = seller;
+    // }
 
-    public String getSellerDescription() {
-        return sellerDescription;
-    }
+    //public String getSellerDescription() {
+        //return sellerDescription;
+    //}
 
-    public void setSellerDescription(String sellerDescription) {
-        this.sellerDescription = sellerDescription;
-    }
+    //public void setSellerDescription(String sellerDescription) {
+      //  this.sellerDescription = sellerDescription;
+   // }
 }
