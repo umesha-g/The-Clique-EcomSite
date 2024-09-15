@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
+
 interface Product {
   id: number;
   name: string;
@@ -94,12 +95,22 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const goToHome = () => {
+    router.push("/");
+  };
+
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      <nav className="bg-gray-800 p-4 fixed left-0 right-0">
+      <nav className="bg-gray-800 p-4 fixed flex left-0 right-0">
         <div className="container mx-auto">
           <h1 className="text-2xl font-bold">Seller Dashboard</h1>
         </div>
+        <button
+          className="px-4 py-2 bg-indigo-600 rounded-lg"
+          onClick={goToHome}
+        >
+          Home
+        </button>
       </nav>
       <main className="container mx-auto p-4">
         <div className="mb-8">
@@ -202,7 +213,7 @@ const Dashboard: React.FC = () => {
                 alt={product.name}
                 layout="responsive"
                 objectFit="cover"
-                width={1200} 
+                width={1200}
                 height={800}
                 className="w-full h-48 object-cover rounded-md mb-4"
               />

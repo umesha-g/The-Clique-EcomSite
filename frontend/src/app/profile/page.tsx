@@ -1,15 +1,17 @@
 "use client";
-import { IdCard, Mail, SquareArrowRight, User } from "lucide-react";
+
+import axios from "axios";
+import { IdCard, Mail } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import { CgHome } from "react-icons/cg";
 
 interface UserProfile {
-  username: string;
   email: string;
   fullName: string;
 }
 
-const DarkModernProfilePage: React.FC = () => {
+const ProfilePage: React.FC = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [error, setError] = useState("");
   const router = useRouter();
@@ -23,17 +25,15 @@ const DarkModernProfilePage: React.FC = () => {
       }
 
       try {
-        const response = await fetch("http://localhost:9090/api/profile", {
+        const response = await axios.get("http://localhost:8080/api/profile", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
 
-        if (response.ok) {
-          const data = await response.json();
-          setProfile(data);
-        } else {
-          setError("Failed to fetch profile");
+        if (response.status === 200) {
+          // axios handles errors for non-2xx status codes
+          setProfile(response.data);
         }
       } catch (err) {
         setError("An error occurred. Please try again.");
@@ -43,9 +43,8 @@ const DarkModernProfilePage: React.FC = () => {
     fetchProfile();
   }, [router]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    router.push("/login");
+  const goToHome = () => {
+    router.push("/");
   };
 
   if (error) {
@@ -76,13 +75,6 @@ const DarkModernProfilePage: React.FC = () => {
         </h1>
         <div className="space-y-6">
           <div className="flex items-center space-x-4 text-gray-300">
-            <User className="w-6 h-6" />
-            <div>
-              <p className="text-sm text-gray-500">Username</p>
-              <p className="font-medium">{profile.username}</p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-4 text-gray-300">
             <Mail className="w-6 h-6" />
             <div>
               <p className="text-sm text-gray-500">Email</p>
@@ -98,15 +90,15 @@ const DarkModernProfilePage: React.FC = () => {
           </div>
         </div>
         <button
-          onClick={handleLogout}
+          onClick={goToHome}
           className="flex items-center justify-center w-full mt-8 px-4 py-2 text-white bg-indigo-600 rounded-lg hover:bg-indigo-800 transition duration-300"
         >
-          <SquareArrowRight className="w-5 h-5 mr-2" />
-          Logout
+          <CgHome className="w-5 h-5 mr-2" />
+          Home
         </button>
       </div>
     </div>
   );
 };
 
-export default DarkModernProfilePage;
+export default ProfilePage;

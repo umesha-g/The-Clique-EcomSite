@@ -6,12 +6,19 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { FaHeart, FaSearch, FaShoppingCart } from "react-icons/fa";
 
+interface User {
+  id: number;
+  email: string;
+  password: string;
+  fullName: string;
+}
 interface Product {
   id: number;
   name: string;
   description: string;
   price: number;
   imageUrl: string;
+  seller: User;
 }
 
 const Home: React.FC = () => {
@@ -28,6 +35,39 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+
+    const fetchUserProfile = async (token: string) => {
+      try {
+        const response = await axios.get("http://localhost:8080/api/profile", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUser(response.data);
+        setIsNewUser(response.data.isNewUser);
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+        localStorage.removeItem("token");
+        router.push("/login");
+      }
+    };
+
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get("http://localhost:8080/api/products");
+        console.log("Product response:", response);
+        setProducts(response.data);
+        setError(null);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+        if (axios.isAxiosError(error) && error.response) {
+          setError(
+            `Failed to load products: ${error.response.status} ${error.response.statusText}`
+          );
+        } else {
+          setError("Failed to load products. Please try again later.");
+        }
+      }
+    };
+
     if (!token) {
       router.push("/login");
     } else {
@@ -36,43 +76,9 @@ const Home: React.FC = () => {
     }
   }, [router]);
 
-  const fetchUserProfile = async (token: string) => {
-    try {
-      const response = await axios.get("http://localhost:8080/api/profile", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setUser(response.data);
-      setIsNewUser(response.data.isNewUser);
-    } catch (error) {
-      console.error("Error fetching user profile:", error);
-      localStorage.removeItem("token");
-      router.push("/login");
-    }
-  };
-
-  const fetchProducts = async () => {
-    try {
-      const response = await axios.get("http://localhost:8080/api/products");
-      console.log("Product response:", response);
-      setProducts(response.data);
-      setError(null);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      if (axios.isAxiosError(error) && error.response) {
-        setError(
-          `Failed to load products: ${error.response.status} ${error.response.statusText}`
-        );
-      } else {
-        setError("Failed to load products. Please try again later.");
-      }
-    }
-  };
-
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  console.log("Filtered products:", filteredProducts);
 
   const toggleWishlist = (productId: number) => {
     setWishlist((prev) =>
@@ -111,12 +117,32 @@ const Home: React.FC = () => {
     setIsCheckoutOpen(true);
   };
 
+  const goToDashboard = () => {
+    router.push("/dashboard");
+  };
+
+  const goToProfile = () => {
+    router.push("/profile");
+  };
+
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       <nav className="bg-gray-800 p-4 left-0 right-0 ">
         <div className="container mx-auto flex justify-between items-center">
           <h1 className="text-2xl font-bold">Our Store</h1>
           <div className="flex items-center space-x-4">
+            <button
+              className="px-4 py-2 bg-indigo-600 rounded-lg"
+              onClick={goToDashboard}
+            >
+              Dashboard
+            </button>
+            <button
+              className="px-4 py-2 bg-indigo-600 rounded-lg"
+              onClick={goToProfile}
+            >
+              Profile
+            </button>
             <div className="relative">
               <input
                 type="text"
@@ -180,8 +206,10 @@ const Home: React.FC = () => {
                 />
               </div>
               <div className="p-4">
-                <h2 className="text-xl font-semibold mb-2">{product.name}</h2>
+                <h2 className="text-xl font-semibold mb-1">{product.name}</h2>
+                <p className="text-gray-400 mb-4">{product.seller.fullName}</p>
                 <p className="text-gray-400 mb-4">{product.description}</p>
+
                 <div className="flex justify-between items-center">
                   <span className="text-2xl font-bold">
                     ${product.price.toFixed(2)}
