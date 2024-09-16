@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import AuthForm from "../components/AuthForm";
-import MobileAuthForm from "../components/AuthFormMobile";
+import AuthForm from "./loginComponents/AuthForm";
+import MobileAuthForm from "./loginComponents/AuthFormMobile";
 
 export default function LoginPage() {
   const [error] = useState("");

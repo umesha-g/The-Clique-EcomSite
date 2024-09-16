@@ -1,19 +1,13 @@
-import { Button } from "@/components/ui/button";
+import ToggleThemeButton from "@/app/commonComponents/toggleThemeButton";
 import { Input } from "@/components/ui/input";
-import { Bell, Menu, Moon, Search, Sun } from "lucide-react";
+import { Bell, Menu, Search } from "lucide-react";
 import React from "react";
 
 interface HeaderProps {
-  isDarkMode: boolean;
-  toggleTheme: () => void;
   toggleSidebar: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({
-  isDarkMode,
-  toggleTheme,
-  toggleSidebar,
-}) => {
+export const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
   return (
     <header className="bg-white dark:bg-gray-800 p-4 flex justify-between items-center">
       <button onClick={toggleSidebar} className="md:hidden">
@@ -31,9 +25,7 @@ export const Header: React.FC<HeaderProps> = ({
         />
       </div>
       <div className="flex items-center space-x-4">
-        <Button onClick={toggleTheme} variant="ghost">
-          {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-        </Button>
+        <ToggleThemeButton />
         <Bell size={20} />
         <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
       </div>

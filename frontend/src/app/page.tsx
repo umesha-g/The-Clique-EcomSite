@@ -74,7 +74,7 @@ const Home: React.FC = () => {
       fetchUserProfile(token);
       fetchProducts();
     }
-  }, [router]);
+  }, [router, setError, setProducts]);
 
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase())

@@ -38,10 +38,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     `}
     >
       <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center">
-          <div className="w-8 h-8 bg-blue-500 rounded-full mr-2"></div>
-          <span className="text-xl font-bold">VANTAGE</span>
-        </div>
+        <div></div>
         <button onClick={toggleSidebar} className="md:hidden">
           <X size={24} />
         </button>
