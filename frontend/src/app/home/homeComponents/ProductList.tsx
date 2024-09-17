@@ -38,9 +38,12 @@ const ProductList: React.FC = () => {
 
     const fetchUserProfile = async (token: string) => {
       try {
-        const response = await axios.get("http://localhost:8080/api/profile", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await axios.get(
+          "http://localhost:8080/api/users/profile",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         setUser(response.data);
         setIsNewUser(response.data.isNewUser);
       } catch (error) {
@@ -52,7 +55,9 @@ const ProductList: React.FC = () => {
 
     const fetchProducts = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/api/products");
+        const response = await axios.get(
+          "http://localhost:8080/api/products"
+        );
         console.log("Product response:", response);
         setProducts(response.data);
         setError(null);

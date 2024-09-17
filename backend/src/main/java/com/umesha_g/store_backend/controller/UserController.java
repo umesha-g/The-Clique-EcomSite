@@ -18,9 +18,9 @@ import com.umesha_g.store_backend.model.User;
 import com.umesha_g.store_backend.service.UserService;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/users")
 @CrossOrigin(origins = "http://localhost:3000")
-public class AuthController {
+public class UserController {
 
     @Autowired
     private UserService userService;

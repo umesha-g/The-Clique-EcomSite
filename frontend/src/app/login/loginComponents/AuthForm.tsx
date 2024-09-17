@@ -27,11 +27,14 @@ const AuthForm: React.FC = () => {
     try {
       if (!isSignUp) {
         // Handle Login
-        const response = await axios.post("http://localhost:8080/api/login", {
-          email,
-          password,
-          staySignedIn,
-        });
+        const response = await axios.post(
+          "http://localhost:8080/api/users/login",
+          {
+            email,
+            password,
+            staySignedIn,
+          }
+        );
 
         localStorage.setItem("token", response.data.token);
         if (staySignedIn) {
@@ -40,7 +43,7 @@ const AuthForm: React.FC = () => {
       } else {
         // Handle Register
         const response = await axios.post(
-          "http://localhost:8080/api/register",
+          "http://localhost:8080/api/users/register",
           {
             email,
             password,

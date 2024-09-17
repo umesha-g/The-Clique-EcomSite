@@ -74,7 +74,7 @@ const AccountPage: React.FC = () => {
         />
         <div className="flex-1">
           <Header toggleSidebar={toggleSidebar} />
-          <main className="p-4 md:p-8">{renderActiveTab()}</main>
+          <main className="p-4 md:p-8 h-fit">{renderActiveTab()}</main>
         </div>
       </div>
     </div>

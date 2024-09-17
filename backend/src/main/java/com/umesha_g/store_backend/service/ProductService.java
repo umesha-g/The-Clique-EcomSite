@@ -44,8 +44,8 @@ public class ProductService {
     // Get search suggestions by query
     public List<String> getSearchSuggestions(String query) {
         return productRepository.findTop5ByNameContainingIgnoreCase(query)
-                                .stream()
-                                .map(Product::getName)  // Assuming Product has a 'getName' method
-                                .collect(Collectors.toList());
+                .stream()
+                .map(Product::getName)
+                .collect(Collectors.toList());
     }
 }

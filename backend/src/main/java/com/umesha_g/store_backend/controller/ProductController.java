@@ -90,7 +90,6 @@ public class ProductController {
         return productService.searchProducts(query);
     }
 
-    // Get search suggestions with the 'q' query parameter
     @GetMapping("/suggestions")
     public List<String> getSearchSuggestions(@RequestParam("q") String query) {
         return productService.getSearchSuggestions(query);

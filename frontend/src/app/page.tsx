@@ -11,7 +11,9 @@ interface User {
   email: string;
   password: string;
   fullName: string;
+  isNewUser: boolean; // Assuming you have this property
 }
+
 interface Product {
   id: number;
   name: string;
@@ -38,11 +40,16 @@ const Home: React.FC = () => {
 
     const fetchUserProfile = async (token: string) => {
       try {
-        const response = await axios.get("http://localhost:8080/api/profile", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await axios.get(
+          "http://localhost:8080/api/users/profile",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         setUser(response.data);
         setIsNewUser(response.data.isNewUser);
+        // Fetch wishlist
+        fetchWishlist(token);
       } catch (error) {
         console.error("Error fetching user profile:", error);
         localStorage.removeItem("token");
@@ -53,7 +60,6 @@ const Home: React.FC = () => {
     const fetchProducts = async () => {
       try {
         const response = await axios.get("http://localhost:8080/api/products");
-        console.log("Product response:", response);
         setProducts(response.data);
         setError(null);
       } catch (error) {
@@ -74,18 +80,42 @@ const Home: React.FC = () => {
       fetchUserProfile(token);
       fetchProducts();
     }
-  }, [router, setError, setProducts]);
+  }, [router]);
 
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const fetchWishlist = async (token: string) => {
+    try {
+      const response = await axios.get("http://localhost:8080/api/wishlist", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setWishlist(response.data.map((item: { id: number }) => item.id));
+    } catch (error) {
+      console.error("Error fetching wishlist:", error);
+    }
+  };
 
-  const toggleWishlist = (productId: number) => {
-    setWishlist((prev) =>
-      prev.includes(productId)
-        ? prev.filter((id) => id !== productId)
-        : [...prev, productId]
-    );
+  const toggleWishlist = async (productId: number) => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+      if (wishlist.includes(productId)) {
+        await axios.delete(`http://localhost:8080/api/wishlist/${productId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setWishlist((prev) => prev.filter((id) => id !== productId));
+      } else {
+        await axios.post(
+          "http://localhost:8080/api/wishlist",
+          { productId },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setWishlist((prev) => [...prev, productId]);
+      }
+    } catch (error) {
+      console.error("Error updating wishlist:", error);
+    }
   };
 
   const addToCart = (productId: number) => {
@@ -124,6 +154,10 @@ const Home: React.FC = () => {
   const goToProfile = () => {
     router.push("/profile");
   };
+
+  const filteredProducts = products.filter((product) =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
@@ -199,11 +233,8 @@ const Home: React.FC = () => {
                 <Image
                   src={product.imageUrl}
                   alt={product.name}
-                  layout="responsive"
-                  objectFit="cover"
-                  width={1200}
-                  height={800}
-                  className="rounded-lg "
+                  fill
+                  className="rounded-lg object-cover"
                 />
               </div>
               <div className="p-4">
@@ -213,27 +244,31 @@ const Home: React.FC = () => {
 
                 <div className="flex justify-between items-center">
                   <span className="text-2xl font-bold">
-                    ${product.price.toFixed(2)}
+                    {product.price} USD
                   </span>
-                  <div className="space-x-2">
-                    <button
-                      onClick={() => toggleWishlist(product.id)}
-                      className={`p-2 rounded-full ${
+                  <button
+                    className={`px-4 py-2 rounded-lg ${
+                      wishlist.includes(product.id)
+                        ? "bg-red-600"
+                        : "bg-blue-600"
+                    }`}
+                    onClick={() => toggleWishlist(product.id)}
+                  >
+                    <FaHeart
+                      className={`text-xl ${
                         wishlist.includes(product.id)
-                          ? "bg-red-600"
-                          : "bg-gray-700"
+                          ? "text-white"
+                          : "text-gray-300"
                       }`}
-                    >
-                      <FaHeart />
-                    </button>
-                    <button
-                      onClick={() => addToCart(product.id)}
-                      className="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700"
-                    >
-                      Add to Cart
-                    </button>
-                  </div>
+                    />
+                  </button>
                 </div>
+                <button
+                  className="w-full mt-4 bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-500"
+                  onClick={() => addToCart(product.id)}
+                >
+                  Add to Cart
+                </button>
               </div>
             </div>
           ))}
@@ -241,114 +276,70 @@ const Home: React.FC = () => {
       </main>
 
       {isCartOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-gray-800 p-6 rounded-lg w-96">
-            <h2 className="text-2xl font-bold mb-4">Your Cart</h2>
-            {Object.keys(cart).length === 0 ? (
-              <p>Your cart is empty.</p>
-            ) : (
-              <>
-                {Object.entries(cart).map(([productId, quantity]) => {
-                  const product = products.find(
-                    (p) => p.id === Number(productId)
-                  );
-                  return product ? (
-                    <div
-                      key={productId}
-                      className="flex justify-between items-center mb-2"
-                    >
-                      <span>{product.name}</span>
-                      <div>
-                        <button
-                          onClick={() => removeFromCart(product.id)}
-                          className="px-2 py-1 bg-red-600 rounded mr-2"
-                        >
-                          -
-                        </button>
-                        <span>{quantity}</span>
-                        <button
-                          onClick={() => addToCart(product.id)}
-                          className="px-2 py-1 bg-green-600 rounded ml-2"
-                        >
-                          +
-                        </button>
-                      </div>
+        <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center bg-gray-800 text-white">
+          <div className="container relative bg-gray-800 p-6 rounded-lg w-96">
+            <h2 className="text-2xl font-bold mb-4">Shopping Cart</h2>
+            <ul>
+              {Object.keys(cart).map((productId) => {
+                const product = products.find(
+                  (p) => p.id === Number(productId)
+                );
+                return (
+                  <li
+                    key={productId}
+                    className="flex justify-between items-center mb-2"
+                  >
+                    <span>{product?.name}</span>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => removeFromCart(Number(productId))}
+                        className="bg-red-600 px-2 py-1 rounded-lg"
+                      >
+                        -
+                      </button>
+                      <span>{cart[productId]}</span>
+                      <button
+                        onClick={() => addToCart(Number(productId))}
+                        className="bg-green-600 px-2 py-1 rounded-lg"
+                      >
+                        +
+                      </button>
                     </div>
-                  ) : null;
-                })}
-                <div className="mt-4">
-                  <strong>Total: ${getTotalPrice().toFixed(2)}</strong>
-                </div>
-                <button
-                  onClick={handleCheckout}
-                  className="mt-4 bg-green-600 text-white px-4 py-2 rounded-full hover:bg-green-700 w-full"
-                >
-                  Proceed to Checkout
-                </button>
-              </>
-            )}
+                  </li>
+                );
+              })}
+            </ul>
+            <div className="mt-4 flex justify-between items-center">
+              <span className="text-xl font-bold">
+                Total: {getTotalPrice()} USD
+              </span>
+              <button
+                onClick={handleCheckout}
+                className="bg-indigo-600 px-4 py-2 rounded-lg hover:bg-indigo-500"
+              >
+                Checkout
+              </button>
+            </div>
             <button
               onClick={() => setIsCartOpen(false)}
-              className="mt-4 bg-gray-700 text-white px-4 py-2 rounded-full hover:bg-gray-600 w-full"
+              className="absolute top-2 right-2 text-red-500 text-2xl"
             >
-              Close
+              x
             </button>
           </div>
         </div>
       )}
 
       {isCheckoutOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-gray-800 p-6 rounded-lg w-96">
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center">
+          <div className="bg-white text-black p-4 rounded-lg shadow-lg">
             <h2 className="text-2xl font-bold mb-4">Checkout</h2>
-            <form className="space-y-4">
-              <div>
-                <label htmlFor="cardNumber" className="block mb-1">
-                  Card Number
-                </label>
-                <input
-                  type="text"
-                  id="cardNumber"
-                  className="w-full px-3 py-2 bg-gray-700 rounded"
-                  placeholder="1234 5678 9012 3456"
-                />
-              </div>
-              <div className="flex space-x-4">
-                <div className="w-1/2">
-                  <label htmlFor="expiry" className="block mb-1">
-                    Expiry Date
-                  </label>
-                  <input
-                    type="text"
-                    id="expiry"
-                    className="w-full px-3 py-2 bg-gray-700 rounded"
-                    placeholder="MM/YY"
-                  />
-                </div>
-                <div className="w-1/2">
-                  <label htmlFor="cvv" className="block mb-1">
-                    CVV
-                  </label>
-                  <input
-                    type="text"
-                    id="cvv"
-                    className="w-full px-3 py-2 bg-gray-700 rounded"
-                    placeholder="123"
-                  />
-                </div>
-              </div>
-              <button
-                type="submit"
-                className="bg-green-600 text-white px-4 py-2 rounded-full hover:bg-green-700 w-full"
-              >
-                Pay ${getTotalPrice().toFixed(2)}
-              </button>
-            </form>
+            <p>Proceeding to payment gateway...</p>
             <button
               onClick={() => setIsCheckoutOpen(false)}
-              className="mt-4 bg-gray-700 text-white px-4 py-2 rounded-full hover:bg-gray-600 w-full"
+              className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg"
             >
-              Cancel
+              Close
             </button>
           </div>
         </div>

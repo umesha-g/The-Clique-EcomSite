@@ -13,12 +13,10 @@ interface Product {
 const searchProducts = async (query: string) => {
   try {
     const response = await axios.get(
-      `http://localhost:8080/api/products/search?q=${encodeURIComponent(
-        query
-      )}`,
+      `http://localhost:8080/api/products/search?q=${query}`,
       {
         params: {
-          query: query, // Axios handles encoding automatically
+          query: query,
         },
       }
     );

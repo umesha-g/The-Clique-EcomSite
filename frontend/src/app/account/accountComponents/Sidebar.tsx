@@ -30,11 +30,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
       ${isOpen ? "translate-x-0" : "-translate-x-full"}
       md:translate-x-0
       fixed md:static
-      w-64 h-screen
+      w-64 min-h-screen
       bg-white dark:bg-gray-800
       p-4
       transition-transform duration-200 ease-in-out
-      z-20 md:z-auto
+      z-50
+      
     `}
     >
       <div className="flex items-center justify-between mb-8">
