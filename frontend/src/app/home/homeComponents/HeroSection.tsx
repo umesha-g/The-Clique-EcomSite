@@ -1,3 +1,5 @@
+"use client";
+import { Button } from "@/components/ui/button"; // Make sure to import the Button component correctly from ShadCN
 import { motion } from "framer-motion";
 import Image from "next/image";
 import React from "react";
@@ -21,13 +23,14 @@ const HeroSection: React.FC = () => {
               technology that is used by both small enterprises and space
               enterprises.
             </p>
-            <button className="btn btn-primary">
+            {/* ShadCN Button Component */}
+            <Button variant="default" className="mb-4">
               See current job openings
-            </button>
+            </Button>
           </div>
           <div className="md:w-1/2">
             <Image
-              src=""
+              src="/path/to/image.jpg" // Make sure to replace this with a valid image path
               alt="Team working together"
               width={600}
               height={400}

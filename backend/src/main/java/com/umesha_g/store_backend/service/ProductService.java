@@ -1,6 +1,7 @@
 package com.umesha_g.store_backend.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,5 +34,18 @@ public class ProductService {
 
     public List<Product> getAllProducts() {
         return productRepository.findAll();
+    }
+
+    // Search products by query
+    public List<Product> searchProducts(String query) {
+        return productRepository.findByNameContainingIgnoreCase(query);
+    }
+
+    // Get search suggestions by query
+    public List<String> getSearchSuggestions(String query) {
+        return productRepository.findTop5ByNameContainingIgnoreCase(query)
+                                .stream()
+                                .map(Product::getName)  // Assuming Product has a 'getName' method
+                                .collect(Collectors.toList());
     }
 }

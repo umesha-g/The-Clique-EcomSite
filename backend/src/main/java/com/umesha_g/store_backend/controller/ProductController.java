@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.umesha_g.store_backend.model.Product;
@@ -51,7 +52,8 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateProduct(@PathVariable Long id, @RequestBody Product product, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> updateProduct(@PathVariable Long id, @RequestBody Product product,
+            @RequestHeader("Authorization") String token) {
         String email = token.replace("Bearer fake-jwt-token-", "");
         User seller = userService.findByEmail(email);
 
@@ -69,7 +71,7 @@ public class ProductController {
     public ResponseEntity<?> deleteProduct(@PathVariable Long id, @RequestHeader("Authorization") String token) {
         String email = token.replace("Bearer fake-jwt-token-", "");
         User seller = userService.findByEmail(email);
- 
+
         Product existingProduct = productService.findById(id);
         if (existingProduct == null || !existingProduct.getSeller().getId().equals(seller.getId())) {
             return ResponseEntity.badRequest().body("Product not found or not owned by the seller");
@@ -82,4 +84,16 @@ public class ProductController {
     public List<Product> getAllProducts() {
         return productService.getAllProducts();
     }
+
+    @GetMapping("/search")
+    public List<Product> searchProducts(@RequestParam("q") String query) {
+        return productService.searchProducts(query);
+    }
+
+    // Get search suggestions with the 'q' query parameter
+    @GetMapping("/suggestions")
+    public List<String> getSearchSuggestions(@RequestParam("q") String query) {
+        return productService.getSearchSuggestions(query);
+    }
+
 }

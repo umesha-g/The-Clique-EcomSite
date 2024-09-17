@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import FeaturesSection from "./homeComponents/FeaturesSection";
 import Footer from "./homeComponents/Footer";

@@ -1,3 +1,11 @@
+"use client";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"; // Adjust import paths based on your structure
 import { motion } from "framer-motion";
 import React from "react";
 
@@ -30,7 +38,7 @@ const features = [
 
 const FeaturesSection: React.FC = () => {
   return (
-    <section className="py-12 bg-gray-100 dark:bg-gray-800">
+    <section className="py-12 bg-muted">
       <div className="container mx-auto px-4">
         <h2 className="text-2xl font-bold mb-8 text-center">
           Or choose a category to quickly find the help you need
@@ -42,11 +50,16 @@ const FeaturesSection: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md"
             >
-              <div className="text-3xl mb-4">{feature.icon}</div>
-              <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-              <p>{feature.description}</p>
+              <Card className="p-6">
+                <CardHeader>
+                  <div className="text-3xl mb-4">{feature.icon}</div>
+                  <CardTitle>{feature.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription>{feature.description}</CardDescription>
+                </CardContent>
+              </Card>
             </motion.div>
           ))}
         </div>

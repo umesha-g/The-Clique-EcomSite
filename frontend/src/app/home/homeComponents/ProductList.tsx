@@ -1,3 +1,5 @@
+"use client";
+import { Card, CardContent, CardTitle } from "@/components/ui/card"; // Assuming ShadCN provides these components
 import axios from "axios";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -72,15 +74,15 @@ const ProductList: React.FC = () => {
       fetchUserProfile(token);
       fetchProducts();
     }
-  }, [router, setError, setProducts]);
+  }, [router]);
 
   return (
     <main className="container mx-auto p-4">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {products.map((product) => (
-          <div
+          <Card
             key={product.id}
-            className="bg-gray-800 rounded-lg overflow-hidden shadow-lg"
+            className="bg-white dark:bg-gray-950 rounded-lg overflow-hidden shadow-lg"
           >
             <div className="relative w-full h-48 overflow-hidden">
               <Image
@@ -90,15 +92,21 @@ const ProductList: React.FC = () => {
                 objectFit="cover"
                 width={1200}
                 height={800}
-                className="rounded-lg "
+                className="rounded-lg"
               />
             </div>
-            <div className="p-4">
-              <h2 className="text-xl font-semibold mb-1">{product.name}</h2>
-              <p className="text-gray-400 mb-4">{product.seller.fullName}</p>
-              <p className="text-gray-400 mb-4">{product.description}</p>
-            </div>
-          </div>
+            <CardContent className="p-4">
+              <CardTitle className="text-black dark:text-white text-xl font-semibold mb-1">
+                {product.name}
+              </CardTitle>
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
+                {product.seller.fullName}
+              </p>
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
+                {product.description}
+              </p>
+            </CardContent>
+          </Card>
         ))}
       </div>
     </main>

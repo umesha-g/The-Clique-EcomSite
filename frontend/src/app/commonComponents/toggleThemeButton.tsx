@@ -6,7 +6,7 @@ const ToggleThemeButton = () => {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <Button onClick={toggleTheme} className="rounded-full">
+    <Button onClick={toggleTheme} className="rounded-full" variant="default">
       {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
     </Button>
   );
