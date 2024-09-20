@@ -1,6 +1,7 @@
 "use client";
 
 import axios from "axios";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { Header } from "./accountComponents/Header";
 import { Sidebar } from "./accountComponents/Sidebar";
@@ -15,6 +16,7 @@ import { Statement } from "./accountComponents/tabs/Statement";
 const AccountPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState("Overview");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const router = useRouter();
   const [data, setData] = useState({
     earnings: {},
     products: [],
@@ -44,7 +46,7 @@ const AccountPage: React.FC = () => {
       case "Overview":
         return <Overview earnings={data.earnings} />;
       case "Products":
-        return <Products products={data.products} />;
+        return <Products />;
       case "Campaigns":
         return <Campaigns campaigns={data.campaigns} />;
       case "Schedules":
@@ -59,6 +61,12 @@ const AccountPage: React.FC = () => {
         return <div>Select a tab</div>;
     }
   };
+
+  const token = localStorage.getItem("token");
+  if (!token) {
+    router.push("/login");
+  } else {
+  }
 
   return (
     <div

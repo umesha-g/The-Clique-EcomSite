@@ -2,17 +2,10 @@
 import ToggleThemeButton from "@/app/commonComponents/toggleThemeButton";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import axios from "axios";
-import {
-  X as CloseIcon,
-  Search as SearchIcon,
-  ShoppingCart,
-  User as UserIcon,
-} from "lucide-react";
+import { ShoppingCart, User as UserIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useRef, useState } from "react";
-import { useDebounce } from "use-debounce";
+import React from "react";
+import Search from "./headerComponents/Search";
 
 interface User {
   id: number;
@@ -34,68 +27,15 @@ const Header: React.FC<HeaderProps> = ({
   onLogout,
 }) => {
   const router = useRouter();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [suggestions, setSuggestions] = useState<string[]>([]);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [debouncedSearchTerm] = useDebounce(searchTerm, 300);
 
-  const getSearchSuggestions = async (query: string): Promise<string[]> => {
-    try {
-      const response = await axios.get(
-        `http://localhost:8080/api/products/suggestions?q=${query}`
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Failed to fetch suggestions:", error);
-      return [];
-    }
-  };
-
-  useEffect(() => {
-    if (debouncedSearchTerm.length > 1) {
-      const fetchSuggestions = async () => {
-        try {
-          const data = await getSearchSuggestions(debouncedSearchTerm);
-          setSuggestions(data);
-        } catch (error) {
-          console.error("Failed to fetch suggestions:", error);
-        }
-      };
-      fetchSuggestions();
-    } else {
-      setSuggestions([]);
-    }
-  }, [debouncedSearchTerm]);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
-        setSuggestions([]);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSearchSubmit = (searchTerm: string) => {
     if (searchTerm) {
       router.push(`/home/search?q=${encodeURIComponent(searchTerm)}`);
-      setSuggestions([]);
     }
   };
 
-  const handleSuggestionClick = (suggestion: string) => {
-    setSearchTerm(suggestion);
-    router.push(`/home/search?q=${encodeURIComponent(suggestion)}`);
-    setSuggestions([]);
+  const gotoAccount = () => {
+    router.push("/account");
   };
 
   return (
@@ -122,51 +62,11 @@ const Header: React.FC<HeaderProps> = ({
             </Button>
           </div>
           <div className="flex items-center space-x-4">
-            <div className="relative" ref={containerRef}>
-              <form onSubmit={handleSearchSubmit} className="relative">
-                <Input
-                  ref={inputRef}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  type="text"
-                  placeholder="Search..."
-                  className="pl-10 pr-4 py-2 rounded-full w-64"
-                />
-                <SearchIcon
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                  size={20}
-                />
-                {suggestions.length > 0 && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    onClick={() => setSuggestions([])}
-                    className="absolute right-2 top-1/2 -translate-y-1/2"
-                  >
-                    <CloseIcon size={16} />
-                  </Button>
-                )}
-              </form>
-              {suggestions.length > 0 && (
-                <Card className="absolute z-10 w-full mt-1">
-                  <ul>
-                    {suggestions.map((suggestion, index) => (
-                      <li
-                        key={index}
-                        onClick={() => handleSuggestionClick(suggestion)}
-                        className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
-                      >
-                        {suggestion}
-                      </li>
-                    ))}
-                  </ul>
-                </Card>
-              )}
-            </div>
+            <Search onSubmit={handleSearchSubmit} />
             <ToggleThemeButton />
             <Button
               variant="ghost"
-              className="rounded-full relative"
+              className="rounded-full p-3  relative hover:bg-gray-200 dark:hover:bg-gray-700"
               onClick={onCartClick}
             >
               <ShoppingCart size={20} />
@@ -177,12 +77,19 @@ const Header: React.FC<HeaderProps> = ({
               )}
             </Button>
             {user ? (
-              <div className="flex items-center space-x-2">
-                <span className="text-sm">Welcome, {user.fullName}</span>
+              <div className="flex items-center space-x-4">
                 <Button
                   variant="ghost"
+                  className="p-3 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
+                  onClick={gotoAccount}
+                >
+                  <UserIcon size={20} />
+                </Button>
+                <span className="text-sm">Welcome, {user.fullName}</span>
+                <Button
+                  variant="destructive"
                   onClick={onLogout}
-                  className="text-red-500 hover:text-red-400"
+                  className=" rounded-full"
                 >
                   Logout
                 </Button>

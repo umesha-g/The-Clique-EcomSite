@@ -9,12 +9,12 @@ import FeaturesSection from "./homeComponents/FeaturesSection";
 import Footer from "./homeComponents/Footer";
 import Header from "./homeComponents/Header";
 import HeroSection from "./homeComponents/HeroSection";
-import ProductList from "./homeComponents/ProductList2";
+import ProductList from "./homeComponents/ProductList";
 import { Product, User } from "./homeComponents/types";
 
 const HomePage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm] = useState("");
   const [wishlist, setWishlist] = useState<number[]>([]);
   const [cart, setCart] = useState<{ [key: number]: number }>({});
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -25,6 +25,23 @@ const HomePage: React.FC = () => {
   const router = useRouter();
 
   useEffect(() => {
+    const fetchUserProfile = async (token: string) => {
+      try {
+        const response = await axios.get(
+          "http://localhost:8080/api/users/profile",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setUser(response.data);
+        setIsNewUser(response.data.isNewUser);
+        fetchWishlist(token);
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+        localStorage.removeItem("token");
+        router.push("/login");
+      }
+    };
     const token = localStorage.getItem("token");
     if (!token) {
       router.push("/login");
@@ -33,24 +50,6 @@ const HomePage: React.FC = () => {
       fetchProducts();
     }
   }, [router]);
-
-  const fetchUserProfile = async (token: string) => {
-    try {
-      const response = await axios.get(
-        "http://localhost:8080/api/users/profile",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      setUser(response.data);
-      setIsNewUser(response.data.isNewUser);
-      fetchWishlist(token);
-    } catch (error) {
-      console.error("Error fetching user profile:", error);
-      localStorage.removeItem("token");
-      router.push("/login");
-    }
-  };
 
   const fetchProducts = async () => {
     try {
@@ -132,6 +131,8 @@ const HomePage: React.FC = () => {
     setIsCheckoutOpen(true);
   };
 
+  
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     router.push("/login");
@@ -147,7 +148,6 @@ const HomePage: React.FC = () => {
         user={user}
         cartItemCount={Object.values(cart).reduce((a, b) => a + b, 0)}
         onCartClick={() => setIsCartOpen(true)}
-        onSearch={setSearchTerm}
         onLogout={handleLogout}
       />
       <main>

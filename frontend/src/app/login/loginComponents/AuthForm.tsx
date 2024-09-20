@@ -52,7 +52,7 @@ const AuthForm: React.FC = () => {
         );
         localStorage.setItem("token", response.data.token);
       }
-      router.push("/"); // Redirect to home page
+      router.push("/home"); // Redirect to home page
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         setError(error.response.data);

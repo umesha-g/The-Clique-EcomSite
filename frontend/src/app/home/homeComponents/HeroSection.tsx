@@ -15,26 +15,23 @@ const HeroSection: React.FC = () => {
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row items-center">
           <div className="md:w-1/2 mb-8 md:mb-0 ml-6">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Come to join us!
-            </h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">Welcome</h1>
             <p className="text-lg mb-6">
-              From year to year we strive to invent the most innovative
-              technology that is used by both small enterprises and space
-              enterprises.
+              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Optio
+              quaerat repellat quasi nihil,
             </p>
             {/* ShadCN Button Component */}
             <Button variant="default" className="mb-4">
-              See current job openings
+              Browse
             </Button>
           </div>
-          <div className="md:w-1/2">
+          <div className="md:w-1/2 flex justify-end">
             <Image
-              src="/path/to/image.jpg" // Make sure to replace this with a valid image path
+              src="https://images.pexels.com/photos/90946/pexels-photo-90946.jpeg" // Make sure to replace this with a valid image path
               alt="Team working together"
               width={600}
               height={400}
-              className="rounded-lg shadow-lg"
+              className="rounded-lg shadow-lg "
             />
           </div>
         </div>

@@ -99,28 +99,28 @@ const Search: React.FC<SearchProps> = ({ onSubmit }) => {
           <Button
             type="button"
             variant="ghost"
-            onClick={() => setSuggestions([])} // Close suggestions when button is clicked
-            className="absolute right-2 top-1/2 -translate-y-1/2"
+            onClick={() => setSuggestions([])}
+            className="absolute rounded-full right-2 top-1/2 -translate-y-1/2"
           >
             <CloseIcon size={16} />
           </Button>
         )}
+        {suggestions.length > 0 && (
+          <Card className="absolute z-10 w-full mt-1">
+            <ul>
+              {suggestions.map((suggestion, index) => (
+                <li
+                  key={index}
+                  onClick={() => handleSuggestionClick(suggestion)}
+                  className="px-4 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                >
+                  {suggestion}
+                </li>
+              ))}
+            </ul>
+          </Card>
+        )}
       </form>
-      {suggestions.length > 0 && (
-        <Card className="absolute z-10 w-full mt-1">
-          <ul>
-            {suggestions.map((suggestion, index) => (
-              <li
-                key={index}
-                onClick={() => handleSuggestionClick(suggestion)}
-                className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
-              >
-                {suggestion}
-              </li>
-            ))}
-          </ul>
-        </Card>
-      )}
     </div>
   );
 };

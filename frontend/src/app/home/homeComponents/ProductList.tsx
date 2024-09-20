@@ -1,120 +1,79 @@
-"use client";
-import { Card, CardContent, CardTitle } from "@/components/ui/card"; // Assuming ShadCN provides these components
-import axios from "axios";
+// homeComponents/ProductList.tsx
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { FaHeart } from "react-icons/fa";
+import { Product } from "./types";
 
-interface User {
-  id: number;
-  email: string;
-  password: string;
-  fullName: string;
-}
-interface Product {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  imageUrl: string;
-  seller: User;
+interface ProductListProps {
+  products: Product[];
+  wishlist: number[];
+  onToggleWishlist: (productId: number) => void;
+  onAddToCart: (productId: number) => void;
+  error: string | null;
 }
 
-const ProductList: React.FC = () => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [wishlist, setWishlist] = useState<number[]>([]);
-  const [cart, setCart] = useState<{ [key: number]: number }>({});
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-  const [isNewUser, setIsNewUser] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
-  const router = useRouter();
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-
-    const fetchUserProfile = async (token: string) => {
-      try {
-        const response = await axios.get(
-          "http://localhost:8080/api/users/profile",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        setUser(response.data);
-        setIsNewUser(response.data.isNewUser);
-      } catch (error) {
-        console.error("Error fetching user profile:", error);
-        localStorage.removeItem("token");
-        router.push("/login");
-      }
-    };
-
-    const fetchProducts = async () => {
-      try {
-        const response = await axios.get(
-          "http://localhost:8080/api/products"
-        );
-        console.log("Product response:", response);
-        setProducts(response.data);
-        setError(null);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-        if (axios.isAxiosError(error) && error.response) {
-          setError(
-            `Failed to load products: ${error.response.status} ${error.response.statusText}`
-          );
-        } else {
-          setError("Failed to load products. Please try again later.");
-        }
-      }
-    };
-
-    if (!token) {
-      router.push("/login");
-    } else {
-      fetchUserProfile(token);
-      fetchProducts();
-    }
-  }, [router]);
+const ProductList: React.FC<ProductListProps> = ({
+  products,
+  wishlist,
+  onToggleWishlist,
+  onAddToCart,
+  error,
+}) => {
+  if (error) {
+    return <div className="text-red-500">{error}</div>;
+  }
 
   return (
-    <main className="container mx-auto p-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div className="container mx-auto p-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
         {products.map((product) => (
-          <Card
-            key={product.id}
-            className="bg-white dark:bg-gray-950 rounded-lg overflow-hidden shadow-lg"
-          >
-            <div className="relative w-full h-48 overflow-hidden">
+          <Card key={product.id} className="dark:bg-gray-950">
+            <CardHeader className="relative h-48">
               <Image
                 src={product.imageUrl}
                 alt={product.name}
-                layout="responsive"
-                objectFit="cover"
-                width={1200}
-                height={800}
-                className="rounded-lg"
+                fill
+                className="object-cover rounded-lg"
               />
-            </div>
+            </CardHeader>
             <CardContent className="p-4">
-              <CardTitle className="text-black dark:text-white text-xl font-semibold mb-1">
+              <CardTitle className="text-xl font-semibold mb-1 dark:text-white">
                 {product.name}
               </CardTitle>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
-                {product.seller.fullName}
-              </p>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
-                {product.description}
-              </p>
+              <p className="text-gray-400 mb-4">{product.seller.fullName}</p>
+              <p className="text-gray-400 mb-4">{product.description}</p>
+
+              <div className="flex justify-between items-center">
+                <span className="text-2xl font-bold dark:text-white">
+                  {product.price} USD
+                </span>
+                <Button
+                  variant={"default"}
+                  onClick={() => onToggleWishlist(product.id)}
+                  className="px-4 py-2 rounded-lg"
+                >
+                  <FaHeart
+                    className={
+                      wishlist.includes(product.id)
+                        ? "text-red-700"
+                        : "text-gray-200 dark:text-gray-900 "
+                    }
+                  />
+                </Button>
+              </div>
+              <Button
+                className="w-full mt-4"
+                onClick={() => onAddToCart(product.id)}
+              >
+                Add to Cart
+              </Button>
             </CardContent>
           </Card>
         ))}
       </div>
-    </main>
+    </div>
   );
 };
 

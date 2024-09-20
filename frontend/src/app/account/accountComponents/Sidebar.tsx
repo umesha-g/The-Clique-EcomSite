@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import React from "react";
 
@@ -38,11 +39,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
       
     `}
     >
-      <div className="flex items-center justify-between mb-8">
-        <div></div>
-        <button onClick={toggleSidebar} className="md:hidden">
+      <div className="flex items-center text-center justify-between mb-8">
+        <Button
+          variant={"secondary"}
+          onClick={toggleSidebar}
+          className="md:hidden"
+        >
           <X size={24} />
-        </button>
+        </Button>
       </div>
       <ul>
         {tabs.map((tab) => (
@@ -50,7 +54,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             key={tab}
             className={`mb-2 ${activeTab === tab ? "text-blue-500" : ""}`}
           >
-            <button
+            <Button
               onClick={() => {
                 setActiveTab(tab);
                 if (window.innerWidth < 768) toggleSidebar();
@@ -58,7 +62,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               className="flex items-center p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700 w-full text-left"
             >
               {tab}
-            </button>
+            </Button>
           </li>
         ))}
       </ul>

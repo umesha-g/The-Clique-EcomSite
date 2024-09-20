@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 interface User {
   id: number;
@@ -17,15 +17,11 @@ interface Product {
   seller: User;
 }
 
-export const Products: React.FC<Product> = () => {
+export const Products = () => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [wishlist, setWishlist] = useState<number[]>([]);
-  const [cart, setCart] = useState<{ [key: number]: number }>({});
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isNewUser, setIsNewUser] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
