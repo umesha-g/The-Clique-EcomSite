@@ -62,12 +62,6 @@ const AccountPage: React.FC = () => {
     }
   };
 
-  const token = localStorage.getItem("token");
-  if (!token) {
-    router.push("/login");
-  } else {
-  }
-
   return (
     <div
       className={`min-h-screen dark:bg-gray-900 dark:text-white bg-gray-100 text-gray-900

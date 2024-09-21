@@ -4,8 +4,6 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
@@ -14,8 +12,8 @@ import jakarta.persistence.Table;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(unique = true, nullable = false)
+    private String id;
 
     // @Column(unique = true, nullable = false)
     // private String username;
@@ -35,16 +33,16 @@ public class User {
     // @Column(name = "is_seller")
     // private boolean isSeller;
 
-    //@Column(name = "seller_description")
-    //private String sellerDescription;
+    // @Column(name = "seller_description")
+    // private String sellerDescription;
 
     // Getters and Setters
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -96,11 +94,11 @@ public class User {
     // isSeller = seller;
     // }
 
-    //public String getSellerDescription() {
-        //return sellerDescription;
-    //}
+    // public String getSellerDescription() {
+    // return sellerDescription;
+    // }
 
-    //public void setSellerDescription(String sellerDescription) {
-      //  this.sellerDescription = sellerDescription;
-   // }
+    // public void setSellerDescription(String sellerDescription) {
+    // this.sellerDescription = sellerDescription;
+    // }
 }

@@ -13,42 +13,32 @@ import ProductList from "./homeComponents/ProductList";
 import { Product, User } from "./homeComponents/types";
 
 const HomePage: React.FC = () => {
+  axios.defaults.withCredentials = true;
   const [products, setProducts] = useState<Product[]>([]);
   const [searchTerm] = useState("");
   const [wishlist, setWishlist] = useState<number[]>([]);
   const [cart, setCart] = useState<{ [key: number]: number }>({});
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-  const [isNewUser, setIsNewUser] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
-    const fetchUserProfile = async (token: string) => {
+    const fetchUserProfile = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/api/users/profile",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
+          "http://localhost:8080/api/users/profile"
         );
         setUser(response.data);
-        setIsNewUser(response.data.isNewUser);
-        fetchWishlist(token);
+        //fetchWishlist();
       } catch (error) {
         console.error("Error fetching user profile:", error);
-        localStorage.removeItem("token");
-        router.push("/login");
       }
     };
-    const token = localStorage.getItem("token");
-    if (!token) {
-      router.push("/login");
-    } else {
-      fetchUserProfile(token);
-      fetchProducts();
-    }
+
+    fetchUserProfile();
+    //fetchProducts();
   }, [router]);
 
   const fetchProducts = async () => {
@@ -68,11 +58,9 @@ const HomePage: React.FC = () => {
     }
   };
 
-  const fetchWishlist = async (token: string) => {
+  const fetchWishlist = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/wishlist", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.get("http://localhost:8080/api/wishlist");
       setWishlist(response.data.map((item: { id: number }) => item.id));
     } catch (error) {
       console.error("Error fetching wishlist:", error);
@@ -80,23 +68,12 @@ const HomePage: React.FC = () => {
   };
 
   const toggleWishlist = async (productId: number) => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
     try {
       if (wishlist.includes(productId)) {
-        await axios.delete(`http://localhost:8080/api/wishlist/${productId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        await axios.delete(`http://localhost:8080/api/wishlist/${productId}`);
         setWishlist((prev) => prev.filter((id) => id !== productId));
       } else {
-        await axios.post(
-          "http://localhost:8080/api/wishlist",
-          { productId },
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        await axios.post("http://localhost:8080/api/wishlist", { productId });
         setWishlist((prev) => [...prev, productId]);
       }
     } catch (error) {
@@ -131,11 +108,18 @@ const HomePage: React.FC = () => {
     setIsCheckoutOpen(true);
   };
 
-  
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    router.push("/login");
+  const handleLogout = async () => {
+    try {
+      await axios.post(
+        "http://localhost:8080/api/users/logout",
+        {},
+        { withCredentials: true }
+      );
+      setUser(null);
+      router.push("/login");
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
   };
 
   const filteredProducts = products.filter((product) =>
@@ -151,14 +135,6 @@ const HomePage: React.FC = () => {
         onLogout={handleLogout}
       />
       <main>
-        {isNewUser && (
-          <div className="bg-blue-600 text-white p-4">
-            <div className="container mx-auto">
-              Welcome to our store! Start shopping by browsing our products
-              below.
-            </div>
-          </div>
-        )}
         <HeroSection />
         <FeaturesSection />
         <ProductList

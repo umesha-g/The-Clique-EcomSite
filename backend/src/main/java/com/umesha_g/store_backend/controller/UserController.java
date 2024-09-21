@@ -4,94 +4,121 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.umesha_g.store_backend.model.User;
 import com.umesha_g.store_backend.service.UserService;
+import com.umesha_g.store_backend.util.JwtUtil;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
 
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
+
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> credentials) {
-        String email = credentials.get("email");
-        String password = credentials.get("password");
+    public ResponseEntity<?> login(@RequestBody Map<String, String> loginRequest, HttpServletResponse response) {
+        String email = loginRequest.get("email");
+        String password = loginRequest.get("password");
 
         User user = userService.findByEmail(email);
-        if (user != null && user.getPassword().equals(password)) {
-            // In a real application, you would use a proper JWT library
-            String token = "fake-jwt-token-" + email;
-            Map<String, String> response = new HashMap<>();
-            response.put("token", token);
-            return ResponseEntity.ok(response);
+        if (user != null && passwordEncoder.matches(password, user.getPassword())) {
+            String token = jwtUtil.generateToken(email);
+            userService.setTokenCookie(response, token);
+            return ResponseEntity.ok("Login successful");
         } else {
-            return ResponseEntity.badRequest().body("Invalid credentials");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
     }
 
     @GetMapping("/profile")
-    public ResponseEntity<?> getProfile(@RequestHeader("Authorization") String token) {
-        // In a real application, you would validate the JWT token
-        String email = token.replace("Bearer fake-jwt-token-", "");
+    public ResponseEntity<?> getProfile(HttpServletRequest request) {
+        System.out.println("profile endpoint hit");
+        String token = userService.getTokenFromCookie(request);
+        if (token == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token is missing");
+        }
+
+        String email = jwtUtil.extractEmail(token);
         User user = userService.findByEmail(email);
+
         if (user != null) {
             Map<String, String> profile = new HashMap<>();
             profile.put("email", user.getEmail());
             profile.put("fullName", user.getFullName());
             return ResponseEntity.ok(profile);
         } else {
-            return ResponseEntity.badRequest().body("User not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
     }
 
     @PutMapping("/profile")
-    public ResponseEntity<?> updateProfile(@RequestHeader("Authorization") String token,
-            @RequestBody Map<String, Object> updates) {
-        String email = token.replace("Bearer fake-jwt-token-", "");
+    public ResponseEntity<?> updateProfile(HttpServletRequest request, @RequestBody Map<String, String> updateRequest) {
+        String token = userService.getTokenFromCookie(request);
+        if (token == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token is missing");
+        }
+
+        String email = jwtUtil.extractEmail(token);
         User user = userService.findByEmail(email);
         if (user != null) {
-            if (updates.containsKey("fullName")) {
-                user.setFullName((String) updates.get("fullName"));
-            }
+            user.setFullName(updateRequest.get("fullName"));
             userService.save(user);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok("Profile updated successfully");
         } else {
-            return ResponseEntity.badRequest().body("User not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody User user) {
+    public ResponseEntity<?> register(@RequestBody User user, HttpServletResponse response) {
         if (userService.existsByEmail(user.getEmail())) {
-            return ResponseEntity.badRequest().body("Email already exists");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already exists");
         }
-        // if (userService.existsByUsername(user.getUsername())) {
-        // return ResponseEntity.badRequest().body("Username already exists");
-        // }
-
-        // In a real application, you should hash the password before saving
+        String id = userService.generateUserId();
+        user.setId(id);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setCreatedAt(java.time.LocalDateTime.now());
         User savedUser = userService.save(user);
 
-        // Generate token
-        String token = "fake-jwt-token-" + savedUser.getEmail();
-        Map<String, Object> response = new HashMap<>();
-        response.put("token", token);
-        response.put("user", savedUser);
+        String token = jwtUtil.generateToken(savedUser.getEmail());
+        userService.setTokenCookie(response, token);
 
-        return ResponseEntity.ok(response);
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("message", "User registered successfully");
+        responseBody.put("email", savedUser.getEmail());
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+        Cookie cookie = new Cookie("token", null);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+
+        return ResponseEntity.ok("Logout successful");
+    }
+
 }

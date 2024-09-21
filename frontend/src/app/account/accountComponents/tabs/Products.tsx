@@ -27,7 +27,7 @@ export const Products = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = document.cookie.split("=")[1];
 
     const fetchUserProfile = async (token: string) => {
       try {
@@ -41,7 +41,6 @@ export const Products = () => {
         setIsNewUser(response.data.isNewUser);
       } catch (error) {
         console.error("Error fetching user profile:", error);
-        localStorage.removeItem("token");
         router.push("/login");
       }
     };

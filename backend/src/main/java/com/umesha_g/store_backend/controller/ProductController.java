@@ -20,6 +20,7 @@ import com.umesha_g.store_backend.model.Product;
 import com.umesha_g.store_backend.model.User;
 import com.umesha_g.store_backend.service.ProductService;
 import com.umesha_g.store_backend.service.UserService;
+import com.umesha_g.store_backend.util.JwtUtil;
 
 @RestController
 @RequestMapping("/api/products")
@@ -30,11 +31,14 @@ public class ProductController {
     private ProductService productService;
 
     @Autowired
+    private JwtUtil jwtUtil;
+
+    @Autowired
     private UserService userService;
 
     @PostMapping
     public ResponseEntity<?> createProduct(@RequestBody Product product, @RequestHeader("Authorization") String token) {
-        String email = token.replace("Bearer fake-jwt-token-", "");
+        String email = jwtUtil.extractEmail(token.replace("Bearer ", ""));
         User seller = userService.findByEmail(email);
 
         product.setSeller(seller);
@@ -44,7 +48,7 @@ public class ProductController {
 
     @GetMapping("/seller")
     public ResponseEntity<?> getSellerProducts(@RequestHeader("Authorization") String token) {
-        String email = token.replace("Bearer fake-jwt-token-", "");
+        String email = jwtUtil.extractEmail(token.replace("Bearer ", ""));
         User seller = userService.findByEmail(email);
 
         List<Product> products = productService.findBySeller(seller);
@@ -54,7 +58,7 @@ public class ProductController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateProduct(@PathVariable Long id, @RequestBody Product product,
             @RequestHeader("Authorization") String token) {
-        String email = token.replace("Bearer fake-jwt-token-", "");
+        String email = jwtUtil.extractEmail(token.replace("Bearer ", ""));
         User seller = userService.findByEmail(email);
 
         Product existingProduct = productService.findById(id);
@@ -69,7 +73,7 @@ public class ProductController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteProduct(@PathVariable Long id, @RequestHeader("Authorization") String token) {
-        String email = token.replace("Bearer fake-jwt-token-", "");
+        String email = jwtUtil.extractEmail(token.replace("Bearer ", ""));
         User seller = userService.findByEmail(email);
 
         Product existingProduct = productService.findById(id);

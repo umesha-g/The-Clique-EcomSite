@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
-
 interface Product {
   id: number;
   name: string;
@@ -22,7 +21,7 @@ const Dashboard: React.FC = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = document.cookie.split("=")[1];
     if (!token) {
       router.push("/login");
     } else {
@@ -32,11 +31,11 @@ const Dashboard: React.FC = () => {
 
   const fetchProducts = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = document.cookie.split("=")[1];
       const response = await axios.get(
         "http://localhost:8080/api/products/seller",
         {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${token}`, withCredentials: true },
         }
       );
       setProducts(response.data);
@@ -54,18 +53,21 @@ const Dashboard: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem("token");
+      const token = document.cookie.split("=")[1];
       if (isEditing) {
         await axios.put(
           `http://localhost:8080/api/products/${isEditing}`,
           newProduct,
           {
-            headers: { Authorization: `Bearer ${token}` },
+            headers: {
+              Authorization: `Bearer ${token}`,
+              withCredentials: true,
+            },
           }
         );
       } else {
         await axios.post("http://localhost:8080/api/products", newProduct, {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${token}`, withCredentials: true },
         });
       }
       setNewProduct({});
@@ -85,9 +87,9 @@ const Dashboard: React.FC = () => {
 
   const handleDelete = async (id: number) => {
     try {
-      const token = localStorage.getItem("token");
+      const token = document.cookie.split("=")[1];
       await axios.delete(`http://localhost:8080/api/products/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}`, withCredentials: true },
       });
       fetchProducts();
     } catch (error) {

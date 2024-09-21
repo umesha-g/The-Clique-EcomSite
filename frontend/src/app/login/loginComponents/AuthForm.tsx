@@ -24,35 +24,31 @@ const AuthForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    let response;
     try {
       if (!isSignUp) {
-        // Handle Login
-        const response = await axios.post(
+        response = await axios.post(
           "http://localhost:8080/api/users/login",
           {
             email,
             password,
-            staySignedIn,
-          }
+          },
+          { withCredentials: true }
         );
-
-        localStorage.setItem("token", response.data.token);
-        if (staySignedIn) {
-          localStorage.setItem("refreshToken", response.data.refreshToken);
-        }
       } else {
-        // Handle Register
-        const response = await axios.post(
+        response = await axios.post(
           "http://localhost:8080/api/users/register",
           {
             email,
             password,
             fullName,
-          }
+          },
+          { withCredentials: true }
         );
-        localStorage.setItem("token", response.data.token);
       }
-      router.push("/home"); // Redirect to home page
+      if (response.status === 200) {
+        router.push("/home");
+      }
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         setError(error.response.data);
