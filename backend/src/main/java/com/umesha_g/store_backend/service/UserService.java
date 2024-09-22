@@ -33,12 +33,14 @@ public class UserService {
     @Autowired
     private IdGen idGen;
 
-    public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
+    public User findByEmail(String email) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        return optionalUser.orElse(null);
     }
 
-    public Optional<User> findById(String id) {
-        return userRepository.findById(id);
+    public User findById(String id) {
+        Optional<User> optionalUser = userRepository.findById(id);
+        return optionalUser.orElse(null);
     }
 
     public User save(User user) {
@@ -51,9 +53,9 @@ public class UserService {
 
     public Map<String, Object> login(String email, String password) {
         Map<String, Object> result = new HashMap<>();
-        Optional<User> userOpt = findByEmail(email);
+        User user = findByEmail(email);
 
-        if (userOpt.isPresent() && passwordEncoder.matches(password, userOpt.get().getPassword())) {
+        if (user != null && passwordEncoder.matches(password, user.getPassword())) {
             String token = jwtUtil.generateToken(email);
             result.put("success", true);
             result.put("token", token);
@@ -72,11 +74,10 @@ public class UserService {
     }
 
     public Map<String, String> getUserProfile(String email) {
-        Optional<User> userOpt = findByEmail(email);
+        User user = findByEmail(email);
         Map<String, String> profile = new HashMap<>();
 
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
+        if (user != null) {
             profile.put("email", user.getEmail());
             profile.put("fullName", user.getFullName());
         }
@@ -85,10 +86,9 @@ public class UserService {
     }
 
     public boolean updateUserProfile(String email, String fullName) {
-        Optional<User> userOpt = findByEmail(email);
+        User user = findByEmail(email);
 
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
+        if (user != null) {
             user.setFullName(fullName);
             save(user);
             return true;
@@ -99,8 +99,8 @@ public class UserService {
 
     public void setTokenCookie(HttpServletResponse response, String token) {
         Cookie cookie = new Cookie("token", token);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
+        cookie.setHttpOnly(false);
+        cookie.setSecure(false);
         cookie.setPath("/");
         cookie.setMaxAge(7 * 24 * 60 * 60); // 7 days
         cookie.setAttribute("SameSite", "Strict");
@@ -121,8 +121,8 @@ public class UserService {
 
     public void clearTokenCookie(HttpServletResponse response) {
         Cookie cookie = new Cookie("token", null);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
+        cookie.setHttpOnly(false);
+        cookie.setSecure(false);
         cookie.setPath("/");
         cookie.setMaxAge(0);
         response.addCookie(cookie);

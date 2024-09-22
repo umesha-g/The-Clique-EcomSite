@@ -36,7 +36,6 @@ public class ProductService {
         return productRepository.findAll();
     }
 
-
     // Search products by query
     public List<Product> searchProducts(String query) {
         return productRepository.findByNameContainingIgnoreCase(query);

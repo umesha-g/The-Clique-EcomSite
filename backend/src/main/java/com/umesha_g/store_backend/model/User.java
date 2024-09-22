@@ -8,6 +8,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -27,20 +28,17 @@ public class User {
     @Column(name = "full_name")
     private String fullName;
 
-    @OneToMany(mappedBy = "wishlist", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Wishlist> items;
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Wishlist wishlist;
 
-    @OneToMany(mappedBy = "Address", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Address> Address;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Address> addresses;
+
+    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Product> products;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
-    // @Column(name = "is_seller")
-    // private boolean isSeller;
-
-    // @Column(name = "seller_description")
-    // private String sellerDescription;
 
     // Getters and Setters
 
@@ -84,19 +82,27 @@ public class User {
         this.createdAt = createdAt;
     }
 
-    public List<Wishlist> getItems() {
-        return items;
+    public Wishlist getWishlist() {
+        return wishlist;
     }
 
-    public void setItems(List<Wishlist> items) {
-        this.items = items;
+    public void setWishlist(Wishlist wishlist) {
+        this.wishlist = wishlist;
     }
 
-    // public String getSellerDescription() {
-    // return sellerDescription;
-    // }
+    public List<Address> getAddresses() {
+        return addresses;
+    }
 
-    // public void setSellerDescription(String sellerDescription) {
-    // this.sellerDescription = sellerDescription;
-    // }
+    public void setAddresses(List<Address> addresses) {
+        this.addresses = addresses;
+    }
+
+    public List<Product> getProducts() {
+        return products;
+    }
+
+    public void setProducts(List<Product> products) {
+        this.products = products;
+    }
 }

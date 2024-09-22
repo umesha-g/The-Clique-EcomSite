@@ -1,7 +1,6 @@
 package com.umesha_g.store_backend.model;
 
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 import jakarta.persistence.Entity;
@@ -22,7 +21,7 @@ public class Wishlist {
 
     @OneToOne
     @JoinColumn(name = "user_id")
-    private Optional<User> user;
+    private User user;
 
     @ManyToMany
     @JoinTable(name = "wishlist_products", joinColumns = @JoinColumn(name = "wishlist_id"), inverseJoinColumns = @JoinColumn(name = "product_id"))
@@ -38,11 +37,11 @@ public class Wishlist {
         this.id = id;
     }
 
-    public Optional<User> getUser() {
+    public User getUser() {
         return user;
     }
 
-    public void setUser(Optional<User> user) {
+    public void setUser(User user) {
         this.user = user;
     }
 

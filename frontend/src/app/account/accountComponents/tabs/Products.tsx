@@ -1,4 +1,5 @@
 import axios from "axios";
+import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -27,8 +28,7 @@ export const Products = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const token = document.cookie.split("=")[1];
-
+    const token = Cookies.get("token");
     const fetchUserProfile = async (token: string) => {
       try {
         const response = await axios.get(
@@ -41,7 +41,6 @@ export const Products = () => {
         setIsNewUser(response.data.isNewUser);
       } catch (error) {
         console.error("Error fetching user profile:", error);
-        router.push("/login");
       }
     };
 

@@ -76,7 +76,6 @@ public class UserController {
         if (userService.existsByEmail(user.getEmail())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already exists");
         }
-
         User savedUser = userService.register(user);
         String token = jwtUtil.generateToken(savedUser.getEmail());
         userService.setTokenCookie(response, token);

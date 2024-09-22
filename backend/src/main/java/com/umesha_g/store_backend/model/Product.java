@@ -5,8 +5,6 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -17,29 +15,29 @@ import jakarta.persistence.Table;
 public class Product {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "Product_Id", nullable = false)
     private String id;
 
-    @Column(nullable = false)
+    @Column(name = "Product_Name", nullable = false)
     private String name;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "Product_Description", columnDefinition = "TEXT")
     private String description;
 
-    @Column(nullable = false)
+    @Column(name = "Product_Price", nullable = false)
     private BigDecimal price;
 
-    @Column(name = "image_url")
+    @Column(name = "Product_image_url")
     private String imageUrl;
 
     @ManyToOne
-    @JoinColumn(name = "seller_id", nullable = false)
+    @JoinColumn(name = "Product_seller_id", nullable = false)
     private User seller;
 
-    @Column(name = "created_at")
+    @Column(name = "Product_created_at")
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
+    @Column(name = "Product_updated_at")
     private LocalDateTime updatedAt;
 
     // Getters and setters

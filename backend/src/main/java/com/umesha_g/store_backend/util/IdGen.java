@@ -21,7 +21,7 @@ public class IdGen {
     @Autowired
     private AddressService addressService;
 
-    private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    private final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     private final SecureRandom random = new SecureRandom();
 
     public String generateId(int idLength, String serviceName) {

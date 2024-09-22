@@ -61,13 +61,13 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateProduct(@PathVariable Long id, @RequestBody Product product,
+    public ResponseEntity<?> updateProduct(@PathVariable String id, @RequestBody Product product,
             @RequestHeader("Authorization") String token) {
         String email = jwtUtil.extractEmail(token.replace("Bearer ", ""));
         User seller = userService.findByEmail(email);
 
         Product existingProduct = productService.findById(id);
-        if (existingProduct == null || !existingProduct.getSeller().getId().equals(seller.getId())) {
+        if (existingProduct == null || !existingProduct.getSeller().equals(seller)) {
             return ResponseEntity.badRequest().body("Product not found or not owned by the seller");
         }
         product.setId(id);
@@ -77,12 +77,12 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteProduct(@PathVariable Long id, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> deleteProduct(@PathVariable String id, @RequestHeader("Authorization") String token) {
         String email = jwtUtil.extractEmail(token.replace("Bearer ", ""));
         User seller = userService.findByEmail(email);
 
         Product existingProduct = productService.findById(id);
-        if (existingProduct == null || !existingProduct.getSeller().getId().equals(seller.getId())) {
+        if (existingProduct == null || !existingProduct.getSeller().equals(seller)) {
             return ResponseEntity.badRequest().body("Product not found or not owned by the seller");
         }
         productService.deleteById(id);

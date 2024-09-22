@@ -37,7 +37,7 @@ const AccountPage: React.FC = () => {
     };
 
     fetchData();
-  }, []);
+  }, [router]);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 

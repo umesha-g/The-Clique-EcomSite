@@ -25,7 +25,7 @@ public class WishlistService {
     private ProductService productService;
 
     public void addProductToWishlist(String userId, String productId) {
-        Optional<User> user = userService.findById(userId);
+        User user = userService.findById(userId);
         Product product = productService.findById(productId);
 
         if (user != null && product != null) {
@@ -57,7 +57,7 @@ public class WishlistService {
                 .orElse(Collections.emptySet());
     }
 
-    private Wishlist createNewWishlist(Optional<User> user) {
+    private Wishlist createNewWishlist(User user) {
         Wishlist wishlist = new Wishlist();
         wishlist.setUser(user);
         return wishlistRepository.save(wishlist);

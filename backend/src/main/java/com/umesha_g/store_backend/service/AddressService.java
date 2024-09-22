@@ -2,7 +2,6 @@ package com.umesha_g.store_backend.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,7 +24,7 @@ public class AddressService {
     private IdGen idGen;
 
     public Address addAddress(String userId, Address address) {
-        Optional<User> user = userService.findById(userId);
+        User user = userService.findById(userId);
         if (user != null) {
             address.setId(idGen.generateId(8, "Address"));
             address.setUser(user);
