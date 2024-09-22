@@ -1,16 +1,17 @@
 package com.umesha_g.store_backend.model;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToOne;
 
 @Entity
 public class Wishlist {
@@ -19,16 +20,13 @@ public class Wishlist {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
-
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "user_id")
-    private User user; // Assuming you have a User entity representing the buyer
+    private Optional<User> user;
 
-    private LocalDateTime createdAt;
-
-    @OneToMany(mappedBy = "wishlist", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<WishlistItem> items;
+    @ManyToMany
+    @JoinTable(name = "wishlist_products", joinColumns = @JoinColumn(name = "wishlist_id"), inverseJoinColumns = @JoinColumn(name = "product_id"))
+    private Set<Product> products = new HashSet<>();
 
     // Getters and setters
 
@@ -40,35 +38,27 @@ public class Wishlist {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public User getUser() {
+    public Optional<User> getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(Optional<User> user) {
         this.user = user;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public Set<Product> getProducts() {
+        return products;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
+    public void setProducts(Set<Product> products) {
+        this.products = products;
     }
 
-    public List<WishlistItem> getItems() {
-        return items;
+    public void addProduct(Product product) {
+        this.products.add(product);
     }
 
-    public void setItems(List<WishlistItem> items) {
-        this.items = items;
+    public void removeProduct(Product product) {
+        this.products.remove(product);
     }
 }

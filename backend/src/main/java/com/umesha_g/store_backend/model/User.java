@@ -1,10 +1,13 @@
 package com.umesha_g.store_backend.model;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -15,9 +18,6 @@ public class User {
     @Column(unique = true, nullable = false)
     private String id;
 
-    // @Column(unique = true, nullable = false)
-    // private String username;
-
     @Column(unique = true, nullable = false)
     private String email;
 
@@ -26,6 +26,12 @@ public class User {
 
     @Column(name = "full_name")
     private String fullName;
+
+    @OneToMany(mappedBy = "wishlist", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Wishlist> items;
+
+    @OneToMany(mappedBy = "Address", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Address> Address;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -45,14 +51,6 @@ public class User {
     public void setId(String id) {
         this.id = id;
     }
-
-    // public String getUsername() {
-    // return username;
-    // }
-
-    // public void setUsername(String username) {
-    // this.username = username;
-    // }
 
     public String getEmail() {
         return email;
@@ -86,13 +84,13 @@ public class User {
         this.createdAt = createdAt;
     }
 
-    // public boolean isSeller() {
-    // return isSeller;
-    // }
+    public List<Wishlist> getItems() {
+        return items;
+    }
 
-    // public void setSeller(boolean seller) {
-    // isSeller = seller;
-    // }
+    public void setItems(List<Wishlist> items) {
+        this.items = items;
+    }
 
     // public String getSellerDescription() {
     // return sellerDescription;

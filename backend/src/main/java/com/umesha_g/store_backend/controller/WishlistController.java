@@ -1,6 +1,6 @@
 package com.umesha_g.store_backend.controller;
 
-import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,12 +9,10 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.umesha_g.store_backend.model.Wishlist;
-import com.umesha_g.store_backend.model.WishlistItem;
+import com.umesha_g.store_backend.model.Product;
 import com.umesha_g.store_backend.service.WishlistService;
 
 @RestController
@@ -24,31 +22,20 @@ public class WishlistController {
     @Autowired
     private WishlistService wishlistService;
 
-    @GetMapping
-    public ResponseEntity<List<Wishlist>> getAllWishlists() {
-        return ResponseEntity.ok(wishlistService.getAllWishlists());
+    @GetMapping("/{userId}")
+    public ResponseEntity<Set<Product>> getWishlist(@PathVariable String userId) {
+        return ResponseEntity.ok(wishlistService.getWishlistProducts(userId));
     }
 
-    @PostMapping
-    public ResponseEntity<Wishlist> createWishlist(@RequestBody Wishlist wishlist) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(wishlistService.createWishlist(wishlist));
-    }
-
-    @PostMapping("/{wishlistId}/items")
-    public ResponseEntity<Void> addItemToWishlist(@PathVariable Long wishlistId, @RequestBody WishlistItem item) {
-        wishlistService.addItemToWishlist(wishlistId, item);
+    @PostMapping("/{userId}/{productId}")
+    public ResponseEntity<Void> addProductToWishlist(@PathVariable String userId, @PathVariable String productId) {
+        wishlistService.addProductToWishlist(userId, productId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @DeleteMapping("/items/{itemId}")
-    public ResponseEntity<Void> removeItemFromWishlist(@PathVariable Long itemId) {
-        wishlistService.removeItemFromWishlist(itemId);
-        return ResponseEntity.noContent().build();
-    }
-
-    @DeleteMapping("/{wishlistId}")
-    public ResponseEntity<Void> deleteWishlist(@PathVariable Long wishlistId) {
-        wishlistService.deleteWishlist(wishlistId);
+    @DeleteMapping("/{userId}/{productId}")
+    public ResponseEntity<Void> removeProductFromWishlist(@PathVariable String userId, @PathVariable String productId) {
+        wishlistService.removeProductFromWishlist(userId, productId);
         return ResponseEntity.noContent().build();
     }
 }

@@ -24,17 +24,18 @@ public class ProductService {
         return productRepository.findBySeller(seller);
     }
 
-    public Product findById(Long id) {
+    public Product findById(String id) {
         return productRepository.findById(id).orElse(null);
     }
 
-    public void deleteById(Long id) {
+    public void deleteById(String id) {
         productRepository.deleteById(id);
     }
 
     public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
+
 
     // Search products by query
     public List<Product> searchProducts(String query) {

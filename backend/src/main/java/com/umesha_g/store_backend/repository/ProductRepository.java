@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.umesha_g.store_backend.model.Product;
 import com.umesha_g.store_backend.model.User;
 
-public interface ProductRepository extends JpaRepository<Product, Long> {
+public interface ProductRepository extends JpaRepository<Product, String> {
     List<Product> findBySeller(User seller);
 
     // Search for products by name (case-insensitive)

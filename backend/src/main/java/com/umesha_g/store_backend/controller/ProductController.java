@@ -36,6 +36,11 @@ public class ProductController {
     @Autowired
     private UserService userService;
 
+    @GetMapping
+    public List<Product> getAllProducts() {
+        return productService.getAllProducts();
+    }
+
     @PostMapping
     public ResponseEntity<?> createProduct(@RequestBody Product product, @RequestHeader("Authorization") String token) {
         String email = jwtUtil.extractEmail(token.replace("Bearer ", ""));
@@ -82,11 +87,6 @@ public class ProductController {
         }
         productService.deleteById(id);
         return ResponseEntity.ok().build();
-    }
-
-    @GetMapping
-    public List<Product> getAllProducts() {
-        return productService.getAllProducts();
     }
 
     @GetMapping("/search")

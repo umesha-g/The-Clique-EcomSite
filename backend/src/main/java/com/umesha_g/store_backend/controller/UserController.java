@@ -1,12 +1,10 @@
 package com.umesha_g.store_backend.controller;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -18,7 +16,6 @@ import com.umesha_g.store_backend.model.User;
 import com.umesha_g.store_backend.service.UserService;
 import com.umesha_g.store_backend.util.JwtUtil;
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -32,18 +29,12 @@ public class UserController {
     @Autowired
     private JwtUtil jwtUtil;
 
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
-
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> loginRequest, HttpServletResponse response) {
-        String email = loginRequest.get("email");
-        String password = loginRequest.get("password");
+        Map<String, Object> result = userService.login(loginRequest.get("email"), loginRequest.get("password"));
 
-        User user = userService.findByEmail(email);
-        if (user != null && passwordEncoder.matches(password, user.getPassword())) {
-            String token = jwtUtil.generateToken(email);
-            userService.setTokenCookie(response, token);
+        if ((Boolean) result.get("success")) {
+            userService.setTokenCookie(response, (String) result.get("token"));
             return ResponseEntity.ok("Login successful");
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
@@ -52,23 +43,17 @@ public class UserController {
 
     @GetMapping("/profile")
     public ResponseEntity<?> getProfile(HttpServletRequest request) {
-        System.out.println("profile endpoint hit");
         String token = userService.getTokenFromCookie(request);
         if (token == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token is missing");
         }
 
         String email = jwtUtil.extractEmail(token);
-        User user = userService.findByEmail(email);
+        Map<String, String> profile = userService.getUserProfile(email);
 
-        if (user != null) {
-            Map<String, String> profile = new HashMap<>();
-            profile.put("email", user.getEmail());
-            profile.put("fullName", user.getFullName());
-            return ResponseEntity.ok(profile);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        }
+        return profile.isEmpty()
+                ? ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found")
+                : ResponseEntity.ok(profile);
     }
 
     @PutMapping("/profile")
@@ -79,14 +64,11 @@ public class UserController {
         }
 
         String email = jwtUtil.extractEmail(token);
-        User user = userService.findByEmail(email);
-        if (user != null) {
-            user.setFullName(updateRequest.get("fullName"));
-            userService.save(user);
-            return ResponseEntity.ok("Profile updated successfully");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        }
+        boolean updated = userService.updateUserProfile(email, updateRequest.get("fullName"));
+
+        return updated
+                ? ResponseEntity.ok("Profile updated successfully")
+                : ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
     }
 
     @PostMapping("/register")
@@ -94,31 +76,19 @@ public class UserController {
         if (userService.existsByEmail(user.getEmail())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already exists");
         }
-        String id = userService.generateUserId();
-        user.setId(id);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setCreatedAt(java.time.LocalDateTime.now());
-        User savedUser = userService.save(user);
 
+        User savedUser = userService.register(user);
         String token = jwtUtil.generateToken(savedUser.getEmail());
         userService.setTokenCookie(response, token);
 
-        Map<String, Object> responseBody = new HashMap<>();
-        responseBody.put("message", "User registered successfully");
-        responseBody.put("email", savedUser.getEmail());
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
+        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
+                "message", "User registered successfully",
+                "email", savedUser.getEmail()));
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
-        Cookie cookie = new Cookie("token", null);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(0);
-        response.addCookie(cookie);
-
+    public ResponseEntity<?> logout(HttpServletResponse response) {
+        userService.clearTokenCookie(response);
         return ResponseEntity.ok("Logout successful");
     }
-
 }
