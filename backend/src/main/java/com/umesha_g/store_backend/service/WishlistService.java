@@ -1,16 +1,16 @@
 package com.umesha_g.store_backend.service;
 
-import java.util.Collections;
-import java.util.Optional;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.umesha_g.store_backend.model.Product;
-import com.umesha_g.store_backend.model.User;
 import com.umesha_g.store_backend.model.Wishlist;
 import com.umesha_g.store_backend.repository.WishlistRepository;
+import com.umesha_g.store_backend.util.IdGen;
 
 @Service
 public class WishlistService {
@@ -19,48 +19,34 @@ public class WishlistService {
     private WishlistRepository wishlistRepository;
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
     private ProductService productService;
 
+    @Autowired
+    private IdGen idGen;
+
     public void addProductToWishlist(String userId, String productId) {
-        User user = userService.findById(userId);
-        Product product = productService.findById(productId);
-
-        if (user != null && product != null) {
-            Wishlist wishlist = wishlistRepository.findByUserId(userId)
-                    .orElseGet(() -> createNewWishlist(user));
-
-            if (!wishlistRepository.existsByUserIdAndProductId(userId, productId)) {
-                wishlist.addProduct(product);
-                wishlistRepository.save(wishlist);
-            }
-        }
-    }
-
-    public void removeProductFromWishlist(String userId, String productId) {
-        Optional<Wishlist> wishlistOpt = wishlistRepository.findByUserId(userId);
-        Optional<Product> productOpt = Optional.ofNullable(productService.findById(productId));
-
-        if (wishlistOpt.isPresent() && productOpt.isPresent()) {
-            Wishlist wishlist = wishlistOpt.get();
-            Product product = productOpt.get();
-            wishlist.removeProduct(product);
+        if (!wishlistRepository.findByUserIdAndProductId(userId, productId).isPresent()) {
+            Wishlist wishlist = new Wishlist();
+            wishlist.setId(idGen.generateId(8, "Wishlist"));
+            wishlist.setUserId(userId);
+            wishlist.setProductId(productId);
             wishlistRepository.save(wishlist);
         }
     }
 
+    public void removeProductFromWishlist(String userId, String productId) {
+        wishlistRepository.deleteByUserIdAndProductId(userId, productId);
+    }
+
     public Set<Product> getWishlistProducts(String userId) {
-        return wishlistRepository.findByUserId(userId)
-                .map(Wishlist::getProducts)
-                .orElse(Collections.emptySet());
+        List<Wishlist> wishlistItems = wishlistRepository.findByUserId(userId);
+        return wishlistItems.stream()
+                .map(item -> productService.findById(item.getProductId()))
+                .collect(Collectors.toSet());
     }
 
-    private Wishlist createNewWishlist(User user) {
-        Wishlist wishlist = new Wishlist();
-        wishlist.setUser(user);
-        return wishlistRepository.save(wishlist);
+    // New method to find a wishlist item by its id
+    public Wishlist findById(String id) {
+        return wishlistRepository.findById(id).orElse(null);
     }
-
 }

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import com.umesha_g.store_backend.service.AddressService;
 import com.umesha_g.store_backend.service.ProductService;
 import com.umesha_g.store_backend.service.UserService;
+import com.umesha_g.store_backend.service.WishlistService;
 
 @Component
 public class IdGen {
@@ -20,6 +21,9 @@ public class IdGen {
 
     @Autowired
     private AddressService addressService;
+
+    @Autowired
+    private WishlistService wishlistService;
 
     private final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     private final SecureRandom random = new SecureRandom();
@@ -46,6 +50,7 @@ public class IdGen {
             case "User" -> userService.findById(id) != null;
             case "Product" -> productService.findById(id) != null;
             case "Address" -> addressService.getAddressById(id) != null;
+            case "Wishlist" -> wishlistService.findById(id) != null;
             default -> throw new IllegalArgumentException("Invalid service name: " + serviceName);
         };
     }

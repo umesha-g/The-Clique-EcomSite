@@ -3,7 +3,6 @@ package com.umesha_g.store_backend.service;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -34,13 +33,11 @@ public class UserService {
     private IdGen idGen;
 
     public User findByEmail(String email) {
-        Optional<User> optionalUser = userRepository.findByEmail(email);
-        return optionalUser.orElse(null);
+        return userRepository.findByEmail(email).orElse(null);
     }
 
     public User findById(String id) {
-        Optional<User> optionalUser = userRepository.findById(id);
-        return optionalUser.orElse(null);
+        return userRepository.findById(id).orElse(null);
     }
 
     public User save(User user) {
