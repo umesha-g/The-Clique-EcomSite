@@ -8,7 +8,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -28,8 +27,8 @@ public class User {
     @Column(name = "full_name")
     private String fullName;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Wishlist wishlist;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Wishlist> wishlistItems;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Address> addresses;
@@ -82,12 +81,12 @@ public class User {
         this.createdAt = createdAt;
     }
 
-    public Wishlist getWishlist() {
-        return wishlist;
+    public List<Wishlist> getWishlistItems() {
+        return wishlistItems;
     }
 
-    public void setWishlist(Wishlist wishlist) {
-        this.wishlist = wishlist;
+    public void setWishlistItems(List<Wishlist> wishlistItems) {
+        this.wishlistItems = wishlistItems;
     }
 
     public List<Address> getAddresses() {

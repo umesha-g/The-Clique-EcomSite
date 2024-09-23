@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.umesha_g.store_backend.model.Product;
+import com.umesha_g.store_backend.model.Wishlist;
 import com.umesha_g.store_backend.service.WishlistService;
 
 @RestController
@@ -37,5 +38,10 @@ public class WishlistController {
     public ResponseEntity<Void> removeProductFromWishlist(@PathVariable String userId, @PathVariable String productId) {
         wishlistService.removeProductFromWishlist(userId, productId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/item/{id}")
+    public ResponseEntity<Wishlist> getWishlistItem(@PathVariable String id) {
+        return ResponseEntity.ok(wishlistService.findById(id));
     }
 }

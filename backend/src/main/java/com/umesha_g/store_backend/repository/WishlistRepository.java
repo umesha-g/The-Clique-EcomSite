@@ -6,14 +6,16 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import com.umesha_g.store_backend.model.Product;
+import com.umesha_g.store_backend.model.User;
 import com.umesha_g.store_backend.model.Wishlist;
 
 @Repository
 public interface WishlistRepository extends JpaRepository<Wishlist, String> {
 
-    List<Wishlist> findByUserId(String userId);
+    List<Wishlist> findByUser(User user);
 
-    Optional<Wishlist> findByUserIdAndProductId(String userId, String productId);
+    Optional<Wishlist> findByUserAndProduct(User user, Product product);
 
-    void deleteByUserIdAndProductId(String userId, String productId);
+    void deleteByUserAndProduct(User user, Product product);
 }
