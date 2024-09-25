@@ -3,6 +3,8 @@ package com.umesha_g.store_backend.model;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,24 +18,30 @@ public class User {
 
     @Id
     @Column(unique = true, nullable = false)
+    @JsonIgnore
     private String id;
 
     @Column(unique = true, nullable = false)
+    @JsonIgnore
     private String email;
 
     @Column(nullable = false)
+    @JsonIgnore
     private String password;
 
     @Column(name = "full_name")
     private String fullName;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Wishlist> wishlistItems;
+    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Product> wishlistItems;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Address> addresses;
 
     @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Product> products;
 
     @Column(name = "created_at")
@@ -81,11 +89,11 @@ public class User {
         this.createdAt = createdAt;
     }
 
-    public List<Wishlist> getWishlistItems() {
+    public List<Product> getWishlistItems() {
         return wishlistItems;
     }
 
-    public void setWishlistItems(List<Wishlist> wishlistItems) {
+    public void setWishlistItems(List<Product> wishlistItems) {
         this.wishlistItems = wishlistItems;
     }
 

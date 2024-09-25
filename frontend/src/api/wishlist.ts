@@ -1,20 +1,27 @@
 import { API_URL } from "@/utils/config";
 import axios from "axios";
-import { fetchUserProfile } from "./users";
 
-export const fetchWishlist = async () => {
-  try {
-    const response = await axios.get(`${API_URL}/wishlist/${getUserId()}`);
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching wishlist:", error);
-    return [];
-  }
+interface Product {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  imageUrl: string;
+}
+
+const api = axios.create({
+  baseURL: API_URL,
+  withCredentials: true,
+});
+
+export const fetchWishlist = async (): Promise<Product[]> => {
+  const response = await api.get<Product[]>("/wishlist");
+  return response.data;
 };
 
 export const removeFromWishlist = async (productId: string) => {
   try {
-    await axios.delete(`${API_URL}/wishlist/${getUserId()}/${productId}`);
+    await api.delete(`/wishlist/${productId}`);
     return true;
   } catch (error) {
     console.error("Error removing from wishlist:", error);
@@ -22,15 +29,24 @@ export const removeFromWishlist = async (productId: string) => {
   }
 };
 
-const getUserId = async () => {
+// Add product to wishlist
+export const addProductToWishlist = async (productId: string) => {
   try {
-    const userProfile = await fetchUserProfile();
-    if (userProfile) {
-      const userId = userProfile.id;
-      return userId;
-    }
+    await api.post(`/wishlist/${productId}`);
+    return true;
   } catch (error) {
-    console.error("No user profile found.");
-    return null;
+    console.error("Error adding product to wishlist:", error);
+    return false;
   }
 };
+
+// Fetch specific wishlist item by ID
+/*export const getWishlistItem = async (itemId: string): Promise<Product> => {
+  try {
+    const response = await api.get(`/wishlist/item/${itemId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching wishlist item:", error);
+    return null;
+  }
+};*/

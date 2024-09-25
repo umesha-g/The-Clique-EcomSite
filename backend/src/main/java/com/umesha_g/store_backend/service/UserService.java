@@ -14,7 +14,6 @@ import com.umesha_g.store_backend.util.IdGen;
 import com.umesha_g.store_backend.util.JwtUtil;
 
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Service
@@ -54,20 +53,25 @@ public class UserService {
 
         if (user != null && passwordEncoder.matches(password, user.getPassword())) {
             String token = jwtUtil.generateToken(email);
-            result.put("success", true);
-            result.put("token", token);
+            result.put("isSuccess", true);
+            result.put("userAuthToken", token);
         } else {
-            result.put("success", false);
+            result.put("isSuccess", false);
         }
 
         return result;
     }
 
-    public User register(User user) {
-        user.setId(idGen.generateId(8, "User"));
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setCreatedAt(LocalDateTime.now());
-        return save(user);
+    public User register(String Email, String Password, String Fullname) {
+        User newUser = new User();
+
+        newUser.setEmail(Email);
+        newUser.setFullName(Fullname);
+        newUser.setId(idGen.generateId(8, "User"));
+        newUser.setPassword(passwordEncoder.encode(Password));
+        newUser.setCreatedAt(LocalDateTime.now());
+        return save(newUser);
+
     }
 
     public Map<String, String> getUserProfile(String email) {
@@ -95,7 +99,7 @@ public class UserService {
     }
 
     public void setTokenCookie(HttpServletResponse response, String token) {
-        Cookie cookie = new Cookie("token", token);
+        Cookie cookie = new Cookie("userAuthToken", token);
         cookie.setHttpOnly(false);
         cookie.setSecure(false);
         cookie.setPath("/");
@@ -104,20 +108,8 @@ public class UserService {
         response.addCookie(cookie);
     }
 
-    public String getTokenFromCookie(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("token")) {
-                    return cookie.getValue();
-                }
-            }
-        }
-        return null;
-    }
-
     public void clearTokenCookie(HttpServletResponse response) {
-        Cookie cookie = new Cookie("token", null);
+        Cookie cookie = new Cookie("userAuthToken", null);
         cookie.setHttpOnly(false);
         cookie.setSecure(false);
         cookie.setPath("/");

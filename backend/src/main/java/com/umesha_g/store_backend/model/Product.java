@@ -3,6 +3,8 @@ package com.umesha_g.store_backend.model;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -32,6 +34,7 @@ public class Product {
 
     @ManyToOne
     @JoinColumn(name = "Product_seller_id", nullable = false)
+    @JsonIgnoreProperties("products")
     private User seller;
 
     @Column(name = "Product_created_at")

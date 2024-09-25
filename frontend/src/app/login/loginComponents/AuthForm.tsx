@@ -1,5 +1,6 @@
 "use client";
 
+import { loginUser, registerUser } from "@/api/users";
 import axios from "axios";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
@@ -29,27 +30,15 @@ const AuthForm: React.FC = () => {
     let response;
     try {
       if (!isSignUp) {
-        response = await axios.post(
-          "http://localhost:8080/api/users/login",
-          {
-            email,
-            password,
-          },
-          { withCredentials: true }
-        );
+        response = await loginUser(email, password);
       } else {
-        response = await axios.post(
-          "http://localhost:8080/api/users/register",
-          {
-            email,
-            password,
-            fullName,
-          },
-          { withCredentials: true }
-        );
+        response = await registerUser(email, password, fullName);
       }
-      if (response.status === 200) {
+
+      if (response?.isSuccess == "true") {
         router.push("/home");
+      } else {
+        setError(response?.error ?? "");
       }
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {

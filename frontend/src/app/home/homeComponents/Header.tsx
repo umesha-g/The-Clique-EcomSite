@@ -8,7 +8,7 @@ import React from "react";
 import Search from "./headerComponents/Search";
 
 interface User {
-  id: number;
+  id: string;
   email: string;
   fullName: string;
 }

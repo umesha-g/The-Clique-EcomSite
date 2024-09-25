@@ -1,15 +1,14 @@
 export interface User {
-  id: number;
+  id: string;
   email: string;
   fullName: string;
-  isNewUser: boolean;
 }
 
 export interface Product {
-  id: number;
+  id: string;
   name: string;
   description: string;
   price: number;
-  imageUrl: string;
   seller: User;
+  imageUrl: string;
 }

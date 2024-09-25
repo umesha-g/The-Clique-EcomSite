@@ -11,26 +11,38 @@ import {
 import { motion } from "framer-motion";
 import { X } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 interface Product {
   id: string;
   name: string;
+  description: string;
   price: number;
-  image: string;
-  stockStatus: string;
+  imageUrl: string;
 }
 
 const Wishlist: React.FC = () => {
   const [wishlistItems, setWishlistItems] = useState<Product[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
-    const loadWishlist = async () => {
+    const token = document.cookie.split("=")[1];
+    if (!token) {
+      router.push("/login");
+    } else {
+      loadWishlist();
+    }
+  }, [router]);
+
+  const loadWishlist = async () => {
+    try {
       const items = await fetchWishlist();
       setWishlistItems(items);
-    };
-    loadWishlist();
-  }, []);
+    } catch (error) {
+      console.error("Error fetching wishlist:", error);
+    }
+  };
 
   const handleRemoveItem = async (productId: string) => {
     await removeFromWishlist(productId);
@@ -56,7 +68,7 @@ const Wishlist: React.FC = () => {
             <TableHead className="w-[100px]">Image</TableHead>
             <TableHead>Product Name</TableHead>
             <TableHead>Unit Price</TableHead>
-            <TableHead>Stock Status</TableHead>
+            {/*<TableHead>Stock Status</TableHead>*/}
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -65,7 +77,7 @@ const Wishlist: React.FC = () => {
             <TableRow key={item.id}>
               <TableCell>
                 <Image
-                  src={item.image}
+                  src={item.imageUrl}
                   alt={item.name}
                   width={80}
                   height={80}
@@ -74,7 +86,7 @@ const Wishlist: React.FC = () => {
               </TableCell>
               <TableCell>{item.name}</TableCell>
               <TableCell>€{item.price.toFixed(2)}</TableCell>
-              <TableCell>{item.stockStatus}</TableCell>
+              {/*<TableCell>{item.stockStatus}</TableCell>*/}
               <TableCell>
                 <div className="flex space-x-2">
                   <Button

@@ -3,7 +3,6 @@ package com.umesha_g.store_backend.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,30 +10,22 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.umesha_g.store_backend.model.Product;
-import com.umesha_g.store_backend.model.User;
 import com.umesha_g.store_backend.service.ProductService;
-import com.umesha_g.store_backend.service.UserService;
-import com.umesha_g.store_backend.util.JwtUtil;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 @RequestMapping("/api/products")
-@CrossOrigin(origins = "http://localhost:3000")
 public class ProductController {
 
     @Autowired
     private ProductService productService;
-
-    @Autowired
-    private JwtUtil jwtUtil;
-
-    @Autowired
-    private UserService userService;
 
     @GetMapping
     public List<Product> getAllProducts() {
@@ -42,51 +33,29 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createProduct(@RequestBody Product product, @RequestHeader("Authorization") String token) {
-        String email = jwtUtil.extractEmail(token.replace("Bearer ", ""));
-        User seller = userService.findByEmail(email);
-
-        product.setSeller(seller);
-        Product savedProduct = productService.save(product);
-        return ResponseEntity.ok(savedProduct);
+    public Product createProduct(@RequestBody Product product, HttpServletRequest request) {
+        return productService.createProduct(product, request);
     }
 
     @GetMapping("/seller")
-    public ResponseEntity<?> getSellerProducts(@RequestHeader("Authorization") String token) {
-        String email = jwtUtil.extractEmail(token.replace("Bearer ", ""));
-        User seller = userService.findByEmail(email);
-
-        List<Product> products = productService.findBySeller(seller);
-        return ResponseEntity.ok(products);
+    public List<Product> getSellerProducts(HttpServletRequest request) {
+        return productService.getSellerProducts(request);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateProduct(@PathVariable String id, @RequestBody Product product,
-            @RequestHeader("Authorization") String token) {
-        String email = jwtUtil.extractEmail(token.replace("Bearer ", ""));
-        User seller = userService.findByEmail(email);
-
-        Product existingProduct = productService.findById(id);
-        if (existingProduct == null || !existingProduct.getSeller().equals(seller)) {
-            return ResponseEntity.badRequest().body("Product not found or not owned by the seller");
-        }
-        product.setId(id);
-        product.setSeller(seller);
-        Product updatedProduct = productService.save(product);
-        return ResponseEntity.ok(updatedProduct);
+    @GetMapping("/{productId}")
+    public Product getProductById(@PathVariable String productId, HttpServletRequest request) {
+        return productService.getProductById(productId, request);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteProduct(@PathVariable String id, @RequestHeader("Authorization") String token) {
-        String email = jwtUtil.extractEmail(token.replace("Bearer ", ""));
-        User seller = userService.findByEmail(email);
+    @PutMapping("/{productId}")
+    public Product updateProduct(@PathVariable String productId, @RequestBody Product product,
+            HttpServletRequest request) {
+        return productService.updateProduct(productId, product, request);
+    }
 
-        Product existingProduct = productService.findById(id);
-        if (existingProduct == null || !existingProduct.getSeller().equals(seller)) {
-            return ResponseEntity.badRequest().body("Product not found or not owned by the seller");
-        }
-        productService.deleteById(id);
-        return ResponseEntity.ok().build();
+    @DeleteMapping("/{productId}")
+    public void deleteProduct(@PathVariable String productId, HttpServletRequest request) {
+        productService.deleteProduct(productId, request);
     }
 
     @GetMapping("/search")
@@ -94,9 +63,8 @@ public class ProductController {
         return productService.searchProducts(query);
     }
 
-    @GetMapping("/suggestions")
+    @GetMapping("/searchSuggestions")
     public List<String> getSearchSuggestions(@RequestParam("q") String query) {
         return productService.getSearchSuggestions(query);
     }
-
 }

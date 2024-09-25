@@ -1,6 +1,7 @@
 "use client";
 
-import { fetchWishlist, toggleWishlist } from "@/api/wishlist";
+import { fetchAllProducts } from "@/api/products";
+import { fetchUserProfile } from "@/api/users";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -11,14 +12,26 @@ import Footer from "./homeComponents/Footer";
 import Header from "./homeComponents/Header";
 import HeroSection from "./homeComponents/HeroSection";
 import ProductList from "./homeComponents/ProductList";
-import { Product, User } from "./homeComponents/types";
+
+interface User {
+  id: string;
+  email: string;
+  fullName: string;
+}
+
+interface Product {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  seller: User;
+  imageUrl: string;
+}
 
 const HomePage: React.FC = () => {
-  axios.defaults.withCredentials = true;
   const [products, setProducts] = useState<Product[]>([]);
   const [searchTerm] = useState("");
-  const [wishlist, setWishlist] = useState<number[]>([]);
-  const [cart, setCart] = useState<{ [key: number]: number }>({});
+  const [cart, setCart] = useState<{ [key: string]: number }>({});
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
@@ -26,44 +39,33 @@ const HomePage: React.FC = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        const response = await axios.get(
-          "http://localhost:8080/api/users/profile"
-        );
-        setUser(response.data);
-      } catch (error) {
-        console.error("Error fetching user profile:", error);
-      }
-    };
-
-    fetchUserProfile();
-    fetchWishlist();
-    //fetchProducts();
+    loadUserProfile();
+    loadProducts();
   }, [router]);
 
-  const fetchProducts = async () => {
+  const loadUserProfile = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/products");
-      setProducts(response.data);
-      setError(null);
+      const userProfile = await fetchUserProfile();
+      setUser(userProfile);
     } catch (error) {
-      console.error("Error fetching products:", error);
-      if (axios.isAxiosError(error) && error.response) {
-        setError(
-          `Failed to load products: ${error.response.status} ${error.response.statusText}`
-        );
-      } else {
-        setError("Failed to load products. Please try again later.");
-      }
+      console.error("Error fetching user profile:", error);
     }
   };
 
-  const addToCart = (productId: number) => {
+  const loadProducts = async () => {
+    try {
+      const fetchedProducts = await fetchAllProducts();
+      setProducts(fetchedProducts);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
+  };
+
+  const addToCart = (productId: string) => {
     setCart((prev) => ({ ...prev, [productId]: (prev[productId] || 0) + 1 }));
   };
 
-  const removeFromCart = (productId: number) => {
+  const removeFromCart = (productId: string) => {
     setCart((prev) => {
       const newCart = { ...prev };
       if (newCart[productId] > 1) {
@@ -77,7 +79,7 @@ const HomePage: React.FC = () => {
 
   const getTotalPrice = () => {
     return Object.entries(cart).reduce((total, [productId, quantity]) => {
-      const product = products.find((p) => p.id === Number(productId));
+      const product = products.find((p) => p.id === String(productId));
       return total + (product ? product.price * quantity : 0);
     }, 0);
   };
@@ -117,8 +119,6 @@ const HomePage: React.FC = () => {
         <FeaturesSection />
         <ProductList
           products={filteredProducts}
-          wishlist={wishlist}
-          onToggleWishlist={toggleWishlist}
           onAddToCart={addToCart}
           error={error}
         />

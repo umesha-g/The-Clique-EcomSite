@@ -42,8 +42,8 @@ public class JwtUtil {
 
     // Token validation method
     public Boolean validateToken(String token, String email) {
-        email = extractEmail(token);
-        return (email.equals(email) && !isTokenExpired(token));
+        String exEmail = extractEmail(token);
+        return (email.equals(exEmail) && !isTokenExpired(token));
     }
 
     // Check if the token has expired

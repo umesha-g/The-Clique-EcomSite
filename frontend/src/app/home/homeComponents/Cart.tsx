@@ -7,8 +7,8 @@ interface CartProps {
   products: Product[];
   onClose: () => void;
   onCheckout: () => void;
-  onAddToCart: (productId: number) => void;
-  onRemoveFromCart: (productId: number) => void;
+  onAddToCart: (productId: string) => void;
+  onRemoveFromCart: (productId: string) => void;
   getTotalPrice: () => number;
 }
 
@@ -27,7 +27,7 @@ const Cart: React.FC<CartProps> = ({
         <h2 className="text-2xl font-bold mb-4">Shopping Cart</h2>
         <ul>
           {Object.keys(cart).map((productId) => {
-            const product = products.find((p) => p.id === Number(productId));
+            const product = products.find((p) => p.id === String(productId));
             return (
               <li
                 key={productId}
@@ -36,14 +36,14 @@ const Cart: React.FC<CartProps> = ({
                 <span>{product?.name}</span>
                 <div className="flex items-center space-x-2">
                   <button
-                    onClick={() => onRemoveFromCart(Number(productId))}
+                    onClick={() => onRemoveFromCart(String(productId))}
                     className="bg-red-600 px-2 py-1 rounded-lg"
                   >
                     -
                   </button>
                   <span>{cart[Number(productId)]}</span>
                   <button
-                    onClick={() => onAddToCart(Number(productId))}
+                    onClick={() => onAddToCart(String(productId))}
                     className="bg-green-600 px-2 py-1 rounded-lg"
                   >
                     +

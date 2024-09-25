@@ -13,9 +13,9 @@ import com.umesha_g.store_backend.model.Wishlist;
 @Repository
 public interface WishlistRepository extends JpaRepository<Wishlist, String> {
 
-    List<Wishlist> findByUser(User user);
+    List<Wishlist> findByUserId(String uerId);
 
     Optional<Wishlist> findByUserAndProduct(User user, Product product);
 
-    void deleteByUserAndProduct(User user, Product product);
+    // void deleteByUser_IdAndProduct_Id(String userId, String productId);
 }

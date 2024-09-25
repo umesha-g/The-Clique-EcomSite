@@ -1,6 +1,6 @@
 package com.umesha_g.store_backend.service;
 
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +10,11 @@ import com.umesha_g.store_backend.model.Product;
 import com.umesha_g.store_backend.model.User;
 import com.umesha_g.store_backend.model.Wishlist;
 import com.umesha_g.store_backend.repository.WishlistRepository;
+import com.umesha_g.store_backend.util.CookieUtil;
 import com.umesha_g.store_backend.util.IdGen;
+import com.umesha_g.store_backend.util.JwtUtil;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class WishlistService {
@@ -27,8 +31,23 @@ public class WishlistService {
     @Autowired
     private IdGen idGen;
 
-    public void addProductToWishlist(String userId, String productId) {
-        User user = userService.findById(userId);
+    @Autowired
+    private CookieUtil cookieUtil;
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    private User getUserFromRequest(HttpServletRequest request) {
+        String token = cookieUtil.getTokenFromCookie(request);
+        if (token == null) {
+            throw new RuntimeException("Authentication token not found");
+        }
+        String email = jwtUtil.extractEmail(token);
+        return userService.findByEmail(email);
+    }
+
+    public Boolean addProductToWishlist(String productId, HttpServletRequest request) {
+        User user = getUserFromRequest(request);
         Product product = productService.findById(productId);
 
         if (user != null && product != null && !wishlistRepository.findByUserAndProduct(user, product).isPresent()) {
@@ -37,29 +56,36 @@ public class WishlistService {
             wishlist.setUser(user);
             wishlist.setProduct(product);
             wishlistRepository.save(wishlist);
+            return true;
         }
+        return false;
     }
 
-    public void removeProductFromWishlist(String userId, String productId) {
-        User user = userService.findById(userId);
+    public Boolean removeProductFromWishlist(String productId, HttpServletRequest request) {
+        User user = getUserFromRequest(request);
         Product product = productService.findById(productId);
 
         if (user != null && product != null) {
-            wishlistRepository.deleteByUserAndProduct(user, product);
+            wishlistRepository.deleteById(wishlistRepository.findByUserAndProduct(user, product).orElse(null).getId());
+            return true;
         }
+        return false;
     }
 
-    public Set<Product> getWishlistProducts(String userId) {
-        User user = userService.findById(userId);
+    public List<Product> getWishlistProducts(HttpServletRequest request) {
+        User user = getUserFromRequest(request);
         if (user != null) {
-            return user.getWishlistItems().stream()
+            return (wishlistRepository.findByUserId(user.getId()).stream()
                     .map(Wishlist::getProduct)
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toList()));
         }
-        return Set.of();
+        return List.of();
     }
 
-    public Wishlist findById(String id) {
-        return wishlistRepository.findById(id).orElse(null);
+    public Wishlist findById(String wishlistId) {
+        // User user = getUserFromRequest(request);
+        return wishlistRepository.findById(wishlistId).orElse(null);
+        // .filter(wishlist -> wishlist.getUser().equals(user))
+        // .orElse(null);
     }
 }
