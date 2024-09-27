@@ -12,7 +12,7 @@
     <artifactId>store_backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>store_backend</name>
-    <description>Etherwave Emporium Online Store Backend</description>
+    <description>The Clique Online Store Backend</description>
     <properties>
         <java.version>17</java.version>
     </properties>
