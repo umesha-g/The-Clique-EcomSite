@@ -36,7 +36,7 @@ const Footer = () => {
         transition={{ duration: 0.5, delay: 1.4 }}
         className="text-gray-500 dark:text-gray-400 mt-4"
       >
-        © 2024 ShopSmart. All rights reserved.
+        © 2024 The Clique. All rights reserved.
       </motion.p>
     </footer>
   );

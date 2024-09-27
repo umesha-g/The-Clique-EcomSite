@@ -14,7 +14,7 @@ const NavBar = () => {
       >
         <ShoppingCart className="text-beige-600" />
         <span className="font-bold text-xl text-gray-800 dark:text-white">
-          ShopSmart
+          The Clique
         </span>
       </motion.div>
       <motion.div
