@@ -59,7 +59,7 @@ public class AddressController {
 
     @GetMapping("/{addressId}")
     public ResponseEntity<Address> getAddress(@PathVariable String addressId, HttpServletRequest request) {
-        Address address = addressService.getAddressById(addressId);
+        Address address = addressService.findAddressById(addressId);
         return address != null
                 ? ResponseEntity.ok(address)
                 : ResponseEntity.notFound().build();

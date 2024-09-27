@@ -43,25 +43,12 @@ public class ProductService {
         return userService.findByEmail(email);
     }
 
-    public Product save(Product product) {
-        return productRepository.save(product);
-    }
-
-    public List<Product> findBySeller(User seller) {
-        return productRepository.findBySeller(seller);
-    }
-
-    public Product findById(String id) {
+    public Product findProductById(String id) {
         return productRepository.findById(id).orElse(null);
-    }
-
-    public void deleteById(String id) {
-        productRepository.deleteById(id);
     }
 
     public List<Product> getAllProducts() {
         return productRepository.findAll();
-
     }
 
     public List<Product> searchProducts(String query) {
@@ -78,43 +65,42 @@ public class ProductService {
     public Product createProduct(Product product, HttpServletRequest request) {
         User seller = getUserFromRequest(request);
 
-        product.setId(idGen.generateId(12, "Product"));
+        product.setId(idGen.generateId("Product"));
         product.setSeller(seller);
         product.setCreatedAt(LocalDateTime.now());
-        return save(product);
+        return productRepository.save(product);
     }
 
     public List<Product> getSellerProducts(HttpServletRequest request) {
         User seller = getUserFromRequest(request);
-        return findBySeller(seller);
+        return productRepository.findBySeller(seller);
     }
 
     public Product getProductById(String id, HttpServletRequest request) {
-        getUserFromRequest(request); // Authenticate user
-        return findById(id);
+        return findProductById(id);
     }
 
     public Product updateProduct(String id, Product product, HttpServletRequest request) {
         User seller = getUserFromRequest(request);
 
-        Product existingProduct = findById(id);
+        Product existingProduct = findProductById(id);
         if (existingProduct == null || !existingProduct.getSeller().equals(seller)) {
             throw new RuntimeException("Product not found or not owned by the seller");
         }
         product.setId(id);
         product.setSeller(seller);
-        product.setCreatedAt(existingProduct.getCreatedAt()); // Preserve the original creation date
-        product.setUpdatedAt(LocalDateTime.now()); // Set the update time
-        return save(product);
+        product.setCreatedAt(existingProduct.getCreatedAt());
+        product.setUpdatedAt(LocalDateTime.now());
+        return productRepository.save(product);
     }
 
     public void deleteProduct(String id, HttpServletRequest request) {
         User seller = getUserFromRequest(request);
 
-        Product existingProduct = findById(id);
+        Product existingProduct = findProductById(id);
         if (existingProduct == null || !existingProduct.getSeller().equals(seller)) {
             throw new RuntimeException("Product not found or not owned by the seller");
         }
-        deleteById(id);
+        productRepository.deleteById(id);
     }
 }

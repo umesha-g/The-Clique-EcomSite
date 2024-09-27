@@ -22,7 +22,8 @@ const Search: React.FC<SearchProps> = ({ onSubmit }) => {
   const getSearchSuggestions = async (query: string): Promise<string[]> => {
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/products/suggestions?q=${query}`
+        `http://localhost:8080/api/products/searchSuggestions?q=${query}`,
+        { withCredentials: true }
       );
       return response.data;
     } catch (error) {
@@ -32,7 +33,7 @@ const Search: React.FC<SearchProps> = ({ onSubmit }) => {
   };
 
   useEffect(() => {
-    if (debouncedSearchTerm.length > 1) {
+    if (debouncedSearchTerm.length > 0) {
       const fetchSuggestions = async () => {
         try {
           const data = await getSearchSuggestions(debouncedSearchTerm);

@@ -45,7 +45,7 @@ public class AddressService {
     public Address addAddress(Address address, HttpServletRequest request) {
         User user = getUserFromRequest(request);
         if (user != null) {
-            address.setId(idGen.generateId(9, "Address"));
+            address.setId(idGen.generateId("Address"));
             address.setUser(user);
             address.setCreatedAt(LocalDateTime.now());
             return addressRepository.save(address);
@@ -72,7 +72,7 @@ public class AddressService {
 
     public boolean deleteAddress(String addressId, HttpServletRequest request) {
         User user = getUserFromRequest(request);
-        Address address = getAddressById(addressId);
+        Address address = findAddressById(addressId);
 
         if (user != null && address != null) {
             addressRepository.deleteByUserAndId(user, addressId);
@@ -90,7 +90,7 @@ public class AddressService {
         return List.of();
     }
 
-    public Address getAddressById(String addressId) {
+    public Address findAddressById(String addressId) {
         // User user = getUserFromRequest(request);
         return addressRepository.findById(addressId).orElse(null);
         // .filter(address -> address.getUser().equals(user))

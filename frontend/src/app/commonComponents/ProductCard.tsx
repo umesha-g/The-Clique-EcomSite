@@ -1,6 +1,6 @@
-import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import AddToCartButton from "./addToCartButton";
 import WishlistHeartButton from "./wishlistHeartButton";
 
 interface User {
@@ -20,9 +20,6 @@ interface Product {
 
 interface ProductCardProps {
   product: Product;
-  //isInWishlist: boolean;
-  // onToggleWishlist: (productId: number) => void;
-  onAddToCart: (productId: string) => void;
 }
 
 const containerVariants = {
@@ -40,12 +37,7 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
-const productCard: React.FC<ProductCardProps> = ({
-  product,
-  //isInWishlist,
-  //onToggleWishlist,
-  onAddToCart,
-}) => {
+const productCard: React.FC<ProductCardProps> = ({ product }) => {
   return (
     <div className="w-fit h-auto">
       <motion.div
@@ -60,6 +52,7 @@ const productCard: React.FC<ProductCardProps> = ({
           whileHover={{ scale: 1.05 }}
           className="bg-white rounded-lg shadow-lg p-4 w-64 flex-none"
         >
+          <WishlistHeartButton productId={product.id} />
           <div className="relative">
             <Image
               src={product.imageUrl}
@@ -92,13 +85,9 @@ const productCard: React.FC<ProductCardProps> = ({
                 </span>
               )}
             </div>
-            <Button
-              className="w-full mt-5"
-              onClick={() => onAddToCart(product.id)}
-            >
-              Add to Cart
-            </Button>
-            <WishlistHeartButton productId={product.id} />
+            <div className=" my-4">
+              <AddToCartButton productId={product.id} />
+            </div>
           </div>
         </motion.div>
       </motion.div>

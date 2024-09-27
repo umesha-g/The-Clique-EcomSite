@@ -35,7 +35,7 @@ public class UserService {
         return userRepository.findByEmail(email).orElse(null);
     }
 
-    public User findById(String id) {
+    public User findUserById(String id) {
         return userRepository.findById(id).orElse(null);
     }
 
@@ -67,7 +67,7 @@ public class UserService {
 
         newUser.setEmail(Email);
         newUser.setFullName(Fullname);
-        newUser.setId(idGen.generateId(8, "User"));
+        newUser.setId(idGen.generateId("User"));
         newUser.setPassword(passwordEncoder.encode(Password));
         newUser.setCreatedAt(LocalDateTime.now());
         return save(newUser);

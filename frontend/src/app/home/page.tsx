@@ -5,8 +5,7 @@ import { fetchUserProfile } from "@/api/users";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import Cart from "./homeComponents/Cart";
-import Checkout from "./homeComponents/Checkout";
+import CartButtonWithPanel from "../commonComponents/cartButtonWithPanel";
 import FeaturesSection from "./homeComponents/FeaturesSection";
 import Footer from "./homeComponents/Footer";
 import Header from "./homeComponents/Header";
@@ -31,11 +30,8 @@ interface Product {
 const HomePage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [searchTerm] = useState("");
-  const [cart, setCart] = useState<{ [key: string]: number }>({});
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -60,34 +56,6 @@ const HomePage: React.FC = () => {
       console.error("Error fetching products:", error);
     }
   };
-
-  const addToCart = (productId: string) => {
-    setCart((prev) => ({ ...prev, [productId]: (prev[productId] || 0) + 1 }));
-  };
-
-  const removeFromCart = (productId: string) => {
-    setCart((prev) => {
-      const newCart = { ...prev };
-      if (newCart[productId] > 1) {
-        newCart[productId]--;
-      } else {
-        delete newCart[productId];
-      }
-      return newCart;
-    });
-  };
-
-  const getTotalPrice = () => {
-    return Object.entries(cart).reduce((total, [productId, quantity]) => {
-      const product = products.find((p) => p.id === String(productId));
-      return total + (product ? product.price * quantity : 0);
-    }, 0);
-  };
-
-  const handleCheckout = () => {
-    setIsCheckoutOpen(true);
-  };
-
   const handleLogout = async () => {
     try {
       await axios.post(
@@ -108,34 +76,14 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
-      <Header
-        user={user}
-        cartItemCount={Object.values(cart).reduce((a, b) => a + b, 0)}
-        onCartClick={() => setIsCartOpen(true)}
-        onLogout={handleLogout}
-      />
+      <Header user={user} onLogout={handleLogout} />
       <main>
         <HeroSection />
         <FeaturesSection />
-        <ProductList
-          products={filteredProducts}
-          onAddToCart={addToCart}
-          error={error}
-        />
+        <ProductList products={filteredProducts} error={error} />
+        <CartButtonWithPanel />
       </main>
       <Footer />
-      {isCartOpen && (
-        <Cart
-          cart={cart}
-          products={products}
-          onClose={() => setIsCartOpen(false)}
-          onCheckout={handleCheckout}
-          onAddToCart={addToCart}
-          onRemoveFromCart={removeFromCart}
-          getTotalPrice={getTotalPrice}
-        />
-      )}
-      {isCheckoutOpen && <Checkout onClose={() => setIsCheckoutOpen(false)} />}
     </div>
   );
 };

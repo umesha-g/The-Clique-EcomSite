@@ -1,4 +1,4 @@
-import ProductCard from "@/app/commonComponents/ProductCard";
+import ProductCard from "@/app/commonComponents/productCard";
 import React from "react";
 
 interface User {
@@ -18,19 +18,10 @@ interface Product {
 
 interface ProductListProps {
   products: Product[];
-  //wishlist: string[];
-  //onToggleWishlist: (productId: string) => void;
-  onAddToCart: (productId: string) => void;
   error: string | null;
 }
 
-const ProductList: React.FC<ProductListProps> = ({
-  products,
-  //wishlist,
-  //onToggleWishlist,
-  onAddToCart,
-  error,
-}) => {
+const ProductList: React.FC<ProductListProps> = ({ products, error }) => {
   if (error) {
     return <div className="text-red-500">{error}</div>;
   }
@@ -39,13 +30,7 @@ const ProductList: React.FC<ProductListProps> = ({
     <div className="container mx-auto p-4">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
         {products.map((product) => (
-          <ProductCard
-            key={product.id}
-            product={product}
-            //isInWishlist={wishlist.includes(product.id)}
-            //onToggleWishlist={onToggleWishlist}
-            onAddToCart={onAddToCart}
-          />
+          <ProductCard key={product.id} product={product} />
         ))}
       </div>
     </div>

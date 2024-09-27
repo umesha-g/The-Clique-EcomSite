@@ -1,11 +1,12 @@
 package com.umesha_g.store_backend.util;
 
-import java.security.SecureRandom;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.umesha_g.store_backend.service.AddressService;
+import com.umesha_g.store_backend.service.CartService;
 import com.umesha_g.store_backend.service.ProductService;
 import com.umesha_g.store_backend.service.UserService;
 import com.umesha_g.store_backend.service.WishlistService;
@@ -25,32 +26,24 @@ public class IdGen {
     @Autowired
     private WishlistService wishlistService;
 
-    private final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    private final SecureRandom random = new SecureRandom();
+    @Autowired
+    private CartService cartService;
 
-    public String generateId(int idLength, String serviceName) {
+    public String generateId(String serviceName) {
         String id;
         do {
-            id = generateRandomString(idLength);
+            id = UUID.randomUUID().toString();
         } while (idExists(id, serviceName));
         return id;
     }
 
-    private String generateRandomString(int length) {
-        StringBuilder idBuilder = new StringBuilder(length);
-        for (int i = 0; i < length; i++) {
-            int index = random.nextInt(CHARACTERS.length());
-            idBuilder.append(CHARACTERS.charAt(index));
-        }
-        return idBuilder.toString();
-    }
-
     private boolean idExists(String id, String serviceName) {
         return switch (serviceName) {
-            case "User" -> userService.findById(id) != null;
-            case "Product" -> productService.findById(id) != null;
-            case "Address" -> addressService.getAddressById(id) != null;
-            case "Wishlist" -> wishlistService.findById(id) != null;
+            case "User" -> userService.findUserById(id) != null;
+            case "Product" -> productService.findProductById(id) != null;
+            case "Address" -> addressService.findAddressById(id) != null;
+            case "Wishlist" -> wishlistService.findWishlistById(id) != null;
+            case "Cart" -> cartService.findCartItemById(id) != null;
             default -> throw new IllegalArgumentException("Invalid service name: " + serviceName);
         };
     }

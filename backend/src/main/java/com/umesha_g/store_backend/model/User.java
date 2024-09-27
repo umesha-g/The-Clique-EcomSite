@@ -1,15 +1,12 @@
 package com.umesha_g.store_backend.model;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -32,17 +29,25 @@ public class User {
     @Column(name = "full_name")
     private String fullName;
 
-    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
-    private List<Product> wishlistItems;
+    // @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval =
+    // true)
+    // @JsonIgnore
+    // private List<Product> wishlistItems;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
-    private List<Address> addresses;
+    // @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval =
+    // true)
+    // @JsonIgnore
+    // private List<Address> addresses;
 
-    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
-    private List<Product> products;
+    // @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval =
+    // true)
+    // @JsonIgnore
+    // private List<Product> products;
+
+    // @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval =
+    // true)
+    // @JsonIgnore
+    // private List<Cart> cartItems;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -89,27 +94,35 @@ public class User {
         this.createdAt = createdAt;
     }
 
-    public List<Product> getWishlistItems() {
-        return wishlistItems;
-    }
+    // public List<Product> getWishlistItems() {
+    // return wishlistItems;
+    // }
 
-    public void setWishlistItems(List<Product> wishlistItems) {
-        this.wishlistItems = wishlistItems;
-    }
+    // public void setWishlistItems(List<Product> wishlistItems) {
+    // this.wishlistItems = wishlistItems;
+    // }
 
-    public List<Address> getAddresses() {
-        return addresses;
-    }
+    // public List<Address> getAddresses() {
+    // return addresses;
+    // }
 
-    public void setAddresses(List<Address> addresses) {
-        this.addresses = addresses;
-    }
+    // public void setAddresses(List<Address> addresses) {
+    // this.addresses = addresses;
+    // }
 
-    public List<Product> getProducts() {
-        return products;
-    }
+    // public List<Product> getProducts() {
+    // return products;
+    // }
 
-    public void setProducts(List<Product> products) {
-        this.products = products;
-    }
+    // public void setProducts(List<Product> products) {
+    // this.products = products;
+    // }
+
+    // public List<Cart> getCartItems() {
+    // return cartItems;
+    // }
+
+    // public void setCartItems(List<Cart> cartItems) {
+    // this.cartItems = cartItems;
+    // }
 }

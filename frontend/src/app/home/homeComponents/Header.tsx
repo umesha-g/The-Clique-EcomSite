@@ -2,7 +2,7 @@
 import ToggleThemeButton from "@/app/commonComponents/toggleThemeButton";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ShoppingCart, User as UserIcon } from "lucide-react";
+import { User as UserIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
 import Search from "./headerComponents/Search";
@@ -15,17 +15,10 @@ interface User {
 
 interface HeaderProps {
   user: User | null;
-  cartItemCount: number;
-  onCartClick: () => void;
   onLogout: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({
-  user,
-  cartItemCount,
-  onCartClick,
-  onLogout,
-}) => {
+const Header: React.FC<HeaderProps> = ({ user, onLogout }) => {
   const router = useRouter();
 
   const handleSearchSubmit = (searchTerm: string) => {
@@ -64,18 +57,7 @@ const Header: React.FC<HeaderProps> = ({
           <div className="flex items-center space-x-4">
             <Search onSubmit={handleSearchSubmit} />
             <ToggleThemeButton />
-            <Button
-              variant="ghost"
-              className="rounded-full p-3  relative hover:bg-gray-200 dark:hover:bg-gray-700"
-              onClick={onCartClick}
-            >
-              <ShoppingCart size={20} />
-              {cartItemCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 rounded-full w-5 h-5 flex items-center justify-center text-xs text-white">
-                  {cartItemCount}
-                </span>
-              )}
-            </Button>
+
             {user ? (
               <div className="flex items-center space-x-4">
                 <Button

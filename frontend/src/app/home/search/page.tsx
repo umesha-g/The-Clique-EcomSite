@@ -4,9 +4,10 @@ import { useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 interface Product {
-  id: number;
+  id: string;
   name: string;
   description: string;
+  seller: string;
   price: number;
 }
 
@@ -18,6 +19,7 @@ const searchProducts = async (query: string) => {
         params: {
           query: query,
         },
+        withCredentials: true,
       }
     );
     return response.data;

@@ -58,6 +58,7 @@ const WishlistHeartButton: React.FC<WishlistHeartButtonProps> = ({
     <motion.button
       className="absolute top-2 right-2 z-10 bg-white dark:bg-gray-800 rounded-full p-2 shadow-md"
       onClick={toggleWishlist}
+      initial={{ scale: 0.9 }}
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.9 }}
       disabled={isLoading}

@@ -48,11 +48,11 @@ public class WishlistService {
 
     public Boolean addProductToWishlist(String productId, HttpServletRequest request) {
         User user = getUserFromRequest(request);
-        Product product = productService.findById(productId);
+        Product product = productService.findProductById(productId);
 
         if (user != null && product != null && !wishlistRepository.findByUserAndProduct(user, product).isPresent()) {
             Wishlist wishlist = new Wishlist();
-            wishlist.setId(idGen.generateId(8, "Wishlist"));
+            wishlist.setId(idGen.generateId("Wishlist"));
             wishlist.setUser(user);
             wishlist.setProduct(product);
             wishlistRepository.save(wishlist);
@@ -63,7 +63,7 @@ public class WishlistService {
 
     public Boolean removeProductFromWishlist(String productId, HttpServletRequest request) {
         User user = getUserFromRequest(request);
-        Product product = productService.findById(productId);
+        Product product = productService.findProductById(productId);
 
         if (user != null && product != null) {
             wishlistRepository.deleteById(wishlistRepository.findByUserAndProduct(user, product).orElse(null).getId());
@@ -82,7 +82,7 @@ public class WishlistService {
         return List.of();
     }
 
-    public Wishlist findById(String wishlistId) {
+    public Wishlist findWishlistById(String wishlistId) {
         // User user = getUserFromRequest(request);
         return wishlistRepository.findById(wishlistId).orElse(null);
         // .filter(wishlist -> wishlist.getUser().equals(user))

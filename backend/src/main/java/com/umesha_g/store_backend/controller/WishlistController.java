@@ -53,7 +53,7 @@ public class WishlistController {
 
     @GetMapping("/item/{id}")
     public ResponseEntity<Product> getWishlistItem(@PathVariable String id, HttpServletRequest request) {
-        Wishlist wishlist = wishlistService.findById(id);
+        Wishlist wishlist = wishlistService.findWishlistById(id);
         return ResponseEntity.ok(wishlist.getProduct());
     }
 }
