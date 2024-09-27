@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.umesha_g.store_backend.model.Cart;
@@ -39,5 +41,17 @@ public class CartController {
     public ResponseEntity<Void> removeFromCart(HttpServletRequest request, @PathVariable String cartItemId) {
         cartService.removeFromCart(request, cartItemId);
         return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{cartItemId}")
+    public ResponseEntity<?> updateCartItemQuantity(
+            HttpServletRequest request,
+            @PathVariable String cartItemId,
+            @RequestParam int quantityChange) {
+        Cart updatedItem = cartService.updateCartItemQuantity(request, cartItemId, quantityChange);
+        if (updatedItem == null) {
+            return ResponseEntity.ok().build(); // Item was removed due to quantity becoming 0
+        }
+        return ResponseEntity.ok(updatedItem);
     }
 }

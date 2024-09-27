@@ -1,9 +1,8 @@
-
+import { CartProvider } from "@/contexts/cartContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { ThemeProvider } from "@/contexts/ThemeContext";
-import { TriggerProvider } from "@/contexts/triggerContext";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -32,9 +31,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ThemeProvider>
-        <TriggerProvider>
-          {children}
-          </TriggerProvider>
+          <CartProvider>{children}</CartProvider>
         </ThemeProvider>
       </body>
     </html>

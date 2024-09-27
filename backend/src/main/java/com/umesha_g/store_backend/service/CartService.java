@@ -1,6 +1,7 @@
 package com.umesha_g.store_backend.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -61,20 +62,46 @@ public class CartService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        Cart cartItem = new Cart();
-        cartItem.setId(idGen.generateId("Cart"));
-        cartItem.setUser(user);
-        cartItem.setProduct(product);
-        cartItem.setQuantity(1);
+        Optional<Cart> existingCartItem = cartRepository.findByUserAndProduct(user, product);
 
-        return cartRepository.save(cartItem);
+        if (existingCartItem.isPresent()) {
+            Cart cartItem = existingCartItem.get();
+            cartItem.setQuantity(cartItem.getQuantity() + 1);
+            return cartRepository.save(cartItem);
+        } else {
+            Cart cartItem = new Cart();
+            cartItem.setId(idGen.generateId("Cart"));
+            cartItem.setUser(user);
+            cartItem.setProduct(product);
+            cartItem.setQuantity(1);
+            return cartRepository.save(cartItem);
+        }
+    }
+
+    public Cart updateCartItemQuantity(HttpServletRequest request, String cartItemId, int quantityChange) {
+        User user = getUserFromRequest(request);
+        Cart cartItem = cartRepository.findById(cartItemId)
+                .orElseThrow(() -> new RuntimeException("Cart item not found"));
+
+        if (!cartItem.getUser().equals(user)) {
+            throw new RuntimeException("Unauthorized access to cart item");
+        }
+
+        int newQuantity = cartItem.getQuantity() + quantityChange;
+        if (newQuantity <= 0) {
+            cartRepository.delete(cartItem);
+            return null;
+        } else {
+            cartItem.setQuantity(newQuantity);
+            return cartRepository.save(cartItem);
+        }
     }
 
     public void removeFromCart(HttpServletRequest request, String cartItemId) {
         User user = getUserFromRequest(request);
-        if (cartRepository.findById(cartItemId).orElse(null).getUser().equals(user)) {
+        Cart cartItem = cartRepository.findById(cartItemId).orElse(null);
+        if (cartItem != null && cartItem.getUser().equals(user)) {
             cartRepository.deleteById(cartItemId);
         }
-
     }
 }

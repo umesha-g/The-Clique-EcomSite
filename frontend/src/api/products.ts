@@ -16,22 +16,10 @@ interface Product {
   imageUrl: string;
 }
 
-// const getAuthToken = (): string => {
-//   return document.cookie.split("=")[1];
-// };
-
 const api = axios.create({
   baseURL: API_URL,
   withCredentials: true,
 });
-
-// api.interceptors.request.use((config) => {
-//   const token = getAuthToken();
-//   if (token) {
-//     config.headers.Authorization = `Bearer ${token}`;
-//   }
-//   return config;
-// });
 
 export const fetchAllProducts = async (): Promise<Product[]> => {
   const response = await api.get<Product[]>("/products");

@@ -1,5 +1,7 @@
-import { useTriggerContext } from "@/contexts/triggerContext";
-import axios from "axios";
+"use client";
+
+import { addToCart } from "@/api/cart";
+import { useCart } from "@/contexts/cartContext";
 import { motion } from "framer-motion";
 import { ShoppingCart } from "lucide-react";
 import React, { useState } from "react";
@@ -10,23 +12,13 @@ interface AddToCartButtonProps {
 
 const AddToCartButton: React.FC<AddToCartButtonProps> = ({ productId }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const { triggerFunction } = useTriggerContext();
+  const { refreshCart } = useCart();
 
-  const handleAddtoCart = () => {
-    addToCart();
-    triggerFunction;
-  };
-
-  const addToCart = async () => {
+  const addItemToCart = async () => {
     setIsLoading(true);
     try {
-      await axios.post(
-        `http://localhost:8080/api/cart/${productId}`,
-        {},
-        {
-          withCredentials: true,
-        }
-      );
+      await addToCart(productId);
+      refreshCart();
     } catch (error) {
       console.error("Error adding to cart:", error);
     } finally {
@@ -37,7 +29,7 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({ productId }) => {
   return (
     <motion.button
       className="bg-blue-950 hover:bg-blue-800 text-white justify-center font-medium py-1 px-4 rounded-lg flex items-center w-full self-center"
-      onClick={handleAddtoCart}
+      onClick={addItemToCart}
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
       disabled={isLoading}

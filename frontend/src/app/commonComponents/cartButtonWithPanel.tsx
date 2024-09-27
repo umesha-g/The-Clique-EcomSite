@@ -1,72 +1,35 @@
-import { useTriggerContext } from "@/contexts/triggerContext";
-import axios from "axios";
+"use client";
+
+import {
+  removeItem as apiRemoveItem,
+  updateCartItemQuantity,
+} from "@/api/cart";
+import { useCart } from "@/contexts/cartContext";
 import { AnimatePresence, motion } from "framer-motion";
-import { ShoppingCart, X } from "lucide-react";
-import React, { useEffect, useState } from "react";
-
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  seller: User;
-  imageUrl: string;
-}
-
-interface User {
-  id: string;
-  email: string;
-  fullName: string;
-}
-
-interface CartItem {
-  id: string;
-  product: Product;
-  quantity: number;
-}
+import { Minus, Plus, ShoppingCart, X } from "lucide-react";
+import React, { useState } from "react";
 
 const CartButtonWithPanel: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const { setTriggerFunction } = useTriggerContext();
-
-  useEffect(() => {
-    setTriggerFunction(() => fetchCartItems());
-  }, [setTriggerFunction]);
-
-  useEffect(() => {
-    if (isOpen) {
-      fetchCartItems();
-    }
-  }, [isOpen]);
-
-  const fetchCartItems = async () => {
-    try {
-      const response = await axios.get("http://localhost:8080/api/cart", {
-        withCredentials: true,
-      });
-      setCartItems(response.data);
-    } catch (error) {
-      console.error("Error fetching cart items:", error);
-    }
-  };
+  const { cartItems, cartItemCount, totalPrice, refreshCart } = useCart();
 
   const removeItem = async (itemId: string) => {
     try {
-      await axios.delete(`http://localhost:8080/api/cart/${itemId}`, {
-        withCredentials: true,
-      });
-      fetchCartItems();
+      await apiRemoveItem(itemId);
+      refreshCart();
     } catch (error) {
       console.error("Error removing item from cart:", error);
     }
   };
 
-  const totalPrice = cartItems.reduce(
-    (sum, item) => sum + item.product.price * item.quantity,
-    0
-  );
-  const cartItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const updateQuantity = async (itemId: string, quantityChange: number) => {
+    try {
+      await updateCartItemQuantity(itemId, quantityChange);
+      refreshCart();
+    } catch (error) {
+      console.error("Error updating cart item quantity:", error);
+    }
+  };
 
   return (
     <>
@@ -116,9 +79,23 @@ const CartButtonWithPanel: React.FC = () => {
                     <p className="font-semibold dark:text-white">
                       {item.product.name}
                     </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">
-                      Quantity: {item.quantity}
-                    </p>
+                    <div className="flex items-center mt-2">
+                      <button
+                        onClick={() => updateQuantity(item.id, -1)}
+                        className="bg-gray-200 dark:bg-gray-600 p-1 rounded"
+                      >
+                        <Minus size={16} />
+                      </button>
+                      <span className="mx-2 dark:text-white">
+                        {item.quantity}
+                      </span>
+                      <button
+                        onClick={() => updateQuantity(item.id, 1)}
+                        className="bg-gray-200 dark:bg-gray-600 p-1 rounded"
+                      >
+                        <Plus size={16} />
+                      </button>
+                    </div>
                   </div>
                   <div className="flex items-center">
                     <p className="mr-4 dark:text-white">
