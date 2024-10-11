@@ -30,6 +30,8 @@ public class Review {
 
     private Integer rating;
     private String comment;
+
+    @ElementCollection
     private List<String> imageUrls;
 
     @Column(name = "created_at")

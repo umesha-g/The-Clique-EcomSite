@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface DiscountRepository extends JpaRepository<Discount, String> {
     List<Discount> findByIsActiveTrue();
-    List<Discount> findByEndDateAfterAndStartDateBefore(LocalDateTime date);
-    List<Discount> findByApplicableCategories_Uuid(String categoryUuid);
+    List<Discount> findByEndDateAfterAndStartDateBefore(LocalDateTime startDate,LocalDateTime endDate);
+    List<Discount> findByApplicableCategoriesId(String categoryId);
 }

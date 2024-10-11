@@ -9,8 +9,8 @@ import java.util.List;
 
 @Repository
 public interface AddressRepository extends JpaRepository<Address, String> {
-    List<Address> findByUserUuidOrderByIsDefaultDesc(String userUuid);
-    Optional<Address> findByUuidAndUserUuid(String uuid, String userUuid);
-    Optional<Address> findByUserUuidAndIsDefaultTrue(String userUuid);
-    boolean existsByUuidAndUserUuid(String uuid, String userUuid);
+    List<Address> findByUserIdOrderByIsDefaultDesc(String userId);
+    Optional<Address> findByIdAndUserId(String id, String userId);
+    Optional<Address> findByUserIdAndIsDefaultTrue(String userId);
+    boolean existsByIdAndUserId(String id, String userId);
 }

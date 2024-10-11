@@ -1,6 +1,7 @@
 package com.umesha_g.the_clique_backend.controller.admin;
 
 import com.umesha_g.the_clique_backend.dto.response.FileUploadResponse;
+import com.umesha_g.the_clique_backend.exception.FileStorageException;
 import com.umesha_g.the_clique_backend.service.FileStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,7 @@ public class AdminFileController {
     @PostMapping("/upload")
     public ResponseEntity<FileUploadResponse> uploadFile(
             @RequestParam("file") MultipartFile file,
-            @RequestParam(value = "prefix", defaultValue = "product") String prefix) {
+            @RequestParam(value = "prefix", defaultValue = "product") String prefix) throws FileStorageException {
 
         String fileName = fileStorageService.storeFile(file, prefix);
 
@@ -33,7 +34,7 @@ public class AdminFileController {
     }
 
     @DeleteMapping("/{fileName:.+}")
-    public ResponseEntity<Void> deleteFile(@PathVariable String fileName) {
+    public ResponseEntity<Void> deleteFile(@PathVariable String fileName) throws FileStorageException {
         fileStorageService.deleteFile(fileName);
         return ResponseEntity.noContent().build();
     }

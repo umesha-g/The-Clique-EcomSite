@@ -11,19 +11,33 @@ import com.umesha_g.the_clique_backend.repository.CategoryRepository;
 import com.umesha_g.the_clique_backend.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class ProductService {
-    private final ProductRepository productRepository;
-    private final CategoryRepository categoryRepository;
-    private final BrandRepository brandRepository;
-    private final ModelMapper modelMapper;
+    private  ProductRepository productRepository;
+    private  CategoryRepository categoryRepository;
+    private  BrandRepository brandRepository;
+    private  ModelMapper modelMapper;
+
+    private ProductImageService productImageService;
+
+    @Autowired
+    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository, BrandRepository brandRepository, ModelMapper modelMapper, ProductImageService productImageService) {
+        this.productRepository = productRepository;
+        this.categoryRepository = categoryRepository;
+        this.brandRepository = brandRepository;
+        this.modelMapper = modelMapper;
+        this.productImageService = productImageService;
+    }
 
     public ProductResponse createProduct(ProductRequest request) throws ResourceNotFoundException {
         Product product = modelMapper.map(request, Product.class);
@@ -37,14 +51,32 @@ public class ProductService {
         product.setBrand(brand);
 
         Product savedProduct = productRepository.save(product);
+
+
         return modelMapper.map(savedProduct, ProductResponse.class);
     }
 
-//    public Page<ProductResponse> getSearchProducts(ProductFilterDto filter, Pageable pageable) {
-//        Specification<Product> spec = ProductSpecifications.withFilter(filter);
-//        Page<Product> products = productRepository.findAll(spec, pageable);
-//        return products.map(product -> modelMapper.map(product, ProductResponse.class));
-//    }
+    public Page<ProductResponse> searchProducts(
+            String categoryId,
+            String brandId,
+            BigDecimal minPrice,
+            BigDecimal maxPrice,
+            String gender,
+            String searchTerm,
+            Pageable pageable) {
+
+        Page<Product> products = productRepository.findWithFilters(
+                categoryId,
+                brandId,
+                minPrice,
+                maxPrice,
+                gender,
+                searchTerm,
+                pageable
+        );
+
+        return products.map(product -> modelMapper.map(product, ProductResponse.class));
+    }
 
     public ProductResponse updateProduct(String id, ProductRequest request) throws ResourceNotFoundException {
         Product product = productRepository.findById(id)

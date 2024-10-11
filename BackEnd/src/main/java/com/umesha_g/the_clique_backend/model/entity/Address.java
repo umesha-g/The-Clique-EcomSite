@@ -3,12 +3,14 @@ package com.umesha_g.the_clique_backend.model.entity;
 import com.umesha_g.the_clique_backend.model.enums.AddressType;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Data
 @Table(name = "addresses")
+@NoArgsConstructor
 public class Address {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

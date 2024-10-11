@@ -10,6 +10,8 @@ import com.umesha_g.the_clique_backend.service.UserService;
 import com.umesha_g.the_clique_backend.util.JwtTokenProvider;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,9 +24,18 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    private final AuthenticationManager authenticationManager;
-    private final JwtTokenProvider tokenProvider;
-    private final UserService userService;
+    private  AuthenticationManager authenticationManager;
+    private  JwtTokenProvider tokenProvider;
+    private  UserService userService;
+    private  ModelMapper modelMapper;
+
+    @Autowired
+    public AuthController(AuthenticationManager authenticationManager, JwtTokenProvider tokenProvider, UserService userService, ModelMapper modelMapper) {
+        this.authenticationManager = authenticationManager;
+        this.tokenProvider = tokenProvider;
+        this.userService = userService;
+        this.modelMapper = modelMapper;
+    }
 
     @PostMapping("/login")
     public ResponseEntity<JwtAuthResponse> login(@Valid @RequestBody LoginRequest request) {
@@ -42,8 +53,11 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterRequest request) {
-        return new ResponseEntity<>(userService.createUser(request), HttpStatus.CREATED);
+    public ResponseEntity<JwtAuthResponse> register(@Valid @RequestBody RegisterRequest request) {
+        UserResponse response = userService.createUser(request);
+        LoginRequest newRequest = modelMapper.map(response,LoginRequest.class);
+        newRequest.setPassword(request.getPassword());
+        return (login(newRequest));
     }
 
     @PostMapping("/refresh")
@@ -53,7 +67,7 @@ public class AuthController {
         String token = bearerToken.substring(7);
         if (tokenProvider.validateToken(token)) {
             String email = tokenProvider.getUsernameFromToken(token);
-            User user = userService.loadUserByEmail(email);
+            User user = userService.getUserByEmail(email);
 
 
             UsernamePasswordAuthenticationToken authentication =

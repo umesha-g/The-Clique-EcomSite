@@ -19,7 +19,8 @@ public class ProductResponse {
     private String description;
     private String brandName;
     private String categoryName;
-    private List<String> imageUrls;
+    private List<String> detailImageUrls;
+    private String CardImageUrl;
     private Gender gender;
     private Set<String> sizes;
     private Set<String> colors;

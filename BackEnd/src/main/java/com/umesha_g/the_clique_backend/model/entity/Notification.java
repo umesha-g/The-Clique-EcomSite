@@ -16,17 +16,20 @@ public class Notification {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
-
     private String title;
     private String message;
     private String link;
-    private boolean read = false;
+
+    @Column(name = "is_read")  // Changed from 'read' to 'is_read'
+    private boolean isRead;
 
     @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "VARCHAR(255)")  // Changed from ENUM to VARCHAR
     private NotificationType type;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

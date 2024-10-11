@@ -9,6 +9,7 @@ import com.umesha_g.the_clique_backend.repository.NotificationRepository;
 import com.umesha_g.the_clique_backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,10 +22,18 @@ import java.util.stream.Collectors;
 @Transactional
 @RequiredArgsConstructor
 public class NotificationService {
-    private final NotificationRepository notificationRepository;
-    private final SimpMessagingTemplate messagingTemplate;
-    private final ModelMapper modelMapper;
-    private final UserRepository userRepository;
+    private  NotificationRepository notificationRepository;
+    private  SimpMessagingTemplate messagingTemplate;
+    private  ModelMapper modelMapper;
+    private  UserRepository userRepository;
+
+    @Autowired
+    public NotificationService(NotificationRepository notificationRepository, SimpMessagingTemplate messagingTemplate, ModelMapper modelMapper, UserRepository userRepository) {
+        this.notificationRepository = notificationRepository;
+        this.messagingTemplate = messagingTemplate;
+        this.modelMapper = modelMapper;
+        this.userRepository = userRepository;
+    }
 
     public void sendAdminNotification(String title, String message, NotificationType type, String link) {
         Notification notification = new Notification();
@@ -70,7 +79,7 @@ public class NotificationService {
 
     public List<NotificationResponse> getUnreadNotifications(String userId) {
         List<Notification> notifications = notificationRepository
-                .findByUserIdAndReadOrderByCreatedAtDesc(userId, false);
+                .findByUserIdAndIsReadOrderByCreatedAtDesc(userId, false);
         return notifications.stream()
                 .map(notification -> modelMapper.map(notification, NotificationResponse.class))
                 .collect(Collectors.toList());

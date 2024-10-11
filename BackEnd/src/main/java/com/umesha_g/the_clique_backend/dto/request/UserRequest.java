@@ -16,7 +16,9 @@ public class UserRequest {
     private String password;
 
     @NotBlank(message = "Name is required")
-    private String name;
+    private String firstName;
+
+    private String lastName;
 
     private String phoneNumber;
 

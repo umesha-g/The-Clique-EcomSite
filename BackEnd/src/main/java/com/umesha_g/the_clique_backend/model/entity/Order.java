@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -36,7 +37,7 @@ public class Order {
     private OrderStatus status;
 
     private String trackingNumber;
-    private LocalDateTime estimatedDeliveryDate;
+    private LocalDate estimatedDeliveryDate;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

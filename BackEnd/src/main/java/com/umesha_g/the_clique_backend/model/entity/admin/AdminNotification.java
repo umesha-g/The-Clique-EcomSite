@@ -4,12 +4,14 @@ import com.umesha_g.the_clique_backend.model.enums.AdminNotificationType;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Data
 @Table(name = "admin_notifications")
+@NoArgsConstructor
 public class AdminNotification {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

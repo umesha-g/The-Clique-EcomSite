@@ -38,7 +38,9 @@ public class Product {
     private Discount discount;
 
     @ElementCollection
-    private List<String> imageUrls;
+    private List<String> detailImageUrls;
+
+    private String CardImageUrl;
 
     @Enumerated(EnumType.STRING)
     private Gender gender;
@@ -68,4 +70,6 @@ public class Product {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+
+
 }

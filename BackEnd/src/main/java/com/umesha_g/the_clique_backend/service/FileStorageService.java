@@ -1,8 +1,11 @@
 package com.umesha_g.the_clique_backend.service;
 
 import com.umesha_g.the_clique_backend.config.FileStorageConfig;
+import com.umesha_g.the_clique_backend.exception.FileStorageException;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import net.coobird.thumbnailator.Thumbnails;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -22,11 +25,17 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class FileStorageService {
-    private final FileStorageConfig storageConfig;
-    private final Path fileStorageLocation;
+
+    private  FileStorageConfig storageConfig;
+    private  Path fileStorageLocation;
+    @Autowired
+    public FileStorageService(FileStorageConfig storageConfig, Path fileStorageLocation) {
+        this.storageConfig = storageConfig;
+        this.fileStorageLocation = fileStorageLocation;
+    }
 
     @PostConstruct
-    public void init() {
+    public void init() throws FileStorageException {
         try {
             Files.createDirectories(fileStorageLocation);
         } catch (IOException ex) {
@@ -34,7 +43,7 @@ public class FileStorageService {
         }
     }
 
-    public String storeFile(MultipartFile file, String prefix) {
+    public String storeFile(MultipartFile file, String prefix) throws FileStorageException {
         validateFile(file);
 
         String fileName = generateFileName(file, prefix);
@@ -60,7 +69,7 @@ public class FileStorageService {
         }
     }
 
-    public Resource loadFileAsResource(String fileName) {
+    public Resource loadFileAsResource(String fileName) throws FileStorageException {
         try {
             Path filePath = fileStorageLocation.resolve(fileName).normalize();
             Resource resource = new UrlResource(filePath.toUri());
@@ -75,7 +84,7 @@ public class FileStorageService {
         }
     }
 
-    public void deleteFile(String fileName) {
+    public void deleteFile(String fileName) throws FileStorageException {
         try {
             Path filePath = fileStorageLocation.resolve(fileName);
             Files.deleteIfExists(filePath);
@@ -89,7 +98,7 @@ public class FileStorageService {
         }
     }
 
-    private void validateFile(MultipartFile file) {
+    private void validateFile(MultipartFile file) throws FileStorageException {
         // Check file size
         if (file.getSize() > storageConfig.getMaxFileSize()) {
             throw new FileStorageException("File size exceeds maximum limit");

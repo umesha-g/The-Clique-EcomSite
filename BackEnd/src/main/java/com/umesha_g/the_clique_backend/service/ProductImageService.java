@@ -1,7 +1,9 @@
 package com.umesha_g.the_clique_backend.service;
 
-import com.umesha_g.the_clique_backend.dto.response.ProductResponse;
+import com.umesha_g.the_clique_backend.exception.FileExceptions.MaxImagesExceededException;
+import com.umesha_g.the_clique_backend.model.entity.FileReference;
 import com.umesha_g.the_clique_backend.model.entity.Product;
+import com.umesha_g.the_clique_backend.model.enums.FileEnums.ImageType;
 import com.umesha_g.the_clique_backend.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -9,40 +11,101 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
 public class ProductImageService {
-    private final FileStorageService fileStorageService;
+    private final FileReferenceService fileReferenceService;
     private final ProductRepository productRepository;
     private final ModelMapper modelMapper;
 
+    private static final int MAX_PRODUCT_IMAGES = 8;
+
     @Transactional
-    public ProductResponse addProductImage(String productId, MultipartFile file) {
-        Product product = productRepository.findById(productId).orElse(null);
+    public void addProductImage(String productId, MultipartFile file, boolean isCardImage) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        String fileName = fileStorageService.storeFile(file, "product_" + productId);
+        // Validate image count
+        List<FileReference> existingImages = fileReferenceService.getActiveFilesByEntity(
+                ImageType.PRODUCT_DETAIL, productId);
 
-        if (product.getImageUrls() == null) {
-            product.setImageUrls(new ArrayList<>());
+        if (!isCardImage && existingImages.size() >= MAX_PRODUCT_IMAGES) {
+            throw new MaxImagesExceededException("Maximum product images limit reached");
         }
-        product.getImageUrls().add(fileName);
+
+        // Save the file
+        FileReference fileReference = fileReferenceService.saveFile(
+                file,
+                isCardImage ? ImageType.PRODUCT_CARD : ImageType.PRODUCT_DETAIL,
+                productId,
+                isCardImage
+        );
+
+        // Update product's image URLs
+        if (isCardImage) {
+            product.setCardImageUrl(fileReference.getStandardUrl());
+        } else {
+            if (product.getDetailImageUrls() == null) {
+                product.setDetailImageUrls(List.of(fileReference.getStandardUrl()));
+            } else {
+                product.getDetailImageUrls().add(fileReference.getStandardUrl());
+            }
+        }
 
         Product updatedProduct = productRepository.save(product);
-        return modelMapper.map(updatedProduct, ProductResponse.class);
+        //modelMapper.map(updatedProduct, ProductResponse.class);
     }
 
     @Transactional
-    public ProductResponse removeProductImage(String productId, String fileName) {
-        Product product = productRepository.findById(productId).orElse(null);
+    public void removeProductImage(String productId, String fileReferenceId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        if (product.getImageUrls().remove(fileName)) {
-            fileStorageService.deleteFile(fileName);
-            Product updatedProduct = productRepository.save(product);
-            return modelMapper.map(updatedProduct, ProductResponse.class);
+        FileReference fileReference = fileReferenceService.getFileReference(fileReferenceId);
 
+        if (fileReference.isCardImage()) {
+            product.setCardImageUrl(null);
+        } else {
+            product.getDetailImageUrls().remove(fileReference.getStandardUrl());
         }
-        return null;
+
+        fileReferenceService.deleteFile(fileReferenceId);
+
+        Product updatedProduct = productRepository.save(product);
+        //modelMapper.map(updatedProduct, ProductResponse.class);
+    }
+
+    @Transactional
+    public void setAsCardImage(String productId, String fileReferenceId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        // Convert the image to card image
+        FileReference newCardImage = fileReferenceService.convertToCardImage(fileReferenceId);
+
+        // Update product's card image URL
+        product.setCardImageUrl(newCardImage.getStandardUrl());
+
+        // Remove the URL from detail images if it exists there
+        if (product.getDetailImageUrls() != null) {
+            product.getDetailImageUrls().remove(newCardImage.getStandardUrl());
+        }
+
+        Product updatedProduct = productRepository.save(product);
+       //modelMapper.map(updatedProduct, ProductResponse.class);
+    }
+
+    public List<FileReference> getProductImages(String productId) {
+        List<FileReference> cardImages = fileReferenceService
+                .getActiveFilesByEntity(ImageType.PRODUCT_CARD, productId);
+        List<FileReference> detailImages = fileReferenceService
+                .getActiveFilesByEntity(ImageType.PRODUCT_DETAIL, productId);
+
+        return Stream.concat(cardImages.stream(), detailImages.stream())
+                .collect(Collectors.toList());
     }
 }

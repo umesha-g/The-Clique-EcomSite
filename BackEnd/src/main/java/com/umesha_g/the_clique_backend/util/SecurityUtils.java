@@ -1,11 +1,12 @@
 package com.umesha_g.the_clique_backend.util;
 
 import com.umesha_g.the_clique_backend.exception.ResourceNotFoundException;
+import com.umesha_g.the_clique_backend.exception.UnauthorizedException;
+import com.umesha_g.the_clique_backend.model.entity.User;
 import com.umesha_g.the_clique_backend.service.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import com.umesha_g.the_clique_backend.exception.UnauthorizedException;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -21,7 +22,7 @@ public class SecurityUtils {
      * @return the user ID of the currently authenticated user
      * @throws UnauthorizedException if no authentication is found
      */
-    public String getCurrentUserId() throws ResourceNotFoundException {
+    public User getCurrentUser() throws ResourceNotFoundException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -31,9 +32,9 @@ public class SecurityUtils {
         Object principal = authentication.getPrincipal();
 
         if (principal instanceof UserDetails) {
-            return userService.loadUserByEmail(((UserDetails) principal).getUsername()).getId();
+            return userService.getUserByEmail(((UserDetails) principal).getUsername());
         } else if (principal instanceof String) {
-            return userService.loadUserByEmail((String) principal).getId();
+            return userService.getUserByEmail((String) principal);
         }
 
         throw new UnauthorizedException("Unable to determine current user ID");

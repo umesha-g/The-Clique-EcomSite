@@ -7,40 +7,61 @@ import com.umesha_g.the_clique_backend.model.entity.Cart;
 import com.umesha_g.the_clique_backend.model.entity.Order;
 import com.umesha_g.the_clique_backend.model.entity.OrderItem;
 import com.umesha_g.the_clique_backend.model.entity.User;
+import com.umesha_g.the_clique_backend.model.enums.NotificationType;
 import com.umesha_g.the_clique_backend.model.enums.OrderStatus;
 import com.umesha_g.the_clique_backend.repository.OrderRepository;
+import com.umesha_g.the_clique_backend.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class OrderService {
-    private final OrderRepository orderRepository;
-    private final CartService cartService;
-    private final UserService userService;
-    private final NotificationService notificationService;
-    private final ModelMapper modelMapper;
+    private OrderRepository orderRepository;
+    private  CartService cartService;
+    private  NotificationService notificationService;
+    private  ModelMapper modelMapper;
+    private  SecurityUtils securityUtils;
+
+    @Autowired
+    public OrderService(OrderRepository orderRepository, CartService cartService, NotificationService notificationService, ModelMapper modelMapper, SecurityUtils securityUtils) {
+        this.orderRepository = orderRepository;
+        this.cartService = cartService;
+        this.notificationService = notificationService;
+        this.modelMapper = modelMapper;
+        this.securityUtils = securityUtils;
+    }
 
     public OrderResponse createOrder(OrderRequest request) throws BadRequestException, ResourceNotFoundException {
-        User user = userService.getCurrentUser();
-        Cart cart = cartService.getUserCart();
+        User user = securityUtils.getCurrentUser();
+        Cart cart = cartService.getCart();
 
         if (cart.getCartItems().isEmpty()) {
             throw new BadRequestException("Cart is empty");
         }
+        Period period = Period.ofDays(3);
+        LocalDate deliveryDate = LocalDate.now().plus(period);
 
         Order order = new Order();
         order.setUser(user);
-        order.setShippingAddress(user.getAddresses().stream()
-                .filter(addr -> addr.getId().equals(request.getAddressId()))
-                .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException("Address not found")));
+        order.setEstimatedDeliveryDate(deliveryDate);
+//        order.setShippingAddress(user.getAddresses().stream()
+//                .filter(addr -> addr.getId().equals(request.getAddressId()))
+//                .findFirst()
+//                .orElseThrow(() -> new ResourceNotFoundException("Address not found")));
 
         // Transform cart items to order items
         List<OrderItem> orderItems = cart.getCartItems().stream()
@@ -63,8 +84,11 @@ public class OrderService {
         // Clear the cart after successful order creation
         cartService.clearCart();
 
+        String message = ("Order Placed Successfully \nTracking Number:" + savedOrder.getTrackingNumber() + "\nEstimated Delivery Date" + savedOrder.getEstimatedDeliveryDate().toString());
+
+        String link = ("/notifications");
         // Send notification to user
-        notificationService.sendOrderConfirmation(savedOrder);
+        notificationService.sendUserNotification(user.getId(),"New Order",message, NotificationType.NEW_ORDER,link);
 
         return modelMapper.map(savedOrder, OrderResponse.class);
     }
@@ -80,5 +104,26 @@ public class OrderService {
         notificationService.sendOrderStatusUpdate(updatedOrder);
 
         return modelMapper.map(updatedOrder, OrderResponse.class);
+    }
+
+    public OrderResponse getOrder(String id) throws ResourceNotFoundException, BadRequestException {
+        User user = securityUtils.getCurrentUser();
+        if (!Objects.equals(user.getCart().getId(), id)) {
+            throw new BadRequestException("Access Denied!");
+        } else {
+            Order order = orderRepository.findById(id).orElse(null);
+            return modelMapper.map(order, OrderResponse.class);
+        }
+    }
+
+    public Page<OrderResponse> getUserOrders(Pageable pageable) throws ResourceNotFoundException {
+        User user = securityUtils.getCurrentUser();
+        Page<Order> orders = orderRepository.findByUser(user,pageable);
+        return orders.map(order -> modelMapper.map(orders, OrderResponse.class));
+    }
+
+    public Page<OrderResponse> getAllOrders(Pageable pageable) {
+        Page<Order> orders = orderRepository.findAll(pageable);
+        return orders.map(order -> modelMapper.map(orders, OrderResponse.class));
     }
 }

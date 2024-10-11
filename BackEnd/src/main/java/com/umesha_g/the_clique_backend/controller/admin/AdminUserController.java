@@ -1,8 +1,7 @@
 package com.umesha_g.the_clique_backend.controller.admin;
 
+import com.umesha_g.the_clique_backend.dto.request.RegisterRequest;
 import com.umesha_g.the_clique_backend.dto.request.UserProfileUpdateRequest;
-import com.umesha_g.the_clique_backend.dto.request.UserRequest;
-import com.umesha_g.the_clique_backend.dto.response.ApiResponse;
 import com.umesha_g.the_clique_backend.dto.response.UserResponse;
 import com.umesha_g.the_clique_backend.exception.ResourceNotFoundException;
 import com.umesha_g.the_clique_backend.service.UserService;
@@ -24,39 +23,39 @@ import org.springframework.web.bind.annotation.*;
 public class AdminUserController {
     private final UserService userService;
     @PostMapping
-    public ResponseEntity<ApiResponse<UserResponse>> createUser(@Valid @RequestBody UserRequest request) {
+    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody RegisterRequest request) {
         UserResponse response = userService.createUser(request);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success(response));
+                .body(response);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<UserResponse>> getUser(@PathVariable String id) throws ResourceNotFoundException {
+    public ResponseEntity<UserResponse> getUser(@PathVariable String id) throws ResourceNotFoundException {
         UserResponse response = userService.getUserById(id);
-        return ResponseEntity.ok(ApiResponse.success(response));
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<UserResponse>> updateUser(
+    public ResponseEntity<UserResponse> updateUser(
             @PathVariable String id,
             @Valid @RequestBody UserProfileUpdateRequest request) throws ResourceNotFoundException {
-        UserResponse response = userService.updateUser(id, request);
-        return ResponseEntity.ok(ApiResponse.success(response));
+        UserResponse response = userService.updateUserById(id, request);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<UserResponse>>> getAllUsers(
+    public ResponseEntity<Page<UserResponse>> getAllUsers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
         Page<UserResponse> response = userService.getAllUsers(pageable);
-        return ResponseEntity.ok(ApiResponse.success(response));
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable String id) throws ResourceNotFoundException {
-        userService.deleteUser(id);
-        return ResponseEntity.ok(ApiResponse.success(null));
+    public ResponseEntity<Void> deleteUser(@PathVariable String id) throws ResourceNotFoundException {
+        userService.deleteUserById(id);
+        return ResponseEntity.ok(null);
     }
 }

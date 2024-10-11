@@ -2,6 +2,7 @@ package com.umesha_g.the_clique_backend.model.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -11,6 +12,7 @@ import java.util.Set;
 @Entity
 @Data
 @Table(name = "discounts")
+@NoArgsConstructor
 public class Discount {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

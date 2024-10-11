@@ -3,8 +3,11 @@ package com.umesha_g.the_clique_backend.config;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -24,5 +27,10 @@ public class FileStorageConfig {
     public static class ImageSize {
         private int width;
         private int height;
+    }
+
+    @Bean
+    public Path fileStorageLocation() {
+        return Paths.get(uploadDir).toAbsolutePath().normalize();
     }
 }
