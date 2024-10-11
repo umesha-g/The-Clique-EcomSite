@@ -53,6 +53,4 @@ public class Discount {
     // Audit fields
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private String createdBy;
-    private String updatedBy;
 }

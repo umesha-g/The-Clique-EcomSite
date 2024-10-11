@@ -47,11 +47,11 @@ public class ReviewController {
         return ResponseEntity.ok(reviewService.getUserReviews(pageable));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteReview(@PathVariable String id) throws ResourceNotFoundException {
-        reviewService.deleteReview(id);
-        return ResponseEntity.noContent().build();
-    }
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<Void> deleteReview(@PathVariable String id) throws ResourceNotFoundException {
+//        reviewService.deleteReview(id);
+//        return ResponseEntity.noContent().build();
+//    }
 
     @PostMapping("/reviews/{reviewId}/images")
     public ResponseEntity<?> uploadReviewImages(

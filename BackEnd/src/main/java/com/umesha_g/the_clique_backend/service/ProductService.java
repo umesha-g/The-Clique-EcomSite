@@ -28,15 +28,12 @@ public class ProductService {
     private  BrandRepository brandRepository;
     private  ModelMapper modelMapper;
 
-    private ProductImageService productImageService;
-
     @Autowired
-    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository, BrandRepository brandRepository, ModelMapper modelMapper, ProductImageService productImageService) {
+    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository, BrandRepository brandRepository, ModelMapper modelMapper) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.brandRepository = brandRepository;
         this.modelMapper = modelMapper;
-        this.productImageService = productImageService;
     }
 
     public ProductResponse createProduct(ProductRequest request) throws ResourceNotFoundException {
@@ -51,8 +48,6 @@ public class ProductService {
         product.setBrand(brand);
 
         Product savedProduct = productRepository.save(product);
-
-
         return modelMapper.map(savedProduct, ProductResponse.class);
     }
 

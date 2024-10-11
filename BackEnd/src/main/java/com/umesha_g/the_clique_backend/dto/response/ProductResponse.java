@@ -5,7 +5,6 @@ import com.umesha_g.the_clique_backend.model.enums.Gender;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -20,14 +19,14 @@ public class ProductResponse {
     private String brandName;
     private String categoryName;
     private List<String> detailImageUrls;
-    private String CardImageUrl;
+    private String cardImageUrl;
     private Gender gender;
     private Set<String> sizes;
     private Set<String> colors;
     private Long viewCount;
     private Long purchaseCount;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    //private LocalDateTime createdAt;
+    //private LocalDateTime updatedAt;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private DiscountResponse activeDiscount;

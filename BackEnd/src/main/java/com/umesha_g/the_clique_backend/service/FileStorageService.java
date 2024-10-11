@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -43,6 +44,7 @@ public class FileStorageService {
         }
     }
 
+    @Transactional
     public String storeFile(MultipartFile file, String prefix) throws FileStorageException {
         validateFile(file);
 
@@ -84,6 +86,7 @@ public class FileStorageService {
         }
     }
 
+    @Transactional
     public void deleteFile(String fileName) throws FileStorageException {
         try {
             Path filePath = fileStorageLocation.resolve(fileName);

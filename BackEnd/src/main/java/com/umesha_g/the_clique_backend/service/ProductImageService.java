@@ -7,6 +7,7 @@ import com.umesha_g.the_clique_backend.model.enums.FileEnums.ImageType;
 import com.umesha_g.the_clique_backend.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,11 +19,18 @@ import java.util.stream.Stream;
 @Service
 @RequiredArgsConstructor
 public class ProductImageService {
-    private final FileReferenceService fileReferenceService;
-    private final ProductRepository productRepository;
-    private final ModelMapper modelMapper;
+    private  FileReferenceService fileReferenceService;
+    private  ProductRepository productRepository;
+    private  ModelMapper modelMapper;
 
     private static final int MAX_PRODUCT_IMAGES = 8;
+
+    @Autowired
+    public ProductImageService(FileReferenceService fileReferenceService, ProductRepository productRepository, ModelMapper modelMapper) {
+        this.fileReferenceService = fileReferenceService;
+        this.productRepository = productRepository;
+        this.modelMapper = modelMapper;
+    }
 
     @Transactional
     public void addProductImage(String productId, MultipartFile file, boolean isCardImage) {

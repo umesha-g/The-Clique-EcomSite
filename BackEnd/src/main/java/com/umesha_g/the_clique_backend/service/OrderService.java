@@ -27,7 +27,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class OrderService {
     private OrderRepository orderRepository;
@@ -45,6 +44,7 @@ public class OrderService {
         this.securityUtils = securityUtils;
     }
 
+    @Transactional
     public OrderResponse createOrder(OrderRequest request) throws BadRequestException, ResourceNotFoundException {
         User user = securityUtils.getCurrentUser();
         Cart cart = cartService.getCart();
@@ -93,6 +93,7 @@ public class OrderService {
         return modelMapper.map(savedOrder, OrderResponse.class);
     }
 
+    @Transactional
     public OrderResponse updateOrderStatus(String orderId, OrderStatus status) throws ResourceNotFoundException {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found"));

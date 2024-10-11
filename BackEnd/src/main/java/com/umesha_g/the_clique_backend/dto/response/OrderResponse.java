@@ -1,5 +1,6 @@
 package com.umesha_g.the_clique_backend.dto.response;
 
+import com.umesha_g.the_clique_backend.model.entity.OrderItem;
 import com.umesha_g.the_clique_backend.model.enums.OrderStatus;
 import lombok.Data;
 
@@ -10,7 +11,7 @@ import java.util.List;
 @Data
 public class OrderResponse {
     private String id;
-    private List<OrderItemResponse> orderItems;
+    private List<OrderItem> orderItems;
     private AddressResponse shippingAddress;
     private BigDecimal totalAmount;
     private BigDecimal shippingCost;

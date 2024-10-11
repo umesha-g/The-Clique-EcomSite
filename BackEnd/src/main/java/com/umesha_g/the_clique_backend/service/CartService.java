@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class CartService {
     private  CartRepository cartRepository;
@@ -40,6 +39,7 @@ public class CartService {
         return getOrCreateCart(user);
     }
 
+    @Transactional
     public CartResponse addToCart(String productId, Integer quantity) throws ResourceNotFoundException {
         User user = securityUtils.getCurrentUser();
         Cart cart = getOrCreateCart(user);
@@ -65,6 +65,7 @@ public class CartService {
         return modelMapper.map(updatedCart, CartResponse.class);
     }
 
+
     public CartResponse updateQuantity(String productId, Integer quantity) throws ResourceNotFoundException {
         User user = securityUtils.getCurrentUser();
         Cart cart = getOrCreateCart(user);
@@ -85,16 +86,19 @@ public class CartService {
         return modelMapper.map(updatedCart, CartResponse.class);
     }
 
+    @Transactional
     public CartResponse incrementQuantity(String productId) throws ResourceNotFoundException {
         CartItem item = getCartItem(productId);
         return updateQuantity(productId, item.getQuantity() + 1);
     }
 
+    @Transactional
     public CartResponse decrementQuantity(String productId) throws ResourceNotFoundException {
         CartItem item = getCartItem(productId);
         return updateQuantity(productId, item.getQuantity() - 1);
     }
 
+    @Transactional
     public CartResponse removeFromCart(String productId) throws ResourceNotFoundException {
         User user = securityUtils.getCurrentUser();
         Cart cart = getOrCreateCart(user);
@@ -112,6 +116,8 @@ public class CartService {
     public void clearCart() throws ResourceNotFoundException {
         User user = securityUtils.getCurrentUser();
         Cart cart = getOrCreateCart(user);
+        cart.getCartItems().clear();
+        cartRepository.save(cart);
     }
 
     private CartItem getCartItem(String productId) throws ResourceNotFoundException {

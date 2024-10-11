@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class NotificationService {
     private  NotificationRepository notificationRepository;
@@ -35,6 +34,7 @@ public class NotificationService {
         this.userRepository = userRepository;
     }
 
+    @Transactional
     public void sendAdminNotification(String title, String message, NotificationType type, String link) {
         Notification notification = new Notification();
         notification.setTitle(title);
@@ -49,6 +49,7 @@ public class NotificationService {
         messagingTemplate.convertAndSend("/topic/admin-notifications", response);
     }
 
+    @Transactional
     public void sendUserNotification(String userId, String title, String message,
                                      NotificationType type, String link) throws ResourceNotFoundException {
         Notification notification = new Notification();
@@ -69,6 +70,7 @@ public class NotificationService {
         );
     }
 
+    @Transactional
     public void markAsRead(String notificationId) throws ResourceNotFoundException {
         Notification notification = notificationRepository.findById(notificationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Notification not found"));

@@ -46,7 +46,6 @@ public class ReviewService {
 
         Review savedReview = reviewRepository.save(review);
 
-        // Update product rating
         updateProductRating(product.getId());
 
         return modelMapper.map(savedReview, ReviewResponse.class);
@@ -63,7 +62,7 @@ public class ReviewService {
         return reviews.map(review -> modelMapper.map(review, ReviewResponse.class));
     }
 
-    public void deleteReview(String id) throws ResourceNotFoundException {
+   /* public void deleteReview(String id) throws ResourceNotFoundException {
         Review review = reviewRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Review not found"));
 
@@ -72,7 +71,7 @@ public class ReviewService {
 
         // Update product rating after deletion
         updateProductRating(productId);
-    }
+    }*/
 
     private void updateProductRating(String productId) throws ResourceNotFoundException {
         Double averageRating = reviewRepository.calculateAverageRating(productId);

@@ -109,6 +109,7 @@ public class FileReferenceService {
       return fileReferenceRepository.findById(fileReferenceId).orElse(null);
     }
 
+    @Transactional
     public FileReference convertToCardImage(String fileId) {
         FileReference fileReference = fileReferenceRepository.findById(fileId)
                 .orElseThrow(() -> new RuntimeException("File reference not found"));
