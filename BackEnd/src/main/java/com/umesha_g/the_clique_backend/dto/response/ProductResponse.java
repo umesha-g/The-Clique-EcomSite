@@ -5,6 +5,7 @@ import com.umesha_g.the_clique_backend.model.enums.Gender;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -25,7 +26,7 @@ public class ProductResponse {
     private Set<String> colors;
     private Long viewCount;
     private Long purchaseCount;
-    //private LocalDateTime createdAt;
+    private LocalDateTime createdAt;
     //private LocalDateTime updatedAt;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)

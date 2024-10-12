@@ -58,10 +58,10 @@ public class OrderService {
         Order order = new Order();
         order.setUser(user);
         order.setEstimatedDeliveryDate(deliveryDate);
-//        order.setShippingAddress(user.getAddresses().stream()
-//                .filter(addr -> addr.getId().equals(request.getAddressId()))
-//                .findFirst()
-//                .orElseThrow(() -> new ResourceNotFoundException("Address not found")));
+        order.setShippingAddress(user.getAddresses().stream()
+                .filter(addr -> addr.getId().equals(request.getAddressId()))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Address not found")));
 
         // Transform cart items to order items
         List<OrderItem> orderItems = cart.getCartItems().stream()

@@ -12,5 +12,4 @@ public class CartResponse {
     private Map<ProductResponse, Integer> items;
     private BigDecimal totalAmount;
     private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 }

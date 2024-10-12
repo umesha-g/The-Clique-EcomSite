@@ -98,4 +98,16 @@ public class ProductService {
         Product product = productRepository.findById(id).orElse(null);
             return modelMapper.map( product,ProductResponse.class);
     }
+
+    public Page<ProductResponse> getAllProductsByCategory(String id , Pageable pageable){
+        Category category = null;
+        try {
+            category = categoryRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+        } catch (ResourceNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        Page<Product> products = productRepository.findByCategory(category,pageable);
+        return products.map(product -> modelMapper.map(product,ProductResponse.class));
+    }
 }

@@ -10,6 +10,10 @@ import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 @Configuration
 public class ModelMapperConfig {
 
@@ -65,15 +69,6 @@ public class ModelMapperConfig {
                     mapper.map(ProductRequest::getGender, Product::setGender);
                     mapper.map(ProductRequest::getSizes, Product::setSizes);
                     mapper.map(ProductRequest::getColors, Product::setColors);
-                    // Brand and Category will need to be set manually using the IDs
-                    // Discount will need to be set manually using the ID
-                });
-
-        // Cart Request mapping
-        modelMapper.createTypeMap(CartRequest.class, CartItem.class)
-                .addMappings(mapper -> {
-                    mapper.map(CartRequest::getQuantity, CartItem::setQuantity);
-                    // Product will need to be set manually using the productId
                 });
 
         // Order Request mapping
@@ -82,7 +77,6 @@ public class ModelMapperConfig {
                     mapper.skip(Order::setId);
                     mapper.skip(Order::setCreatedAt);
                     mapper.skip(Order::setUpdatedAt);
-                    // Address will need to be set manually using the addressId
                 });
 
         // Brand Request mapping
@@ -90,7 +84,6 @@ public class ModelMapperConfig {
                 .addMappings(mapper -> {
                     mapper.map(BrandRequest::getName, Brand::setName);
                     mapper.map(BrandRequest::getDescription, Brand::setDescription);
-                    mapper.map(BrandRequest::getLogoUrl, Brand::setLogoUrl);
                     mapper.map(BrandRequest::isActive, Brand::setActive);
                 });
 
@@ -204,6 +197,39 @@ public class ModelMapperConfig {
                     mapper.map(Wishlist::getId, WishlistResponse::setId);
                     mapper.map(Wishlist::getProducts, WishlistResponse::setProducts);
                     mapper.map(Wishlist::getCreatedAt, WishlistResponse::setCreatedAt);
+                });
+
+        // Cart mapping
+        modelMapper.addMappings(new PropertyMap<Cart, CartResponse>() {
+            @Override
+            protected void configure() {
+                // Mapping simple fields
+                map().setId(source.getId());
+                map().setTotalAmount(source.getTotalAmount());
+                map().setCreatedAt(source.getCreatedAt());
+
+                // Custom mapping for items field (convert List<CartItem> to Map<ProductResponse, Integer>)
+                using(context -> {
+                    List<CartItem> cartItems = (List<CartItem>) context.getSource();
+                    Map<ProductResponse, Integer> itemsMap = new HashMap<>();
+                    for (CartItem cartItem : cartItems) {
+                        // Manually map Product to ProductResponse
+                        ProductResponse productResponse = modelMapper.map(cartItem.getProduct(), ProductResponse.class);
+                        itemsMap.put(productResponse, cartItem.getQuantity());
+                    }
+                    return itemsMap;
+                }).map(source.getCartItems(), destination.getItems());
+            }
+        });
+
+        // Discount mapping
+        modelMapper.createTypeMap(Discount.class, DiscountResponse.class)
+                .addMappings(mapper -> {
+                    mapper.map(Discount::getId, DiscountResponse::setId);
+                    mapper.map(Discount::getDiscountPercentage, DiscountResponse::setDiscountPercentage);
+                    mapper.map(Discount::getStartDate, DiscountResponse::setStartDate);
+                    mapper.map(Discount::getEndDate, DiscountResponse::setEndDate);
+                    mapper.map(Discount::getDescription, DiscountResponse::setDescription);
                 });
     }
 }

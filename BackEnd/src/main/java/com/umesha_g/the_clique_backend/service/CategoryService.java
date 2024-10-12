@@ -1,47 +1,87 @@
 package com.umesha_g.the_clique_backend.service;
 
 import com.umesha_g.the_clique_backend.dto.request.CategoryRequest;
-import com.umesha_g.the_clique_backend.exception.ResourceNotFoundException;
+import com.umesha_g.the_clique_backend.dto.response.CategoryResponse;
 import com.umesha_g.the_clique_backend.model.entity.Category;
 import com.umesha_g.the_clique_backend.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class CategoryService {
 
-    private ModelMapper modelMapper;
     private CategoryRepository categoryRepository;
 
+    private ModelMapper modelMapper;
+
     @Autowired
-    public CategoryService(ModelMapper modelMapper, CategoryRepository categoryRepository) {
-        this.modelMapper = modelMapper;
+    public CategoryService(CategoryRepository categoryRepository, ModelMapper modelMapper) {
         this.categoryRepository = categoryRepository;
+        this.modelMapper = modelMapper;
     }
 
     @Transactional
-    public Category createCategory(CategoryRequest request) {
-        Category category = modelMapper.map(request, Category.class);
+    public CategoryResponse createCategory(CategoryRequest categoryRequest) {
+        if (categoryRepository.existsByName(categoryRequest.getName())) {
+            throw new RuntimeException("Category with this name already exists");
+        }
+
+        Category category = new Category();
+        category.setName(categoryRequest.getName());
+        category.setDescription(categoryRequest.getDescription());
         category.setCreatedAt(LocalDateTime.now());
-        category.setCreatedBy(SecurityContextHolder.getContext().getAuthentication().getName());
-        return categoryRepository.save(category);
+        category.setUpdatedAt(LocalDateTime.now());
+
+        Category savedCategory = categoryRepository.save(category);
+        return modelMapper.map(savedCategory, CategoryResponse.class);
+    }
+
+    public List<CategoryResponse> getAllCategories() {
+        return categoryRepository.findAll().stream()
+                .map(this::mapCategoryToResponse)
+                .collect(Collectors.toList());
+    }
+
+    public CategoryResponse getCategoryById(String id) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+        return modelMapper.map(category, CategoryResponse.class);
     }
 
     @Transactional
-    public Category updateCategory(String id, CategoryRequest request) throws ResourceNotFoundException {
+    public CategoryResponse updateCategory(String id, CategoryRequest categoryRequest) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+                .orElseThrow(() -> new RuntimeException("Category not found"));
 
-        modelMapper.map(request, category);
+        category.setName(categoryRequest.getName());
+        category.setDescription(categoryRequest.getDescription());
         category.setUpdatedAt(LocalDateTime.now());
-        category.setUpdatedBy(SecurityContextHolder.getContext().getAuthentication().getName());
-        return categoryRepository.save(category);
+
+        Category updatedCategory = categoryRepository.save(category);
+        return modelMapper.map(updatedCategory, CategoryResponse.class);
+    }
+
+    @Transactional
+    public void deleteCategory(String id) {
+        if (!categoryRepository.existsById(id)) {
+            throw new RuntimeException("Category not found");
+        }
+        categoryRepository.deleteById(id);
+    }
+
+    private CategoryResponse mapCategoryToResponse(Category category) {
+        CategoryResponse response = new CategoryResponse();
+        response.setId(category.getId());
+        response.setName(category.getName());
+        response.setDescription(category.getDescription());
+        return response;
     }
 }

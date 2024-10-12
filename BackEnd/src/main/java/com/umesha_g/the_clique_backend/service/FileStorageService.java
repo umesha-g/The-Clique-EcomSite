@@ -71,6 +71,31 @@ public class FileStorageService {
         }
     }
 
+    @Transactional
+    public String storeLogoFile(MultipartFile file, String prefix) throws FileStorageException {
+        validateFile(file);
+
+        String fileName = generateFileName(file, prefix);
+        try {
+            //Path targetLocation = fileStorageLocation.resolve(fileName);
+
+            // Create different sizes of the image
+            BufferedImage originalImage = ImageIO.read(file.getInputStream());
+
+            // Store logo
+            Path logoLocation = fileStorageLocation.resolve(fileName);
+            saveResizedImage(originalImage, logoLocation,
+                    storageConfig.getThumbnailSize());
+
+            // Store standard size
+            //saveResizedImage(originalImage, targetLocation,
+            //        storageConfig.getStandardSize());
+            return fileName;
+        } catch (IOException ex) {
+            throw new FileStorageException("Could not store file " + fileName, ex);
+        }
+    }
+
     public Resource loadFileAsResource(String fileName) throws FileStorageException {
         try {
             Path filePath = fileStorageLocation.resolve(fileName).normalize();

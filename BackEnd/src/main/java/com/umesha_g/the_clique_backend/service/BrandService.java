@@ -1,17 +1,19 @@
 package com.umesha_g.the_clique_backend.service;
 
 import com.umesha_g.the_clique_backend.dto.request.BrandRequest;
-import com.umesha_g.the_clique_backend.exception.ResourceNotFoundException;
+import com.umesha_g.the_clique_backend.dto.response.BrandResponse;
+import com.umesha_g.the_clique_backend.exception.FileStorageException;
 import com.umesha_g.the_clique_backend.model.entity.Brand;
 import com.umesha_g.the_clique_backend.repository.BrandRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -19,27 +21,97 @@ import java.time.LocalDateTime;
 public class BrandService {
     private ModelMapper modelMapper;
     private BrandRepository brandRepository;
+    private FileStorageService fileStorageService;
 
     @Autowired
-    public BrandService(ModelMapper modelMapper, BrandRepository brandRepository) {
+    public BrandService(ModelMapper modelMapper, BrandRepository brandRepository, FileStorageService fileStorageService) {
         this.modelMapper = modelMapper;
         this.brandRepository = brandRepository;
+        this.fileStorageService = fileStorageService;
     }
 
-    public Brand createBrand(BrandRequest request) {
+    @Transactional
+    public BrandResponse createBrand(BrandRequest request) {
+        if (brandRepository.existsByName(request.getName())) {
+            throw new RuntimeException("Brand with this name already exists");
+        }
+
         Brand brand = modelMapper.map(request, Brand.class);
         brand.setCreatedAt(LocalDateTime.now());
-        brand.setCreatedBy(SecurityContextHolder.getContext().getAuthentication().getName());
-        return brandRepository.save(brand);
+
+        if (request.getLogoFile() != null && !request.getLogoFile().isEmpty()) {
+            String prefix = "brand_logo_" + brand.getId();
+            String fileName = null;
+            try {
+                fileName = fileStorageService.storeLogoFile(request.getLogoFile(), prefix);
+            } catch (FileStorageException e) {
+                throw new RuntimeException(e);
+            }
+            brand.setLogoUrl("/api/v1/files/brand_logo_" + fileName);
+        }
+        Brand savedBrand =  brandRepository.save(brand);
+        return modelMapper.map(savedBrand,BrandResponse.class);
     }
 
-    public Brand updateBrand(String id, BrandRequest request) throws ResourceNotFoundException {
-        Brand brand = brandRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Brand not found"));
+    public List<BrandResponse> getAllBrands() {
+        return brandRepository.findAll().stream()
+                .map(this::mapBrandToResponse)
+                .collect(Collectors.toList());
+    }
 
-        modelMapper.map(request, brand);
+    public List<BrandResponse> getActiveBrands() {
+        return brandRepository.findByIsActiveTrue().stream()
+                .map(this::mapBrandToResponse)
+                .collect(Collectors.toList());
+    }
+
+    public BrandResponse getBrandById(String id) {
+        Brand brand = brandRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Brand not found"));
+        return modelMapper.map(brand,BrandResponse.class);
+    }
+
+    @Transactional
+    public BrandResponse updateBrand(String id, BrandRequest request) {
+        Brand brand = brandRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Brand not found"));
+
+        brand.setName(request.getName());
+        brand.setDescription(request.getDescription());
+        brand.setActive(request.isActive());
         brand.setUpdatedAt(LocalDateTime.now());
-        brand.setUpdatedBy(SecurityContextHolder.getContext().getAuthentication().getName());
-        return brandRepository.save(brand);
+
+        // Handle logo file update
+        if (request.getLogoFile() != null && !request.getLogoFile().isEmpty()) {
+            String prefix = "brand_logo_" + brand.getId();
+            String fileName = null;
+            try {
+                fileName = fileStorageService.storeLogoFile(request.getLogoFile(), prefix);
+            } catch (FileStorageException e) {
+                throw new RuntimeException(e);
+            }
+            brand.setLogoUrl("/api/v1/files/brand_logo_" + fileName);
+        }
+
+        Brand updatedBrand = brandRepository.save(brand);
+        return modelMapper.map(updatedBrand,BrandResponse.class);
+    }
+
+    @Transactional
+    public void deleteBrand(String id) {
+        if (!brandRepository.existsById(id)) {
+            throw new RuntimeException("Brand not found");
+        }
+        brandRepository.deleteById(id);
+    }
+
+    private BrandResponse mapBrandToResponse(Brand brand) {
+        BrandResponse response = new BrandResponse();
+        response.setId(brand.getId());
+        response.setName(brand.getName());
+        response.setDescription(brand.getDescription());
+        response.setLogoUrl(brand.getLogoUrl());
+        response.setActive(brand.isActive());
+        return response;
     }
 }

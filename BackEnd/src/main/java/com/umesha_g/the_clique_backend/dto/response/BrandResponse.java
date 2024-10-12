@@ -17,5 +17,4 @@ public class BrandResponse {
     private List<ProductResponse> products;
 
     private boolean isActive;
-
 }

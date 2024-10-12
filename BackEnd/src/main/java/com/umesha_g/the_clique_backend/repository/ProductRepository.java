@@ -15,9 +15,13 @@ import java.util.List;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, String> {
     Page<Product> findByCategory(Category category, Pageable pageable);
+
     Page<Product> findByBrand(Brand brand, Pageable pageable);
+
     Page<Product> findByNameContainingIgnoreCase(String name, Pageable pageable);
+
     List<Product> findByStockLessThan(int threshold);
+
     Page<Product> findByPriceBetween(BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable);
 
     @Query("SELECT p FROM Product p WHERE " +
