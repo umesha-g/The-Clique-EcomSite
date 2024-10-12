@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,8 +36,6 @@ public class CategoryService {
         Category category = new Category();
         category.setName(categoryRequest.getName());
         category.setDescription(categoryRequest.getDescription());
-        category.setCreatedAt(LocalDateTime.now());
-        category.setUpdatedAt(LocalDateTime.now());
 
         Category savedCategory = categoryRepository.save(category);
         return modelMapper.map(savedCategory, CategoryResponse.class);
@@ -63,7 +60,6 @@ public class CategoryService {
 
         category.setName(categoryRequest.getName());
         category.setDescription(categoryRequest.getDescription());
-        category.setUpdatedAt(LocalDateTime.now());
 
         Category updatedCategory = categoryRepository.save(category);
         return modelMapper.map(updatedCategory, CategoryResponse.class);

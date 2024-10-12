@@ -1,15 +1,16 @@
 package com.umesha_g.the_clique_backend.config;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import lombok.Data;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConfigurationProperties(prefix = "jwt")
 @Data
 public class JwtConfig {
-    private String secret;
-    private long expiration;
+    Dotenv dotenv = Dotenv.load();
+
+    private String secret = dotenv.get("JWT_SECRET");
+    private long expiration = Long.parseLong(dotenv.get("JWT_EXPIRATION"));
     private String tokenPrefix = "Bearer ";
     private String headerString = "Authorization";
 }

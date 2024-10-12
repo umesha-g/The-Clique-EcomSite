@@ -42,9 +42,6 @@ public class UserService {
 
         User user = modelMapper.map(request, User.class);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        //user.setFirstName(request.getFirstName());
-        //user.setLastName(request.getLastName());
-        //user.setPhoneNumber(request.getPhoneNumber());
         user.setRole(Role.USER);
 
         User savedUser = userRepository.save(user);

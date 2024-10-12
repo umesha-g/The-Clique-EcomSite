@@ -18,7 +18,7 @@ public class FileStorageConfig {
     private String uploadDir;
     private long maxFileSize = 5242880; // 5MB
     private List<String> allowedFileTypes = Arrays.asList("image/jpeg", "image/png", "image/webp");
-    private int imageQuality = 85; // JPEG compression quality
+    private int imageQuality = 90; // JPEG compression quality
     private ImageSize thumbnailSize = new ImageSize(200, 200);
     private ImageSize standardSize = new ImageSize(800, 800);
 

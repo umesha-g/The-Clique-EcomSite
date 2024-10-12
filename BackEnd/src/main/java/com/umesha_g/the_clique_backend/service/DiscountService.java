@@ -32,8 +32,6 @@ public class DiscountService {
         Discount discount = modelMapper.map(request, Discount.class);
 
         discountProcess(request, discount);
-        discount.setCreatedAt(LocalDateTime.now());
-        discount.setUpdatedAt(LocalDateTime.now());
 
         Discount savedDiscount = discountRepository.save(discount);
         return modelMapper.map(savedDiscount, DiscountResponse.class);
@@ -65,7 +63,6 @@ public class DiscountService {
         modelMapper.map(request, discount);
 
         discountProcess(request, discount);
-        discount.setUpdatedAt(LocalDateTime.now());
 
         Discount updatedDiscount = discountRepository.save(discount);
         return modelMapper.map(updatedDiscount, DiscountResponse.class);

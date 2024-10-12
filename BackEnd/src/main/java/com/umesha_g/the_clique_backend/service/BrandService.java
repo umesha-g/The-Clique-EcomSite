@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,7 +36,6 @@ public class BrandService {
         }
 
         Brand brand = modelMapper.map(request, Brand.class);
-        brand.setCreatedAt(LocalDateTime.now());
 
         if (request.getLogoFile() != null && !request.getLogoFile().isEmpty()) {
             String prefix = "brand_logo_" + brand.getId();
@@ -79,7 +77,6 @@ public class BrandService {
         brand.setName(request.getName());
         brand.setDescription(request.getDescription());
         brand.setActive(request.isActive());
-        brand.setUpdatedAt(LocalDateTime.now());
 
         // Handle logo file update
         if (request.getLogoFile() != null && !request.getLogoFile().isEmpty()) {

@@ -40,7 +40,6 @@ public class ModelMapperConfig {
         modelMapper.createTypeMap(UserRequest.class, User.class)
                 .addMappings(mapper -> {
                     mapper.map(UserRequest::getEmail, User::setEmail);
-                    mapper.map(UserRequest::getPassword, User::setPassword);
                     mapper.map(UserRequest::getFirstName, User::setFirstName);
                     mapper.map(UserRequest::getLastName, User::setLastName);
                     mapper.map(UserRequest::getPhoneNumber, User::setPhoneNumber);

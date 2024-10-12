@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,8 +37,6 @@ public class AddressService {
 
         Address address = modelMapper.map(request, Address.class);
         address.setUser(user);
-        address.setCreatedAt(LocalDateTime.now());
-        address.setUpdatedAt(LocalDateTime.now());
 
         if (request.isDefault()) {
             // If this is a default address, unset any existing default
@@ -76,7 +73,6 @@ public class AddressService {
                 .orElseThrow(() -> new ResourceNotFoundException("Address", "id", addressId));
 
         modelMapper.map(request, address);
-        address.setUpdatedAt(LocalDateTime.now());
 
         if (request.isDefault()) {
             // If this is being set as default, unset any existing default
