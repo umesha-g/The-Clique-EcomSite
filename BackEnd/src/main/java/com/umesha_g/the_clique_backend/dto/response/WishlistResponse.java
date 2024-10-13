@@ -8,6 +8,6 @@ import java.util.Set;
 @Data
 public class WishlistResponse {
     private String id;
-    private Set<ProductResponse> products;
+    private Set<ProductCardResponse> products;
     private LocalDateTime createdAt;
 }

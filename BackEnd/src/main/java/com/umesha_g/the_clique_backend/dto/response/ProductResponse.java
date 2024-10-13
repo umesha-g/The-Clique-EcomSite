@@ -24,7 +24,7 @@ public class ProductResponse {
     private Gender gender;
     private Set<String> sizes;
     private Set<String> colors;
-    private Long viewCount;
+    //private Long viewCount;
     private Long purchaseCount;
     private LocalDateTime createdAt;
     //private LocalDateTime updatedAt;

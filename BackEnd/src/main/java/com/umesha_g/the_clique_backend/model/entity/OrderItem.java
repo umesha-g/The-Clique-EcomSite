@@ -26,7 +26,7 @@ public class OrderItem {
 
     private Integer quantity;
 
-    private BigDecimal price;
+    private BigDecimal subTotal;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

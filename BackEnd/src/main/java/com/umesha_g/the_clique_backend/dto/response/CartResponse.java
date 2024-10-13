@@ -9,7 +9,7 @@ import java.util.Map;
 @Data
 public class CartResponse {
     private String id;
-    private Map<ProductResponse, Integer> items;
+    private Map<ProductCardResponse, Integer> cartItems;
     private BigDecimal totalAmount;
     private LocalDateTime createdAt;
 }

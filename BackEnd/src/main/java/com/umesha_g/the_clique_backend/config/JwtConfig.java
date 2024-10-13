@@ -13,4 +13,5 @@ public class JwtConfig {
     private long expiration = Long.parseLong(dotenv.get("JWT_EXPIRATION"));
     private String tokenPrefix = "Bearer ";
     private String headerString = "Authorization";
+    private String cookieName = "THE_CLIQUE_TOKEN";
 }

@@ -1,7 +1,10 @@
 package com.umesha_g.the_clique_backend.controller;
 
+import com.umesha_g.the_clique_backend.dto.response.ProductCardResponse;
 import com.umesha_g.the_clique_backend.dto.response.ProductResponse;
+import com.umesha_g.the_clique_backend.model.entity.Product;
 import com.umesha_g.the_clique_backend.service.ProductService;
+import com.umesha_g.the_clique_backend.service.ProductStatisticsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -19,14 +22,16 @@ import java.math.BigDecimal;
 @RequiredArgsConstructor
 public class ProductController {
     private ProductService productService;
+    private ProductStatisticsService productStatisticsService;
 
     @Autowired
-    public ProductController(ProductService productService) {
+    public ProductController(ProductService productService, ProductStatisticsService productStatisticsService) {
         this.productService = productService;
+        this.productStatisticsService = productStatisticsService;
     }
 
     @GetMapping
-    public  ResponseEntity<Page<ProductResponse>> getAllProducts(
+    public  ResponseEntity<Page<ProductCardResponse>> getAllProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy) {
@@ -40,7 +45,7 @@ public class ProductController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Page<ProductResponse>> searchProducts(
+    public ResponseEntity<Page<ProductCardResponse>> searchProducts(
             @RequestParam(required = false) String categoryId,
             @RequestParam(required = false) String brandId,
             @RequestParam(required = false) BigDecimal minPrice,
@@ -49,7 +54,7 @@ public class ProductController {
             @RequestParam(required = false) String searchTerm,
             @PageableDefault Pageable pageable) {
 
-        Page<ProductResponse> products = productService.searchProducts(
+        Page<ProductCardResponse> products = productService.searchProducts(
                 categoryId,
                 brandId,
                 minPrice,
@@ -63,12 +68,22 @@ public class ProductController {
     }
 
     @GetMapping("/{categoryId}")
-    public  ResponseEntity<Page<ProductResponse>> getAllProductsByCategory(
+    public  ResponseEntity<Page<ProductCardResponse>> getAllProductsByCategory(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @PathVariable String categoryId) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
         return ResponseEntity.ok(productService.getAllProductsByCategory(categoryId,pageable));
+    }
+
+    @PostMapping("/{id}/view")
+    public ResponseEntity<String> incrementViewCount(@PathVariable String id) {
+        Product product = productService.getProductById(id);
+        if (product == null) {
+            return ResponseEntity.notFound().build();
+        }
+        productStatisticsService.incrementViewCount(product);
+        return ResponseEntity.ok("View Count Increased");
     }
 }

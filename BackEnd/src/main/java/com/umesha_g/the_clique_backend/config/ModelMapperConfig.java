@@ -130,13 +130,28 @@ public class ModelMapperConfig {
                     mapper.map(Product::getGender, ProductResponse::setGender);
                     mapper.map(Product::getSizes, ProductResponse::setSizes);
                     mapper.map(Product::getColors, ProductResponse::setColors);
-                    mapper.map(Product::getViewCount, ProductResponse::setViewCount);
+                    //mapper.map(Product::getViewCount, ProductResponse::setViewCount);
                     mapper.map(Product::getPurchaseCount, ProductResponse::setPurchaseCount);
                     mapper.map(Product::getDiscount, ProductResponse::setActiveDiscount);
                 });
 
         Converter<Product, ProductResponse> producttoProductResponseConverter = ctx ->
                 ctx.getSource() == null ? null : modelMapper.map(ctx.getSource(), ProductResponse.class);
+
+        modelMapper.createTypeMap(Product .class, ProductCardResponse.class)
+                .addMappings(mapper -> {
+                    mapper.map(Product::getId, ProductCardResponse::setId);
+                    mapper.map(Product::getName, ProductCardResponse::setName);
+                    mapper.map(Product::getPrice, ProductCardResponse::setPrice);
+                    mapper.map(Product::getStock, ProductCardResponse::setStock);
+                    mapper.map(Product::getRating, ProductCardResponse::setRating);
+                    mapper.map(Product::getCardImageUrl, ProductCardResponse::setCardImageUrl);
+                    mapper.map(Product::getPurchaseCount, ProductCardResponse::setPurchaseCount);
+                    mapper.map(Product::getDiscount, ProductCardResponse::setActiveDiscount);
+                });
+
+        Converter<Product, ProductCardResponse> producttoProductCardResponseConverter = ctx ->
+                ctx.getSource() == null ? null : modelMapper.map(ctx.getSource(), ProductCardResponse.class);
 
         // Order mapping with careful handling of shipping address
         modelMapper.addMappings(new PropertyMap<Order, OrderResponse>() {
@@ -151,8 +166,15 @@ public class ModelMapperConfig {
                 map().setUpdatedAt(source.getUpdatedAt());
                 using(addressToResponseConverter).map(source.getShippingAddress()).setShippingAddress(null);
 
-                // Map OrderItems
-                map().setOrderItems(source.getOrderItems());
+                using(context -> {
+                    List<OrderItem> orderItems = (List<OrderItem>) context.getSource();
+                    Map<ProductCardResponse, Integer> itemsMap = new HashMap<>();
+                    for (OrderItem orderItem : orderItems) {
+                        ProductCardResponse productCardResponse = modelMapper.map(orderItem.getProduct(), ProductCardResponse.class);
+                        itemsMap.put(productCardResponse, orderItem.getQuantity());
+                    }
+                    return itemsMap;
+                }).map(source.getOrderItems(), destination.getOrderItems());
             }
         });
 
@@ -162,10 +184,11 @@ public class ModelMapperConfig {
                 protected void configure() {
                     map().setId(source.getId());
                     map().setQuantity(source.getQuantity());
-                    map().setPrice(source.getPrice());
-                    using(producttoProductResponseConverter).map(source.getProduct()).setProduct(null);
+                    map().setSubTotal(source.getSubTotal());
+                    using(producttoProductCardResponseConverter).map(source.getProduct()).setProduct(null);
                 }
             });
+
 
         // Review mapping
         modelMapper.createTypeMap(Review.class, ReviewResponse.class)
@@ -207,17 +230,15 @@ public class ModelMapperConfig {
                 map().setTotalAmount(source.getTotalAmount());
                 map().setCreatedAt(source.getCreatedAt());
 
-                // Custom mapping for items field (convert List<CartItem> to Map<ProductResponse, Integer>)
                 using(context -> {
                     List<CartItem> cartItems = (List<CartItem>) context.getSource();
                     Map<ProductResponse, Integer> itemsMap = new HashMap<>();
                     for (CartItem cartItem : cartItems) {
-                        // Manually map Product to ProductResponse
                         ProductResponse productResponse = modelMapper.map(cartItem.getProduct(), ProductResponse.class);
                         itemsMap.put(productResponse, cartItem.getQuantity());
                     }
                     return itemsMap;
-                }).map(source.getCartItems(), destination.getItems());
+                }).map(source.getCartItems(), destination.getCartItems());
             }
         });
 
@@ -229,6 +250,16 @@ public class ModelMapperConfig {
                     mapper.map(Discount::getStartDate, DiscountResponse::setStartDate);
                     mapper.map(Discount::getEndDate, DiscountResponse::setEndDate);
                     mapper.map(Discount::getDescription, DiscountResponse::setDescription);
+                });
+
+        //Brand Mapping
+        modelMapper.createTypeMap(Brand.class,BrandResponse.class)
+                .addMappings(mapper -> {
+                    mapper.map(Brand::getId,BrandResponse::setId);
+                    mapper.map(Brand::getName,BrandResponse::setName);
+                    mapper.map(Brand::getDescription,BrandResponse::setDescription);
+                    mapper.map(Brand::getLogoUrl,BrandResponse::setLogoUrl);
+                    mapper.map(Brand::isActive,BrandResponse::setActive);
                 });
     }
 }

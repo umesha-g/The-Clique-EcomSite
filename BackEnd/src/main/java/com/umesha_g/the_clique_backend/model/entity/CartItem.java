@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -24,6 +25,8 @@ public class CartItem {
     private Product product;
 
     private Integer quantity;
+
+    private BigDecimal subTotal;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

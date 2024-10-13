@@ -1,6 +1,7 @@
 package com.umesha_g.the_clique_backend.service;
 
 import com.umesha_g.the_clique_backend.dto.request.ProductRequest;
+import com.umesha_g.the_clique_backend.dto.response.ProductCardResponse;
 import com.umesha_g.the_clique_backend.dto.response.ProductResponse;
 import com.umesha_g.the_clique_backend.exception.ResourceNotFoundException;
 import com.umesha_g.the_clique_backend.model.entity.Brand;
@@ -51,7 +52,7 @@ public class ProductService {
         return modelMapper.map(savedProduct, ProductResponse.class);
     }
 
-    public Page<ProductResponse> searchProducts(
+    public Page<ProductCardResponse> searchProducts(
             String categoryId,
             String brandId,
             BigDecimal minPrice,
@@ -70,7 +71,7 @@ public class ProductService {
                 pageable
         );
 
-        return products.map(product -> modelMapper.map(product, ProductResponse.class));
+        return products.map(product -> modelMapper.map(product, ProductCardResponse.class));
     }
 
     public ProductResponse updateProduct(String id, ProductRequest request) throws ResourceNotFoundException {
@@ -89,9 +90,9 @@ public class ProductService {
         productRepository.deleteById(id);
     }
 
-    public Page<ProductResponse> getAllProducts(Pageable pageable) {
+    public Page<ProductCardResponse> getAllProducts(Pageable pageable) {
         Page<Product> products = productRepository.findAll(pageable);
-        return products.map(product -> modelMapper.map(product,ProductResponse.class));
+        return products.map(product -> modelMapper.map(product, ProductCardResponse.class));
     }
 
     public ProductResponse getProduct(String id) {
@@ -99,7 +100,7 @@ public class ProductService {
             return modelMapper.map( product,ProductResponse.class);
     }
 
-    public Page<ProductResponse> getAllProductsByCategory(String id , Pageable pageable){
+    public Page<ProductCardResponse> getAllProductsByCategory(String id , Pageable pageable){
         Category category = null;
         try {
             category = categoryRepository.findById(id)
@@ -108,6 +109,10 @@ public class ProductService {
             throw new RuntimeException(e);
         }
         Page<Product> products = productRepository.findByCategory(category,pageable);
-        return products.map(product -> modelMapper.map(product,ProductResponse.class));
+        return products.map(product -> modelMapper.map(product,ProductCardResponse.class));
+    }
+
+    public Product getProductById (String id){
+            return productRepository.findById(id).orElse(null);
     }
 }

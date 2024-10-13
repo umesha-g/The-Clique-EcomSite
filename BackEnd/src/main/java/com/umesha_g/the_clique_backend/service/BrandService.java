@@ -53,13 +53,13 @@ public class BrandService {
 
     public List<BrandResponse> getAllBrands() {
         return brandRepository.findAll().stream()
-                .map(this::mapBrandToResponse)
+                .map(brand -> modelMapper.map(brand, BrandResponse.class))
                 .collect(Collectors.toList());
     }
 
     public List<BrandResponse> getActiveBrands() {
         return brandRepository.findByIsActiveTrue().stream()
-                .map(this::mapBrandToResponse)
+                .map(brand -> modelMapper.map(brand, BrandResponse.class))
                 .collect(Collectors.toList());
     }
 
@@ -100,15 +100,5 @@ public class BrandService {
             throw new RuntimeException("Brand not found");
         }
         brandRepository.deleteById(id);
-    }
-
-    private BrandResponse mapBrandToResponse(Brand brand) {
-        BrandResponse response = new BrandResponse();
-        response.setId(brand.getId());
-        response.setName(brand.getName());
-        response.setDescription(brand.getDescription());
-        response.setLogoUrl(brand.getLogoUrl());
-        response.setActive(brand.isActive());
-        return response;
     }
 }
