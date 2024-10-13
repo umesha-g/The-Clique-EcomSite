@@ -10,9 +10,7 @@ import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Configuration
 public class ModelMapperConfig {
@@ -58,7 +56,7 @@ public class ModelMapperConfig {
                     mapper.map(AddressRequest::isDefault, Address::setDefault);
                 });
 
-        // Product Request mapping with brand and category references
+        // Product Request mapping
         modelMapper.createTypeMap(ProductRequest.class, Product.class)
                 .addMappings(mapper -> {
                     mapper.map(ProductRequest::getName, Product::setName);
@@ -110,7 +108,7 @@ public class ModelMapperConfig {
                     mapper.map(Address::getAddressType, AddressResponse::setAddressType);
                 });
 
-        // Create a converter for handling the shipping address
+        // Converter for handling the shipping address
         Converter<Address, AddressResponse> addressToResponseConverter = ctx ->
                 ctx.getSource() == null ? null : modelMapper.map(ctx.getSource(), AddressResponse.class);
 
@@ -153,7 +151,7 @@ public class ModelMapperConfig {
         Converter<Product, ProductCardResponse> producttoProductCardResponseConverter = ctx ->
                 ctx.getSource() == null ? null : modelMapper.map(ctx.getSource(), ProductCardResponse.class);
 
-        // Order mapping with careful handling of shipping address
+        // Order mapping
         modelMapper.addMappings(new PropertyMap<Order, OrderResponse>() {
             @Override
             protected void configure() {
@@ -178,7 +176,7 @@ public class ModelMapperConfig {
             }
         });
 
-        // OrderItem to OrderItemResponse mapping
+        // OrderItem mapping
         modelMapper.addMappings(new PropertyMap<OrderItem, OrderItemResponse>() {
                 @Override
                 protected void configure() {
@@ -212,14 +210,24 @@ public class ModelMapperConfig {
                     mapper.map(User::getCreatedAt,UserResponse::setCreatedAt);
                 });
 
+        //Wishlist mapping
+        modelMapper.addMappings(new PropertyMap<Wishlist, WishlistResponse>() {
+            @Override
+            protected void configure() {
+                map().setId(source.getId());
+                map().setCreatedAt(source.getCreatedAt());
 
-        // Wishlist mapping
-        modelMapper.createTypeMap(Wishlist.class, WishlistResponse.class)
-                .addMappings(mapper -> {
-                    mapper.map(Wishlist::getId, WishlistResponse::setId);
-                    mapper.map(Wishlist::getProducts, WishlistResponse::setProducts);
-                    mapper.map(Wishlist::getCreatedAt, WishlistResponse::setCreatedAt);
-                });
+                using(context -> {
+                    Set<Product> products = (Set<Product>) context.getSource();
+                    Set<ProductCardResponse> productCardSet = new HashSet<>();
+                    for (Product product : products) {
+                        ProductCardResponse productCardResponse = modelMapper.map(product, ProductCardResponse.class);
+                        productCardSet.add(productCardResponse);
+                    }
+                    return productCardSet;
+                }).map(source.getProducts(), destination.getProducts());
+            }
+        });
 
         // Cart mapping
         modelMapper.addMappings(new PropertyMap<Cart, CartResponse>() {
@@ -252,7 +260,7 @@ public class ModelMapperConfig {
                     mapper.map(Discount::getDescription, DiscountResponse::setDescription);
                 });
 
-        //Brand Mapping
+        //Brand mapping
         modelMapper.createTypeMap(Brand.class,BrandResponse.class)
                 .addMappings(mapper -> {
                     mapper.map(Brand::getId,BrandResponse::setId);
