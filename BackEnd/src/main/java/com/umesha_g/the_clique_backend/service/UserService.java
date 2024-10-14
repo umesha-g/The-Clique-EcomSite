@@ -1,5 +1,13 @@
 package com.umesha_g.the_clique_backend.service;
 
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.umesha_g.the_clique_backend.dto.request.RegisterRequest;
 import com.umesha_g.the_clique_backend.dto.request.UserProfileUpdateRequest;
 import com.umesha_g.the_clique_backend.dto.response.UserResponse;
@@ -9,16 +17,8 @@ import com.umesha_g.the_clique_backend.model.entity.User;
 import com.umesha_g.the_clique_backend.model.enums.Role;
 import com.umesha_g.the_clique_backend.repository.UserRepository;
 import com.umesha_g.the_clique_backend.util.SecurityUtils;
+
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
@@ -135,15 +135,5 @@ public class UserService {
         User updatedUser = userRepository.save(user);
         return modelMapper.map(updatedUser, UserResponse.class);
 
-    }
-    public UserDetails loadUserByEmail(String email) throws UsernameNotFoundException {  //userName = Email
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
-
-        return org.springframework.security.core.userdetails.User
-                .withUsername(user.getEmail())
-                .password(user.getPassword())
-                .roles(user.getRole().toString())
-                .build();
     }
 }

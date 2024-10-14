@@ -1,15 +1,10 @@
 package com.umesha_g.the_clique_backend.util;
 
-import com.umesha_g.the_clique_backend.config.JwtConfig;
-import com.umesha_g.the_clique_backend.service.UserService;
-import io.jsonwebtoken.Claims;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.constraints.NotNull;
-import lombok.RequiredArgsConstructor;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,21 +13,29 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.umesha_g.the_clique_backend.config.JwtConfig;
+import com.umesha_g.the_clique_backend.service.CustomUserDetailsService;
+
+import io.jsonwebtoken.Claims;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private JwtTokenProvider tokenProvider;
-    private UserService userService;
-    private  JwtConfig jwtConfig;
+    private CustomUserDetailsService customUserDetailsService;
+    private JwtConfig jwtConfig;
 
-    public JwtAuthenticationFilter(JwtTokenProvider tokenProvider, UserService userService, JwtConfig jwtConfig) {
+    public JwtAuthenticationFilter(JwtTokenProvider tokenProvider, CustomUserDetailsService customUserDetailsService,
+            JwtConfig jwtConfig) {
         this.tokenProvider = tokenProvider;
-        this.userService = userService;
+        this.customUserDetailsService = customUserDetailsService;
         this.jwtConfig = jwtConfig;
     }
 
@@ -47,15 +50,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             if (jwt != null && tokenProvider.validateToken(jwt)) {
                 Claims claims = tokenProvider.getClaimsFromToken(jwt);
-                String email = claims.getSubject();
+                String userName = claims.getSubject();
                 List<SimpleGrantedAuthority> authorities = Arrays.stream(claims.get("role", String.class).split(","))
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
 
-                UserDetails userDetails = userService.loadUserByEmail(email);
+                UserDetails userDetails = customUserDetailsService.loadUserByUsername(userName);
 
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, authorities);
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
