@@ -1,7 +1,14 @@
 {
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "ecmaVersion": 2020,
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": "latest",
     "sourceType": "module",
     "project": "./tsconfig.json" // Specify the path to your tsconfig.json
   },
@@ -9,11 +16,13 @@
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:react/recommended",
-    "next/core-web-vitals"
+    "next/core-web-vitals",
+    "prettier"
   ],
   "plugins": [
     "@typescript-eslint",
-    "react"
+    "react",
+    "prettier"
   ],
   "rules": {
     "@typescript-eslint/no-explicit-any": "warn", // Warn against using 'any' type
@@ -24,6 +33,9 @@
   "settings": {
     "react": {
       "version": "detect" // Automatically detect the version of React to use
+    },
+    "import/resolver": {
+      "typescript": {}
     }
   }
 }

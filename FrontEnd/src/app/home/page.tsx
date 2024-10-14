@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 import BestSellingSection from "./BestSellingSection/BestSellingSection";
 import FeaturedSection from "./FeaturedSection/FeaturedSection";
 import HomeFooter from "./Footer/Footer";
@@ -7,7 +8,7 @@ import HeroSection from "./HeroSection/HeroSection";
 import TestimonialSection from "./TesimonialSection/TestimonialSection";
 import TrendingSection from "./TrendingSection/TrendingSection";
 
-const HomePage = () => {
+const HomePage: React.FC = () => {
   return (
     <div className="min-h-screen text-gray-600 bg-white">
       <HomeHeader />
