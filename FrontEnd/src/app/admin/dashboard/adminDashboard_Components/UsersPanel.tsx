@@ -1,13 +1,16 @@
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   createUser,
   deleteUser,
   getAllUsers,
-  RegisterRequest,
+  RegisterRequest, updateUserById,
+  UserProfileUpdateRequest,
   UserResponse,
 } from '@/api/admin/admin-user-api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import debounce from 'lodash/debounce';
 import {
   Table,
   TableBody,
@@ -16,138 +19,227 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import React, { useEffect, useState } from 'react';
 
 const UsersPanel: React.FC = () => {
   const [users, setUsers] = useState<UserResponse[]>([]);
-  const [newUser, setNewUser] = useState<RegisterRequest>({
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
+  const [userForm, setUserForm] = useState<RegisterRequest & { id: string }>({
+    id:'',
     firstName: '',
+    lastName: '',
     email: '',
     password: '',
+    phoneNumber: '',
   });
-  const [page, setPage] = useState(0);
+  const [pageSize] = useState(10);
+  const [searchTerm, setSearchTerm] = useState('');
   const [totalPages, setTotalPages] = useState(0);
+  const [isEditing, setIsEditing] = useState(false);
+
+  // Debounced search function
+  const debouncedSearch = useCallback(
+      debounce((term: string) => {
+        fetchUsers(term);
+      }, 500),
+      []
+  );
 
   useEffect(() => {
-    fetchUsers();
-  }, [page]);
+    fetchUsers('');
+  }, []);
 
-  const fetchUsers = async () => {
+  useEffect(() => {
+    debouncedSearch(searchTerm);
+  }, [searchTerm, currentPage, debouncedSearch]);
+
+  const handleCreateOrUpdateUser = async () => {
     try {
-      const response = await getAllUsers(page);
+      if (isEditing) {
+        const updateRequest: UserProfileUpdateRequest = {
+          firstName: userForm.firstName,
+          lastName: userForm.lastName,
+          email: userForm.email,
+          phoneNumber: userForm.phoneNumber,
+          currentPassword: '',
+        };
+        await updateUserById(userForm.id, updateRequest);
+      } else {
+        await createUser(userForm);
+      }
+      await fetchUsers('');
+      resetForm();
+    } catch (error) {
+      console.error('Error creating/updating user:', error);
+    }
+  };
+
+  const fetchUsers = async (searchTerm: string = '') => {
+    try {
+      const response = await getAllUsers(currentPage,pageSize,'createdAt', searchTerm);
       setUsers(response.content);
       setTotalPages(response.totalPages);
+      setTotalElements(response.totalElements);
     } catch (error) {
-      console.error('Error fetching users:', error);
+      console.error('Error fetching Users:', error);
     }
   };
 
-  const handleCreateUser = async () => {
-    try {
-      await createUser(newUser);
-      fetchUsers();
-      setNewUser({ firstName: '', email: '', password: '' });
-    } catch (error) {
-      console.error('Error creating user:', error);
-    }
+  const handleUpdateClick = (user: UserResponse) => {
+    setUserForm({
+      id:user.id,
+      firstName: user.firstName,
+      lastName: user.lastName || '',
+      email: user.email,
+      phoneNumber: user.phoneNumber || '',
+      password:'', // Clear password field for security
+    });
+    setIsEditing(true);
   };
-
-  // const handleUpdateUser = async (
-  //   id: string,
-  //   updatedUser: UserProfileUpdateRequest,
-  // ) => {
-  //   try {
-  //     await updateUser(id, updatedUser);
-  //     fetchUsers();
-  //   } catch (error) {
-  //     console.error('Error updating user:', error);
-  //   }
-  // };
 
   const handleDeleteUser = async (id: string) => {
     try {
       await deleteUser(id);
-      fetchUsers();
+      await fetchUsers('');
     } catch (error) {
       console.error('Error deleting user:', error);
     }
   };
 
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
+
+  const resetForm = () => {
+    setUserForm({
+      id:'',
+      firstName: '',
+      lastName: '',
+      email: '',
+      password: '',
+      phoneNumber: '',
+    });
+    setIsEditing(false);
+  };
+
   return (
-    <Card className="rounded-none">
-      <CardHeader>
-        <CardTitle>Users Management</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="mb-4 grid grid-cols-3 gap-4">
+      <Card className="rounded-none">
+        <CardHeader>
+          <CardTitle>Users Management</CardTitle>
+        </CardHeader>
+        <CardContent>
           <Input
-            placeholder="First Name"
-            value={newUser.firstName}
-            onChange={(e) =>
-              setNewUser({ ...newUser, firstName: e.target.value })
-            }
+              placeholder="Search Users..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="mb-8"
           />
-          <Input
-            type="email"
-            placeholder="Email"
-            value={newUser.email}
-            onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-          />
-          <Input
-            type="password"
-            placeholder="Password"
-            value={newUser.password}
-            onChange={(e) =>
-              setNewUser({ ...newUser, password: e.target.value })
-            }
-          />
-          <Button onClick={handleCreateUser} className="col-span-3">
-            Create User
-          </Button>
-        </div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Username</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {users.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell>{user.firstName}</TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>
-                  <Button
-                    onClick={() => handleDeleteUser(user.id)}
-                    variant="destructive"
-                    className="mr-2"
-                  >
-                    Delete
-                  </Button>
-                  {/* Add an edit button or modal here for updating user details */}
-                </TableCell>
+          <h4 className={'mb-4 mt-4'}>Add/Update Users</h4>
+          <div className="mb-12 grid grid-cols-3 gap-4">
+
+            <Input
+                placeholder="First Name"
+                value={userForm.firstName}
+                onChange={(e) =>
+                    setUserForm({ ...userForm, firstName: e.target.value })
+                }
+            />
+            <Input
+                placeholder="Last Name"
+                value={userForm.lastName}
+                onChange={(e) =>
+                    setUserForm({ ...userForm, lastName: e.target.value })
+                }
+            />
+            <Input
+                placeholder="Phone"
+                value={userForm.phoneNumber}
+                onChange={(e) =>
+                    setUserForm({ ...userForm, phoneNumber: e.target.value })
+                }
+            />
+            <Input
+                type="email"
+                placeholder="Email"
+                value={userForm.email}
+                onChange={(e) => setUserForm({ ...userForm, email: e.target.value })}
+            />
+            <Input
+                type="password"
+                placeholder="Password"
+                value={userForm.password}
+                onChange={(e) =>
+                    setUserForm({ ...userForm, password: e.target.value })
+                }
+            />
+            <Button onClick={handleCreateOrUpdateUser} className="col-span-3 rounded-none">
+              {isEditing ? 'Update User' : 'Create User'}
+            </Button>
+          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>E-mail</TableHead>
+                <TableHead>First Name</TableHead>
+                <TableHead>Last Name</TableHead>
+                <TableHead>Phone</TableHead>
+                <TableHead>Role</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        <div className="flex justify-between mt-4">
-          <Button
-            onClick={() => setPage(Math.max(0, page - 1))}
-            disabled={page === 0}
-          >
-            Previous
-          </Button>
-          <Button
-            onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
-            disabled={page === totalPages - 1}
-          >
-            Next
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+            </TableHeader>
+            <TableBody>
+              {users.map((user) => (
+                  <TableRow key={user.id}>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>{user.firstName}</TableCell>
+                    <TableCell>{user.lastName}</TableCell>
+                    <TableCell>{user.phoneNumber}</TableCell>
+                    <TableCell>{user.role}</TableCell>
+                    <TableCell>
+                      <Button
+                          onClick={() => handleUpdateClick(user)}
+                          className="mr-2 rounded-none"
+                      >
+                        Update
+                      </Button>
+                      <Button
+                          onClick={() => handleDeleteUser(user.id)}
+                          variant="destructive"
+                          className="mr-2 rounded-none"
+                      >
+                        Delete
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <div className="flex justify-between items-center mt-4">
+            <div className="text-sm text-gray-500">
+              Total items: {totalElements}
+            </div>
+            <div className="flex gap-2">
+              <Button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 0}
+                  variant="outline"
+              >
+                Previous
+              </Button>
+              <span className="flex items-center px-4">
+              Page {currentPage + 1} of {totalPages}
+            </span>
+              <Button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages - 1}
+                  variant="outline"
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
   );
 };
 

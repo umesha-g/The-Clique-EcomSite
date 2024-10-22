@@ -1,11 +1,12 @@
 package com.umesha_g.the_clique_backend.dto.response;
 
-import com.umesha_g.the_clique_backend.model.enums.OrderStatus;
-import lombok.Data;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Map;
+
+import com.umesha_g.the_clique_backend.model.enums.OrderStatus;
+
+import lombok.Data;
 
 @Data
 public class OrderResponse {

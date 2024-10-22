@@ -1,5 +1,7 @@
 import { DiscountResponse } from './admin-discount-api';
 import {api} from "@/utils/apiConfig";
+import axios from "axios";
+import {ProductCardResponse} from "@/api/product-api";
 
 export interface ProductRequest {
   name: string;
@@ -46,6 +48,26 @@ export interface FileRefResponse {
   displayOrder?: number;
   status: ImageStatus;
 }
+
+export const getAllProducts = async (
+    page: number = 0,
+    size: number = 10,
+    sortBy: string = 'createdAt',
+    searchTerm: string): Promise<{
+  content: ProductResponse[];
+  totalPages: number;
+  totalElements: number;
+}> => {
+  try {
+    const response = await api.get(`/admin/products`, {
+      params: { page, size, sortBy, searchTerm },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    throw error;
+  }
+};
 
 export const createProduct = async (
   request: ProductRequest,

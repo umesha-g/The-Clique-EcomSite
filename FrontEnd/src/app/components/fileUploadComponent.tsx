@@ -15,14 +15,14 @@ interface FileUploadProps {
   allowCardImage?: boolean;
 }
 
-export function FileUpload({
+const FileUpload:React.FC<FileUploadProps> = ({
   maxFiles,
   onUpload,
   existingFiles = [],
   onRemove,
   onSetAsCard,
-  allowCardImage
-}: FileUploadProps) {
+  allowCardImage})=>
+ {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -116,3 +116,5 @@ export function FileUpload({
     </div>
   );
 }
+
+export default FileUpload;

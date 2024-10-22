@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { authApi } from '@/api/auth-api';
+import { login,register } from '@/api/auth-api';
 
-const AuthForm = () => {
+const AuthForm:React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [firstName, setName] = useState('');
@@ -16,7 +16,7 @@ const AuthForm = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await authApi.login({ email, password });
+      await login({ email, password });
       // Handle successful login (e.g., redirect or update UI)
     } catch (error) {
       console.error('Login failed:', error);
@@ -27,7 +27,7 @@ const AuthForm = () => {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await authApi.register({ firstName, email, password });
+      await register({ firstName, email, password });
       // Handle successful registration (e.g., redirect or update UI)
     } catch (error) {
       console.error('Registration failed:', error);

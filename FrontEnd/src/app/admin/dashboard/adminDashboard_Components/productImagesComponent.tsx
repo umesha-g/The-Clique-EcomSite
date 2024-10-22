@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FileUpload } from './FileUpload';
+import FileUpload from "@/app/components/fileUploadComponent";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface ProductImage {
@@ -12,20 +12,20 @@ interface ProductImagesProps {
   productId: string;
 }
 
-export function ProductImages({ productId }: ProductImagesProps) {
+const ProductImages: React.FC<ProductImagesProps> =( productId) => {
   const [cardImage, setCardImage] = useState<ProductImage[]>([]);
   const [detailImages, setDetailImages] = useState<ProductImage[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadImages();
+     loadImages();
   }, [productId]);
 
   const loadImages = async () => {
     try {
       const response = await fetch(`/api/v1/products/${productId}/images`);
       const data = await response.json();
-      
+
       setCardImage(data.filter((img: ProductImage) => img.isCardImage));
       setDetailImages(data.filter((img: ProductImage) => !img.isCardImage));
     } finally {
@@ -43,7 +43,7 @@ export function ProductImages({ productId }: ProductImagesProps) {
       body: formData
     });
 
-    loadImages();
+    await loadImages();
   };
 
   const handleDetailImagesUpload = async (files: File[]) => {
@@ -109,3 +109,5 @@ export function ProductImages({ productId }: ProductImagesProps) {
     </Tabs>
   );
 }
+
+export default ProductImages;

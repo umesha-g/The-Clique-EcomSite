@@ -52,8 +52,7 @@ public class UserService {
 
 
     public UserResponse getUserById(String id) throws ResourceNotFoundException {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        User user = findUserById(id);
         return modelMapper.map(user, UserResponse.class);
     }
 
@@ -85,14 +84,19 @@ public class UserService {
         return updateUserProcess(user,request);
     }
 
-    public Page<UserResponse> getAllUsers(Pageable pageable) {
-        Page<User> users = userRepository.findAll(pageable);
-        return users.map(user -> modelMapper.map(users, UserResponse.class));
+    public Page<UserResponse> getAllUsers(Pageable pageable , String searchTerm) {
+        Page<User> users = userRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrEmailContainingIgnoreCase(searchTerm,searchTerm,searchTerm, pageable);
+        return users.map(user -> modelMapper.map(user, UserResponse.class));
     }
 
     public void deleteUserById(String id) throws ResourceNotFoundException {
+
         if (!userRepository.existsById(id)) {
             throw new ResourceNotFoundException("User not found");
+        }
+        else if (Role.ADMIN.equals(getUserById(id).getRole()))
+        {
+            throw new RuntimeException("");
         }
         userRepository.deleteById(id);
     }
@@ -108,7 +112,7 @@ public class UserService {
 
         if (request.getEmail() != null && !request.getEmail().equals(user.getEmail())) {
             if (userRepository.existsByEmail(request.getEmail())) {
-                throw new UserException.ResourceAlreadyExistsException("Email already registered");
+                throw new UserException.ResourceAlreadyExistsException("A User already exists with this E-mail");
             }
             user.setEmail(request.getEmail());
         }
@@ -126,7 +130,10 @@ public class UserService {
         }
 
         if (request.getNewPassword() != null) {
-            if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            if(user.getRole().equals(Role.ADMIN)){
+                user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+            }
+            else if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
                 throw new UserException.InvalidPasswordException("Current password is incorrect");
             }
             user.setPassword(passwordEncoder.encode(request.getNewPassword()));
@@ -135,5 +142,10 @@ public class UserService {
         User updatedUser = userRepository.save(user);
         return modelMapper.map(updatedUser, UserResponse.class);
 
+    }
+
+    private User findUserById(String id) throws ResourceNotFoundException {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 }

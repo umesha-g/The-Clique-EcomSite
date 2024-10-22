@@ -1,9 +1,9 @@
 package com.umesha_g.the_clique_backend.controller;
 
 import com.umesha_g.the_clique_backend.dto.request.ReviewRequest;
+import com.umesha_g.the_clique_backend.dto.response.FileRefResponse;
 import com.umesha_g.the_clique_backend.dto.response.ReviewResponse;
 import com.umesha_g.the_clique_backend.exception.ResourceNotFoundException;
-import com.umesha_g.the_clique_backend.model.entity.FileReference;
 import com.umesha_g.the_clique_backend.service.ReviewImageService;
 import com.umesha_g.the_clique_backend.service.ReviewService;
 import lombok.RequiredArgsConstructor;
@@ -68,9 +68,9 @@ public class ReviewController {
     }
 
     @GetMapping("/reviews/{reviewId}/images")
-    public ResponseEntity<List<FileReference>> getReviewImages(
+    public ResponseEntity<List<FileRefResponse>> getReviewImages(
             @PathVariable String reviewId) {
-       List<FileReference> files =  reviewImageService.getReviewImages(reviewId);
+       List<FileRefResponse> files =  reviewImageService.getReviewImages(reviewId);
         return ResponseEntity.ok(files);
     }
 }

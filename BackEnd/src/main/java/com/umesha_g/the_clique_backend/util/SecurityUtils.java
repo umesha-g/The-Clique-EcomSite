@@ -4,79 +4,136 @@ import com.umesha_g.the_clique_backend.exception.ResourceNotFoundException;
 import com.umesha_g.the_clique_backend.exception.UnauthorizedException;
 import com.umesha_g.the_clique_backend.model.entity.User;
 import com.umesha_g.the_clique_backend.service.UserService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class SecurityUtils {
     private UserService userService;
-    private SecurityUtils() {
-        // Private constructor to prevent instantiation
+
+    public SecurityUtils(UserService userService) {
+        this.userService = userService;
     }
 
     /**
-     * Gets the current user's ID from the SecurityContext
+     * Gets the current user from the SecurityContext
      *
-     * @return the user ID of the currently authenticated user
+     * @return the currently authenticated user
      * @throws UnauthorizedException if no authentication is found
+     * @throws ResourceNotFoundException if user is not found in database
      */
     public User getCurrentUser() throws ResourceNotFoundException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Authentication authentication = Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
+                .orElseThrow(() -> new UnauthorizedException("No authentication found"));
 
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new UnauthorizedException("No authentication found");
+        if (!authentication.isAuthenticated()) {
+            throw new UnauthorizedException("User is not authenticated");
         }
 
+        String userEmail = extractUserEmail(authentication);
+        return userService.getUserByEmail(userEmail);
+    }
+
+    /**
+     * Extracts user email from Authentication object
+     */
+    private String extractUserEmail(Authentication authentication) {
         Object principal = authentication.getPrincipal();
 
         if (principal instanceof UserDetails) {
-            return userService.getUserByEmail(((UserDetails) principal).getUsername());
+            return ((UserDetails) principal).getUsername();
         } else if (principal instanceof String) {
-            return userService.getUserByEmail((String) principal);
+            return (String) principal;
         }
 
-        throw new UnauthorizedException("Unable to determine current user ID");
+        throw new UnauthorizedException("Unable to determine user email");
     }
 
     /**
      * Checks if the current user is authenticated
-     *
-     * @return true if the user is authenticated, false otherwise
      */
     public static boolean isAuthenticated() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication != null && authentication.isAuthenticated();
+        return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
+                .map(Authentication::isAuthenticated)
+                .orElse(false);
     }
 
     /**
-     * Gets the current user's Authentication object
-     *
-     * @return the Authentication object
-     * @throws UnauthorizedException if no authentication is found
+     * Gets the current Authentication object
      */
     public static Authentication getCurrentAuthentication() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
+                .orElseThrow(() -> new UnauthorizedException("No authentication found"));
+    }
 
-        if (authentication == null) {
-            throw new UnauthorizedException("No authentication found");
+    /**
+     * Gets all roles of the current user
+     */
+    public static Set<String> getCurrentUserRoles() {
+        Authentication authentication = getCurrentAuthentication();
+        return authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .map(role -> role.replace("ROLE_", ""))
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * Checks if the current user has any of the specified roles
+     */
+    public static boolean hasAnyRole(String... roles) {
+        Set<String> userRoles = getCurrentUserRoles();
+        return Set.of(roles).stream().anyMatch(userRoles::contains);
+    }
+
+    /**
+     * Checks if the current user has all specified roles
+     */
+    public static boolean hasAllRoles(String... roles) {
+        Set<String> userRoles = getCurrentUserRoles();
+        return Set.of(roles).stream().allMatch(userRoles::contains);
+    }
+
+    /**
+     * Gets authentication details including IP address
+     */
+    public static String getAuthenticationDetails() {
+        Authentication authentication = getCurrentAuthentication();
+        if (authentication.getDetails() instanceof WebAuthenticationDetails details) {
+            return String.format("IP: %s, Session ID: %s",
+                    details.getRemoteAddress(),
+                    details.getSessionId());
         }
+        return "No details available";
+    }
 
-        return authentication;
+    /**
+     * Validates if the current user has access to the requested user ID
+     */
+    public boolean validateUserAccess(Long requestedUserId) throws ResourceNotFoundException {
+        User currentUser = getCurrentUser();
+        return currentUser.getId().equals(requestedUserId) ||
+                hasRole("ADMIN");
     }
 
     /**
      * Checks if the current user has a specific role
-     *
-     * @param role the role to check
-     * @return true if the user has the role, false otherwise
      */
     public static boolean hasRole(String role) {
         Authentication authentication = getCurrentAuthentication();
         return authentication.getAuthorities().stream()
-                .anyMatch(grantedAuthority ->
-                        grantedAuthority.getAuthority().equals("ROLE_" + role));
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(authority -> authority.equals("ROLE_" + role));
     }
 }

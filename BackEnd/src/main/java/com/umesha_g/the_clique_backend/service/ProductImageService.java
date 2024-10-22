@@ -1,5 +1,6 @@
 package com.umesha_g.the_clique_backend.service;
 
+import com.umesha_g.the_clique_backend.dto.response.FileRefResponse;
 import com.umesha_g.the_clique_backend.exception.FileExceptions.MaxImagesExceededException;
 import com.umesha_g.the_clique_backend.model.entity.FileReference;
 import com.umesha_g.the_clique_backend.model.entity.Product;
@@ -107,13 +108,21 @@ public class ProductImageService {
        //modelMapper.map(updatedProduct, ProductResponse.class);
     }
 
-    public List<FileReference> getProductImages(String productId) {
+    public List<FileRefResponse> getProductImages(String productId) {
         List<FileReference> cardImages = fileReferenceService
                 .getActiveFilesByEntity(ImageType.PRODUCT_CARD, productId);
         List<FileReference> detailImages = fileReferenceService
                 .getActiveFilesByEntity(ImageType.PRODUCT_DETAIL, productId);
 
-        return Stream.concat(cardImages.stream(), detailImages.stream())
+        List<FileRefResponse> detailList = detailImages.stream()
+                .map(fileReference -> modelMapper.map(fileReference, FileRefResponse.class)).toList();
+                //.collect(Collectors.toList());
+
+        List<FileRefResponse> cardList = cardImages.stream()
+                .map(fileReference -> modelMapper.map(fileReference, FileRefResponse.class)).toList();
+                //.collect(Collectors.toList());
+
+        return Stream.concat(cardList.stream(), detailList.stream())
                 .collect(Collectors.toList());
     }
 }

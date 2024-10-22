@@ -1,11 +1,16 @@
 package com.umesha_g.the_clique_backend.dto.request;
 
-import com.umesha_g.the_clique_backend.model.enums.Gender;
-import jakarta.validation.constraints.*;
-import lombok.Data;
-
 import java.math.BigDecimal;
 import java.util.Set;
+
+import com.umesha_g.the_clique_backend.model.enums.Gender;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
+import lombok.Data;
 
 @Data
 public class ProductRequest {
@@ -23,7 +28,6 @@ public class ProductRequest {
     @NotBlank(message = "Description is required")
     private String description;
 
-    @NotNull(message = "Brand ID is required")
     private String brandId;
 
     @NotNull(message = "Category ID is required")

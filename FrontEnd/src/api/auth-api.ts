@@ -1,18 +1,34 @@
-import axios from 'axios';
-import { LoginRequest, RegisterRequest } from '../types/auth';
+import { RegisterRequest } from './admin/admin-user-api';
+import {api} from "@/utils/apiConfig";
 
-const BASE_URL = 'http://localhost:8080/api/v1/auth';
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
 
-export const authApi = {
-  login: async (request: LoginRequest): Promise<void> => {
-    await axios.post(`${BASE_URL}/login`, request);
-  },
+export const login = async (request: LoginRequest): Promise<void> => {
+  try {
+    await api.post('/auth/login', request);
+  } catch (error) {
+    console.error('Error logging in:', error);
+    throw error;
+  }
+};
 
-  register: async (request: RegisterRequest): Promise<void> => {
-    await axios.post(`${BASE_URL}/register`, request);
-  },
+export const register = async (request: RegisterRequest): Promise<void> => {
+  try {
+    await api.post('/auth/register', request);
+  } catch (error) {
+    console.error('Error registering user:', error);
+    throw error;
+  }
+};
 
-  logout: async (): Promise<void> => {
-    await axios.post(`${BASE_URL}/logout`);
-  },
+export const logout = async (): Promise<void> => {
+  try {
+    await api.post('/auth/logout');
+  } catch (error) {
+    console.error('Error logging out:', error);
+    throw error;
+  }
 };

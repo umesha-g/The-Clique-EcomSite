@@ -44,12 +44,13 @@ public class AdminUserController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<UserResponse>> getAllUsers(
+    public ResponseEntity<Page<UserResponse>> searchAllUsers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "createdAt") String sortBy) {
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam String searchTerm)  {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
-        Page<UserResponse> response = userService.getAllUsers(pageable);
+        Page<UserResponse> response = userService.getAllUsers(pageable ,searchTerm);
         return ResponseEntity.ok(response);
     }
 

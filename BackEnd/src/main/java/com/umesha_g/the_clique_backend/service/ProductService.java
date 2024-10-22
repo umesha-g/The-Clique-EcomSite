@@ -90,9 +90,9 @@ public class ProductService {
         productRepository.deleteById(id);
     }
 
-    public Page<ProductCardResponse> getAllProducts(Pageable pageable) {
-        Page<Product> products = productRepository.findAll(pageable);
-        return products.map(product -> modelMapper.map(product, ProductCardResponse.class));
+    public Page<ProductResponse> getAllProducts(Pageable pageable , String searchTerm) {
+        Page<Product> products = productRepository.findByNameContainingIgnoreCase(searchTerm,pageable);
+        return products.map(product -> modelMapper.map(product, ProductResponse.class));
     }
 
     public ProductResponse getProduct(String id) {

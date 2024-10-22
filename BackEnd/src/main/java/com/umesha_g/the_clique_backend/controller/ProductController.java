@@ -30,15 +30,6 @@ public class ProductController {
         this.productStatisticsService = productStatisticsService;
     }
 
-    @GetMapping
-    public  ResponseEntity<Page<ProductCardResponse>> getAllProducts(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "createdAt") String sortBy) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
-        return ResponseEntity.ok(productService.getAllProducts(pageable));
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponse> getProduct(@PathVariable String id) {
         return ResponseEntity.ok(productService.getProduct(id));

@@ -2,6 +2,7 @@ package com.umesha_g.the_clique_backend.util.Jwt;
 
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 
 import javax.crypto.SecretKey;
 import java.time.LocalDate;
@@ -9,8 +10,9 @@ import java.time.temporal.WeekFields;
 import java.util.Base64;
 import java.util.Locale;
 
+@RequiredArgsConstructor
 public class WeeklyKeyManager {
-    private static JwtKeyRepository jwtKeyRepository = new JwtKeyRepository();
+    private static final JwtKeyRepository jwtKeyRepository = new JwtKeyRepository();
 
     public static SecretKey getWeeklyKey() {
         JwtKeyData storedKeyData = jwtKeyRepository.getStoredKey();
@@ -19,7 +21,7 @@ public class WeeklyKeyManager {
         // Check if the key needs to be regenerated
         if (storedKeyData == null || isNewWeek(storedKeyData.getLastGeneratedDate(), currentDate)) {
             // Generate a new key
-            SecretKey newKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+            SecretKey newKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);
             String base64Key = Base64.getEncoder().encodeToString(newKey.getEncoded());
 
             // Store the new key and generation date

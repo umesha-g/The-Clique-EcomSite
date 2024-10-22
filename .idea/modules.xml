@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/The Clique.iml" filepath="$PROJECT_DIR$/.idea/The Clique.iml" />
+      <module fileurl="file://$PROJECT_DIR$/BackEnd/The_Clique_Backend.iml" filepath="$PROJECT_DIR$/BackEnd/The_Clique_Backend.iml" />
     </modules>
   </component>
 </project>

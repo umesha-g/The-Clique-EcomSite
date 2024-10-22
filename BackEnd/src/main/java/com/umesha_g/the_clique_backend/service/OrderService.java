@@ -121,11 +121,16 @@ public class OrderService {
     public Page<OrderResponse> getUserOrders(Pageable pageable) throws ResourceNotFoundException {
         User user = securityUtils.getCurrentUser();
         Page<Order> orders = orderRepository.findByUser(user,pageable);
-        return orders.map(order -> modelMapper.map(orders, OrderResponse.class));
+        return orders.map(order -> modelMapper.map(order, OrderResponse.class));
     }
 
-    public Page<OrderResponse> getAllOrders(Pageable pageable) {
-        Page<Order> orders = orderRepository.findAll(pageable);
-        return orders.map(order -> modelMapper.map(orders, OrderResponse.class));
+    public Page<OrderResponse> filterAllOrders(Pageable pageable , String searchTerm, OrderStatus status) {
+        Page<Order> orders = orderRepository.findByStatusAndSearch(status, searchTerm, searchTerm, pageable );
+        return orders.map(order -> modelMapper.map(order, OrderResponse.class));
+    }
+
+    public Page<OrderResponse> searchAllOrders(Pageable pageable , String searchTerm) {
+        Page<Order> orders = orderRepository.findByTrackingNumberContainingIgnoreCaseOrIdContainingIgnoreCase(searchTerm, searchTerm, pageable );
+        return orders.map(order -> modelMapper.map(order, OrderResponse.class));
     }
 }

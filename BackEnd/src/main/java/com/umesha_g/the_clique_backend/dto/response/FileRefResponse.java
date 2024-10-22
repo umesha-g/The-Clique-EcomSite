@@ -1,2 +1,14 @@
-package com.umesha_g.the_clique_backend.dto.response;public class FileRefResponse {
+package com.umesha_g.the_clique_backend.dto.response;
+
+import com.umesha_g.the_clique_backend.model.enums.FileEnums;
+import lombok.Data;
+
+@Data
+public class FileRefResponse {
+
+    private String thumbnailUrl;
+    private String standardUrl;
+    private boolean isCardImage;
+    private Integer displayOrder;
+    private FileEnums.ImageStatus status;
 }

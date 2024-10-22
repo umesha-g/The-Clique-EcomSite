@@ -43,7 +43,7 @@ public class CategoryService {
 
     public List<CategoryResponse> getAllCategories() {
         return categoryRepository.findAll().stream()
-                .map(this::mapCategoryToResponse)
+                .map(category -> modelMapper.map(category, CategoryResponse.class))
                 .collect(Collectors.toList());
     }
 
@@ -71,13 +71,5 @@ public class CategoryService {
             throw new RuntimeException("Category not found");
         }
         categoryRepository.deleteById(id);
-    }
-
-    private CategoryResponse mapCategoryToResponse(Category category) {
-        CategoryResponse response = new CategoryResponse();
-        response.setId(category.getId());
-        response.setName(category.getName());
-        response.setDescription(category.getDescription());
-        return response;
     }
 }

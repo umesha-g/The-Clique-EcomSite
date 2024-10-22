@@ -1,35 +1,44 @@
 package com.umesha_g.the_clique_backend.service;
 
 import com.umesha_g.the_clique_backend.config.JwtConfig;
-import com.umesha_g.the_clique_backend.util.JwtTokenProvider;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
+import com.umesha_g.the_clique_backend.util.Jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-    private final JwtTokenProvider tokenProvider;
-    private final JwtConfig jwtConfig;
+    private JwtTokenProvider tokenProvider;
+    private JwtConfig jwtConfig;
+
+    @Autowired
+    public AuthService(JwtTokenProvider tokenProvider, JwtConfig jwtConfig) {
+        this.tokenProvider = tokenProvider;
+        this.jwtConfig = jwtConfig;
+    }
 
     public void setAuthenticationCookie(HttpServletResponse response, Authentication authentication) {
         String jwt = tokenProvider.generateToken(authentication);
-        Cookie cookie = new Cookie(jwtConfig.getCookieName(), jwt);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true); // set to true if using HTTPS
-        cookie.setPath("/");
-        cookie.setMaxAge((int) (jwtConfig.getExpiration() / 1000)); // convert milliseconds to seconds
-        response.addCookie(cookie);
+        String cookieValue = String.format("%s=%s; HttpOnly; Path=/; Max-Age=%d; SameSite=Lax",
+                jwtConfig.getCookieName(),
+                jwt,
+                (int) (jwtConfig.getExpiration() / 1000));
+
+        if (jwtConfig.isSecure()) {
+            cookieValue += "; Secure";
+        }
+
+        response.setHeader("Set-Cookie", cookieValue);
     }
 
     public void clearAuthenticationCookie(HttpServletResponse response) {
-        Cookie cookie = new Cookie(jwtConfig.getCookieName(), null);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(0);
-        response.addCookie(cookie);
+        String cookieValue = String.format("%s=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax; Secure",
+                jwtConfig.getCookieName());
+
+        response.setHeader("Set-Cookie", cookieValue);
     }
 }

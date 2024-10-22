@@ -1,14 +1,18 @@
 package com.umesha_g.the_clique_backend.controller.admin;
 
 import com.umesha_g.the_clique_backend.dto.request.ProductRequest;
+import com.umesha_g.the_clique_backend.dto.response.FileRefResponse;
 import com.umesha_g.the_clique_backend.dto.response.ProductResponse;
 import com.umesha_g.the_clique_backend.exception.ResourceNotFoundException;
-import com.umesha_g.the_clique_backend.model.entity.FileReference;
 import com.umesha_g.the_clique_backend.service.ProductImageService;
 import com.umesha_g.the_clique_backend.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -64,10 +68,21 @@ public class AdminProductController {
         }
     }
 
+    @GetMapping
+    public  ResponseEntity<Page<ProductResponse>> searchAllProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "") String searchTerm)
+        {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+        return ResponseEntity.ok(productService.getAllProducts(pageable,searchTerm));
+    }
+
     @GetMapping("/{productId}/images")
-    public ResponseEntity<List<FileReference>> getProductImages(
+    public ResponseEntity<List<FileRefResponse>> getProductImages(
             @PathVariable String productId) {
-        List<FileReference> files =  productImageService.getProductImages(productId);
+        List<FileRefResponse> files =  productImageService.getProductImages(productId);
         return ResponseEntity.ok(files);
     }
 
@@ -88,7 +103,7 @@ public class AdminProductController {
     public ResponseEntity<?> setAsCardImage(@PathVariable String productId,@PathVariable String fileId) {
         try {
             productImageService.setAsCardImage(productId,fileId);
-            return ResponseEntity.ok("Image set as card image successfully");
+            return ResponseEntity.ok("Image set as card image successful");
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(e.getMessage());

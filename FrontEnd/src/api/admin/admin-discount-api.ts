@@ -7,7 +7,6 @@ export interface DiscountRequest {
   startDate: string;
   endDate: string;
   applicableCategoryIds: string[];
-  applicableProductIds: string[];
   isActive: boolean;
 }
 
@@ -49,16 +48,6 @@ export const getAllDiscounts = async (): Promise<DiscountResponse[]> => {
     return response.data;
   } catch (error) {
     console.error('Error fetching all discounts:', error);
-    throw error;
-  }
-};
-
-export const getActiveDiscounts = async (): Promise<DiscountResponse[]> => {
-  try {
-    const response = await api.get(`/admin/discounts/active`);
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching active discounts:', error);
     throw error;
   }
 };

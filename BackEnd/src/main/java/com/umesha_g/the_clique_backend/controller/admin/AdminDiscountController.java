@@ -41,13 +41,12 @@ public class AdminDiscountController {
         return ResponseEntity.ok(discountService.getAllDiscounts());
     }
 
-    @GetMapping("/active")
-    public ResponseEntity<List<DiscountResponse>> getActiveDiscounts() {
-        return ResponseEntity.ok(discountService.getActiveDiscounts());
-    }
+//    @GetMapping("/active")
+//    public ResponseEntity<List<DiscountResponse>> getActiveDiscounts() {
+//        return ResponseEntity.ok(discountService.getActiveDiscounts());
+//    }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<DiscountResponse> updateDiscount(
             @PathVariable String id,
             @Valid @RequestBody DiscountRequest request) throws ResourceNotFoundException {
@@ -55,7 +54,6 @@ public class AdminDiscountController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteDiscount(@PathVariable String id) throws ResourceNotFoundException {
         discountService.deleteDiscount(id);
         return ResponseEntity.noContent().build();

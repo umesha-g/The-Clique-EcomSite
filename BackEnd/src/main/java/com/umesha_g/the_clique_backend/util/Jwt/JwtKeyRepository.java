@@ -1,12 +1,18 @@
+package com.umesha_g.the_clique_backend.util.Jwt;
+
+import io.github.cdimascio.dotenv.Dotenv;
+import lombok.RequiredArgsConstructor;
+
 import java.sql.*;
 import java.time.LocalDate;
 
 public class JwtKeyRepository {
+    Dotenv dotenv = Dotenv.load();
 
     // JDBC URL, username and password of MySQL server
-    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/your_database";
-    private static final String JDBC_USER = "username";
-    private static final String JDBC_PASSWORD = "password";
+    private final String JDBC_URL = dotenv.get("MYSQL_URL");
+    private final String JDBC_USER = dotenv.get("MYSQL_USER");
+    private final String JDBC_PASSWORD = dotenv.get("MYSQL_PASSWORD");
 
     // SQL queries
     private static final String SELECT_KEY_QUERY = "SELECT secret_key, last_generated_date FROM jwt_keys WHERE id = 1";
@@ -44,6 +50,7 @@ public class JwtKeyRepository {
 }
 
 // Data class to hold the key and date
+@RequiredArgsConstructor
 class JwtKeyData {
     private String secretKey;
     private LocalDate lastGeneratedDate;

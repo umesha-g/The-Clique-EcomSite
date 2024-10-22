@@ -1,6 +1,7 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import React from 'react';
 
-const TestimonialSection = () => (
+const TestimonialSection: React.FC = () => (
   <div className=" bg-beige-100 text-center py-20 md:py-28">
     <h2 className="text-xl md:text-2xl font-semibold mb-6">Testimonials</h2>
     <blockquote className="text-lg font-playfair italic font-thin px-5 mb-4">

@@ -1,14 +1,14 @@
-import { AnimatePresence, motion } from "framer-motion";
-import Image from "next/image";
-import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from 'framer-motion';
+import Image from 'next/image';
+import React, { useEffect, useState } from 'react';
 
 const images = [
-  "/assets/homePage/hero/hero-1.png",
-  "/assets/homePage/hero/hero-2.png",
-  "/assets/homePage/hero/hero-3.png",
+  '/assets/homePage/hero/hero-1.png',
+  '/assets/homePage/hero/hero-2.png',
+  '/assets/homePage/hero/hero-3.png',
 ];
 
-const ImageSlider = () => {
+const ImageSlider: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(1);
 
@@ -32,7 +32,7 @@ const ImageSlider = () => {
 
       opacity: 1,
       transition: {
-        x: { type: "spring", stiffness: 300, damping: 30 },
+        x: { type: 'spring', stiffness: 300, damping: 30 },
       },
     },
     exit: (direction: number) => ({

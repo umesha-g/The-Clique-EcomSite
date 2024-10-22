@@ -2,15 +2,17 @@ import { AddressResponse } from '../address-api';
 import { ProductCardResponse } from '../product-api';
 import {api} from "@/utils/apiConfig";
 
-enum OrderStatus {
-  PENDING,
-  CONFIRMED,
-  SHIPPED,
-  DELIVERED,
-  CANCELLED,
-  RETURNED,
-  REFUNDED,
-  FAILED,
+export enum OrderStatus {
+  ALL = "ALL",
+  PENDING = "PENDING",
+  CONFIRMED = "CONFIRMED",
+  PROCESSING = "PROCESSING",
+  SHIPPED = "SHIPPED",
+  DELIVERED = "DELIVERED",
+  CANCELLED = "CANCELLED",
+  RETURNED = "RETURNED",
+  REFUNDED = "REFUNDED",
+  FAILED = "FAILED"
 }
 
 interface OrderItem {
@@ -39,18 +41,29 @@ export const getAllOrders = async (
   page: number = 0,
   size: number = 10,
   sortBy: string = 'createdAt',
+  searchTerm:string,
+  status:OrderStatus
 ): Promise<{
   content: OrderResponse[];
   totalPages: number;
   totalElements: number;
 }> => {
   try {
-    const response = await api.get(`/admin/orders`, {
-      params: { page, size, sortBy },
-    });
-    return response.data;
+    if(status === OrderStatus.ALL){
+      const response = await api.get(`/admin/orders/search`, {
+        params: { page, size, sortBy, searchTerm},
+
+      });return response.data;
+    }
+    else{
+      const response = await api.get(`/admin/orders/filtered`, {
+      params: { page, size, sortBy, searchTerm ,status},
+
+    }); return response.data;
+    }
+
   } catch (error) {
-    console.error('Error fetching all orders:', error);
+    console.error('Error fetching orders:', error);
     throw error;
   }
 };

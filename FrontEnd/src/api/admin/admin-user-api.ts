@@ -1,4 +1,3 @@
-import axios from 'axios';
 import {api} from "@/utils/apiConfig";
 export interface RegisterRequest {
   firstName: string;
@@ -12,7 +11,7 @@ export interface UserProfileUpdateRequest {
   firstName: string;
   lastName?: string;
   email: string;
-  currentPassword: string;
+  currentPassword?: string;
   newPassword?: string;
   phoneNumber?: string;
 }
@@ -54,7 +53,7 @@ export const getUser = async (id: string): Promise<UserResponse> => {
   }
 };
 
-export const updateUser = async (
+export const updateUserById = async (
   id: string,
   request: UserProfileUpdateRequest,
 ): Promise<UserResponse> => {
@@ -71,18 +70,18 @@ export const getAllUsers = async (
   page: number = 0,
   size: number = 10,
   sortBy: string = 'createdAt',
-): Promise<{
+  searchTerm:string ): Promise<{
   content: UserResponse[];
   totalPages: number;
   totalElements: number;
 }> => {
   try {
     const response = await api.get(`/admin/users`, {
-      params: { page, size, sortBy },
+      params: { page, size, sortBy , searchTerm },
     });
     return response.data;
   } catch (error) {
-    console.error('Error fetching all users:', error);
+    console.error('Error fetching Users:', error);
     throw error;
   }
 };

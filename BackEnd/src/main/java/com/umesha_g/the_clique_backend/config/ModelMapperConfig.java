@@ -84,6 +84,18 @@ public class ModelMapperConfig {
                     mapper.map(BrandRequest::isActive, Brand::setActive);
                 });
 
+        // Discount Request mapping
+        modelMapper.createTypeMap(DiscountRequest.class, Discount.class)
+                .addMappings(mapper -> {
+                    mapper.map(DiscountRequest::getName, Discount::setName);
+                    mapper.map(DiscountRequest::getDescription, Discount::setDescription);
+                    mapper.map(DiscountRequest::isActive, Discount::setActive);
+                    mapper.map(DiscountRequest::getDiscountPercentage, Discount::setDiscountPercentage);
+                    mapper.map(DiscountRequest::getApplicableCategoryIds, Discount::setApplicableCategories);
+                    mapper.map(DiscountRequest::getStartDate, Discount::setStartDate);
+                    mapper.map(DiscountRequest::getEndDate, Discount::setEndDate);
+                });
+
         // Category Request mapping
         modelMapper.createTypeMap(CategoryRequest.class, Category.class)
                 .addMappings(mapper -> {
@@ -254,10 +266,18 @@ public class ModelMapperConfig {
         modelMapper.createTypeMap(Discount.class, DiscountResponse.class)
                 .addMappings(mapper -> {
                     mapper.map(Discount::getId, DiscountResponse::setId);
+                    mapper.map(Discount::getName, DiscountResponse::setName);
                     mapper.map(Discount::getDiscountPercentage, DiscountResponse::setDiscountPercentage);
                     mapper.map(Discount::getStartDate, DiscountResponse::setStartDate);
                     mapper.map(Discount::getEndDate, DiscountResponse::setEndDate);
                     mapper.map(Discount::getDescription, DiscountResponse::setDescription);
+                });
+
+        modelMapper.createTypeMap(Discount.class, MiniDiscountResponse.class)
+                .addMappings(mapper -> {
+                    mapper.map(Discount::getId, MiniDiscountResponse::setId);
+                    mapper.map(Discount::getName, MiniDiscountResponse::setName);
+                    mapper.map(Discount::getDescription, MiniDiscountResponse::setDescription);
                 });
 
         //Brand mapping
@@ -269,5 +289,16 @@ public class ModelMapperConfig {
                     mapper.map(Brand::getLogoUrl,BrandResponse::setLogoUrl);
                     mapper.map(Brand::isActive,BrandResponse::setActive);
                 });
+
+        //File Reference mapping
+        modelMapper.createTypeMap(FileReference.class,FileRefResponse.class)
+                .addMappings(mapper -> {
+                    mapper.map(FileReference::getThumbnailUrl,FileRefResponse::setThumbnailUrl);
+                    mapper.map(FileReference::getStandardUrl,FileRefResponse::setStandardUrl);
+                    mapper.map(FileReference::isCardImage,FileRefResponse::setCardImage);
+                    mapper.map(FileReference::getDisplayOrder,FileRefResponse::setDisplayOrder);
+                    mapper.map(FileReference::getStatus,FileRefResponse::setStatus);
+
+        });
     }
 }

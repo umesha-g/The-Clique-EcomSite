@@ -14,6 +14,5 @@ public class DiscountRequest {
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private Set<String> applicableCategoryIds;
-    private Set<String> applicableProductIds;
     private boolean isActive;
 }

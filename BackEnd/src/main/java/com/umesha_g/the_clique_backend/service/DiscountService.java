@@ -2,10 +2,10 @@ package com.umesha_g.the_clique_backend.service;
 
 import com.umesha_g.the_clique_backend.dto.request.DiscountRequest;
 import com.umesha_g.the_clique_backend.dto.response.DiscountResponse;
+import com.umesha_g.the_clique_backend.dto.response.MiniDiscountResponse;
 import com.umesha_g.the_clique_backend.exception.ResourceNotFoundException;
 import com.umesha_g.the_clique_backend.model.entity.Category;
 import com.umesha_g.the_clique_backend.model.entity.Discount;
-import com.umesha_g.the_clique_backend.model.entity.Product;
 import com.umesha_g.the_clique_backend.repository.CategoryRepository;
 import com.umesha_g.the_clique_backend.repository.DiscountRepository;
 import com.umesha_g.the_clique_backend.repository.ProductRepository;
@@ -49,9 +49,9 @@ public class DiscountService {
                 .collect(Collectors.toList());
     }
 
-    public List<DiscountResponse> getActiveDiscounts() {
+    public List<MiniDiscountResponse> getActiveDiscounts() {
         return discountRepository.findActiveDiscounts(LocalDateTime.now()).stream()
-                .map(discount -> modelMapper.map(discount, DiscountResponse.class))
+                .map(discount -> modelMapper.map(discount, MiniDiscountResponse.class))
                 .collect(Collectors.toList());
     }
 
@@ -88,18 +88,18 @@ public class DiscountService {
                 })
                 .collect(Collectors.toSet());
 
-        Set<Product> products = request.getApplicableProductIds().stream()
-                .map(id -> {
-                    try {
-                        return productRepository.findById(id)
-                                .orElseThrow(() -> new ResourceNotFoundException("Product", "id", id));
-                    } catch (ResourceNotFoundException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .collect(Collectors.toSet());
+//        Set<Product> products = request.getApplicableProductIds().stream()
+//                .map(id -> {
+//                    try {
+//                        return productRepository.findById(id)
+//                                .orElseThrow(() -> new ResourceNotFoundException("Product", "id", id));
+//                    } catch (ResourceNotFoundException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//                })
+//                .collect(Collectors.toSet());
 
         discount.setApplicableCategories(categories);
-        discount.setApplicableProducts(products);
+        //discount.setApplicableProducts(products);
     }
 }

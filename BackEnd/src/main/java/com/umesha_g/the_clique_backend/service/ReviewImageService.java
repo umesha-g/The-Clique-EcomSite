@@ -1,7 +1,8 @@
 package com.umesha_g.the_clique_backend.service;
 
+import com.umesha_g.the_clique_backend.dto.response.FileRefResponse;
 import com.umesha_g.the_clique_backend.dto.response.ReviewResponse;
-import com.umesha_g.the_clique_backend.exception.FileExceptions.*;
+import com.umesha_g.the_clique_backend.exception.FileExceptions.MaxImagesExceededException;
 import com.umesha_g.the_clique_backend.model.entity.FileReference;
 import com.umesha_g.the_clique_backend.model.entity.Review;
 import com.umesha_g.the_clique_backend.model.enums.FileEnums.ImageType;
@@ -14,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -79,8 +81,11 @@ public class ReviewImageService {
         return modelMapper.map(updatedReview, ReviewResponse.class);
     }
 
-    public List<FileReference> getReviewImages(String reviewId) {
-        return fileReferenceService.getActiveFilesByEntity(ImageType.REVIEW, reviewId);
+    public List<FileRefResponse> getReviewImages(String reviewId) {
+        List<FileReference> files = fileReferenceService.getActiveFilesByEntity(ImageType.REVIEW, reviewId);
+        return files.stream()
+                .map(fileReference -> modelMapper.map(fileReference, FileRefResponse.class))
+                .collect(Collectors.toList());
     }
 
     @Transactional
