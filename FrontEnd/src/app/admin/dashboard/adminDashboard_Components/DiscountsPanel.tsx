@@ -5,7 +5,7 @@ import {
   updateDiscount,
   DiscountRequest,
   DiscountResponse,
-  getAllDiscounts,
+  getAllDiscounts, updateDiscountState,
 } from '@/api/admin/admin-discount-api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,10 +18,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {Textarea} from "@/components/ui/textarea";
 
 const DiscountsPanel: React.FC = () => {
   const [discounts, setDiscounts] = useState<DiscountResponse[]>([]);
   const [isEditing, setIsEditing] = useState(false);
+  const [state, setState] = useState(true);
   const [selectedDiscountId, setSelectedDiscountId] = useState<string | null>(null);
   const [formData, setFormData] = useState<DiscountRequest>({
     name: '',
@@ -29,8 +31,7 @@ const DiscountsPanel: React.FC = () => {
     discountPercentage: 0,
     startDate: '',
     endDate: '',
-    applicableCategoryIds: [''],
-    isActive: true,
+    applicableCategoryIds: ['']
   });
 
   // Convert ISO string to YYYY-MM-DD format for input
@@ -65,8 +66,7 @@ const DiscountsPanel: React.FC = () => {
       discountPercentage: 0,
       startDate: '',
       endDate: '',
-      applicableCategoryIds: [''],
-      isActive: true,
+      applicableCategoryIds: ['']
     });
     setIsEditing(false);
     setSelectedDiscountId(null);
@@ -86,7 +86,7 @@ const DiscountsPanel: React.FC = () => {
       } else {
         await createDiscount(requestData);
       }
-      fetchDiscounts();
+      await fetchDiscounts();
       resetForm();
     } catch (error) {
       console.error('Error saving discount:', error);
@@ -103,14 +103,23 @@ const DiscountsPanel: React.FC = () => {
       startDate: formatDateForInput(discount.startDate),
       endDate: formatDateForInput(discount.endDate),
       applicableCategoryIds: [''],
-      isActive: discount.isActive,
     });
   };
+
+  const handleStateChange = async (id: string , newState:Boolean)=>{
+    try{
+      await updateDiscountState(id,newState);
+      await fetchDiscounts();
+    }
+    catch (error) {
+    console.error('Error deleting discount:', error);
+  }
+  }
 
   const handleDeleteDiscount = async (id: string) => {
     try {
       await deleteDiscount(id);
-      fetchDiscounts();
+      await fetchDiscounts();
       if (selectedDiscountId === id) {
         resetForm();
       }
@@ -125,32 +134,38 @@ const DiscountsPanel: React.FC = () => {
           <CardTitle>Discounts Management</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="mb-4 space-y-4">
+          <h4 className={'mb-4 mt-4'}>Add/Update Discounts</h4>
+          <div className="mb-12 grid grid-cols-2 gap-4">
             <Input
                 placeholder="Name"
                 value={formData.name}
+                className={"rounded-none"}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             />
             <Input
+              type="number"
+              placeholder="Percentage"
+              value={formData.discountPercentage}
+              className={"rounded-none"}
+              onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    discountPercentage: Number(e.target.value),
+                  })
+              }
+          />
+            <Textarea
                 placeholder="Description"
+                className={"col-span-2 rounded-none"}
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             />
-            <Input
-                type="number"
-                placeholder="Percentage"
-                value={formData.discountPercentage}
-                onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      discountPercentage: Number(e.target.value),
-                    })
-                }
-            />
+
             <Input
                 type="date"
                 placeholder="Valid From"
                 value={formData.startDate}
+                className={"rounded-none"}
                 onChange={(e) =>
                     setFormData({ ...formData, startDate: e.target.value })
                 }
@@ -159,16 +174,17 @@ const DiscountsPanel: React.FC = () => {
                 type="date"
                 placeholder="Valid To"
                 value={formData.endDate}
+                className={"rounded-none"}
                 onChange={(e) =>
                     setFormData({ ...formData, endDate: e.target.value })
                 }
             />
-            <div className="space-x-2">
-              <Button onClick={handleSubmit}>
+            <div className="space-x-2 col-span-2">
+              <Button onClick={handleSubmit} className={"rounded-none"}>
                 {isEditing ? 'Update Discount' : 'Create Discount'}
               </Button>
               {isEditing && (
-                  <Button variant="outline" onClick={resetForm}>
+                  <Button variant="outline" onClick={resetForm} className={"rounded-none"}>
                     Cancel
                   </Button>
               )}
@@ -194,19 +210,28 @@ const DiscountsPanel: React.FC = () => {
                     <TableCell>{discount.discountPercentage}%</TableCell>
                     <TableCell>{formatDateForInput(discount.startDate)}</TableCell>
                     <TableCell>{formatDateForInput(discount.endDate)}</TableCell>
-                    <TableCell>{discount.isActive ? 'Active' : 'Inactive'}</TableCell>
+                    <TableCell>
+                        <Button
+                          onClick={() => handleStateChange(discount.id , !discount.active)}
+                          variant={discount.active ? "default": "ghost"}
+                          className={` ${discount.active ? 'bg-green-600':''} rounded-none`}
+                      >
+                        {discount.active ? "Active": "Inactive"}
+                      </Button>
+                    </TableCell>
                     <TableCell>
                       <div className="space-x-2">
                         <Button
                             onClick={() => handleEdit(discount)}
-                            variant="secondary"
-                            className="mr-2"
+                            variant="default"
+                            className="mr-2 rounded-none"
                         >
                           Edit
                         </Button>
                         <Button
                             onClick={() => handleDeleteDiscount(discount.id)}
                             variant="destructive"
+                            className=" rounded-none"
                         >
                           Delete
                         </Button>

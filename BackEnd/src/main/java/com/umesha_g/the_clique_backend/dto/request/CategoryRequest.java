@@ -7,6 +7,6 @@ import lombok.Data;
 public class CategoryRequest {
     @NotBlank(message = "Category name is required")
     private String name;
-
+    private String discountId;
     private String description;
 }

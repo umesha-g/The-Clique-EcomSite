@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 
 @Service
-@Transactional
+
 @RequiredArgsConstructor
 public class ProductService {
     private  ProductRepository productRepository;
@@ -37,6 +37,7 @@ public class ProductService {
         this.modelMapper = modelMapper;
     }
 
+    @Transactional
     public ProductResponse createProduct(ProductRequest request) throws ResourceNotFoundException {
         Product product = modelMapper.map(request, Product.class);
 
@@ -74,6 +75,7 @@ public class ProductService {
         return products.map(product -> modelMapper.map(product, ProductCardResponse.class));
     }
 
+    @Transactional
     public ProductResponse updateProduct(String id, ProductRequest request) throws ResourceNotFoundException {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
@@ -83,6 +85,7 @@ public class ProductService {
         return modelMapper.map(updatedProduct, ProductResponse.class);
     }
 
+    @Transactional
     public void deleteProduct(String id) throws ResourceNotFoundException {
         if (!productRepository.existsById(id)) {
             throw new ResourceNotFoundException("Product not found");

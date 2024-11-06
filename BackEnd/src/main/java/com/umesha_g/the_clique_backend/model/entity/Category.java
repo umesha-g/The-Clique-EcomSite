@@ -24,6 +24,10 @@ public class Category {
     @OneToMany(mappedBy = "category")
     private List<Product> products;
 
+    @ManyToOne
+    @JoinColumn(name = "discount_id")
+    private Discount discount;
+
     // Audit fields
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

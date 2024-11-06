@@ -2,7 +2,9 @@ package com.umesha_g.the_clique_backend.service;
 
 import com.umesha_g.the_clique_backend.dto.request.CategoryRequest;
 import com.umesha_g.the_clique_backend.dto.response.CategoryResponse;
+import com.umesha_g.the_clique_backend.exception.ResourceNotFoundException;
 import com.umesha_g.the_clique_backend.model.entity.Category;
+import com.umesha_g.the_clique_backend.model.entity.Discount;
 import com.umesha_g.the_clique_backend.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -21,21 +23,29 @@ public class CategoryService {
 
     private ModelMapper modelMapper;
 
+    private DiscountService discountService;
+
     @Autowired
-    public CategoryService(CategoryRepository categoryRepository, ModelMapper modelMapper) {
+    public CategoryService(CategoryRepository categoryRepository, ModelMapper modelMapper, DiscountService discountService) {
         this.categoryRepository = categoryRepository;
         this.modelMapper = modelMapper;
+        this.discountService = discountService;
     }
 
     @Transactional
-    public CategoryResponse createCategory(CategoryRequest categoryRequest) {
+    public CategoryResponse createCategory(CategoryRequest categoryRequest) throws ResourceNotFoundException {
         if (categoryRepository.existsByName(categoryRequest.getName())) {
             throw new RuntimeException("Category with this name already exists");
         }
+        Category category = modelMapper.map(categoryRequest,Category.class);
 
-        Category category = new Category();
-        category.setName(categoryRequest.getName());
-        category.setDescription(categoryRequest.getDescription());
+        if(!categoryRequest.getDiscountId().isEmpty()) {
+            Discount discount = discountService.getDiscount(categoryRequest.getDiscountId());
+            category.setDiscount(discount);
+        }
+        else {
+            category.setDiscount(null);
+        }
 
         Category savedCategory = categoryRepository.save(category);
         return modelMapper.map(savedCategory, CategoryResponse.class);
@@ -54,12 +64,20 @@ public class CategoryService {
     }
 
     @Transactional
-    public CategoryResponse updateCategory(String id, CategoryRequest categoryRequest) {
+    public CategoryResponse updateCategory(String id, CategoryRequest categoryRequest) throws ResourceNotFoundException {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Category not found"));
 
         category.setName(categoryRequest.getName());
         category.setDescription(categoryRequest.getDescription());
+
+        if(!categoryRequest.getDiscountId().isEmpty()) {
+            Discount discount = discountService.getDiscount(categoryRequest.getDiscountId());
+            category.setDiscount(discount);
+        }
+        else {
+            category.setDiscount(null);
+        }
 
         Category updatedCategory = categoryRepository.save(category);
         return modelMapper.map(updatedCategory, CategoryResponse.class);

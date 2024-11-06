@@ -27,6 +27,10 @@ public class Brand {
     @OneToMany(mappedBy = "brand")
     private List<Product> products;
 
+    @ManyToOne
+    @JoinColumn(name = "discount_id")
+    private Discount discount;
+
     private boolean isActive = true;
 
     // Audit fields

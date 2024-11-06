@@ -132,7 +132,7 @@ const UsersPanel: React.FC = () => {
               placeholder="Search Users..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="mb-8"
+              className="mb-8 rounded-none"
           />
           <h4 className={'mb-4 mt-4'}>Add/Update Users</h4>
           <div className="mb-12 grid grid-cols-3 gap-4">
@@ -140,6 +140,7 @@ const UsersPanel: React.FC = () => {
             <Input
                 placeholder="First Name"
                 value={userForm.firstName}
+                className="rounded-none"
                 onChange={(e) =>
                     setUserForm({ ...userForm, firstName: e.target.value })
                 }
@@ -147,6 +148,7 @@ const UsersPanel: React.FC = () => {
             <Input
                 placeholder="Last Name"
                 value={userForm.lastName}
+                className="rounded-none"
                 onChange={(e) =>
                     setUserForm({ ...userForm, lastName: e.target.value })
                 }
@@ -154,6 +156,7 @@ const UsersPanel: React.FC = () => {
             <Input
                 placeholder="Phone"
                 value={userForm.phoneNumber}
+                className="rounded-none"
                 onChange={(e) =>
                     setUserForm({ ...userForm, phoneNumber: e.target.value })
                 }
@@ -162,19 +165,28 @@ const UsersPanel: React.FC = () => {
                 type="email"
                 placeholder="Email"
                 value={userForm.email}
+                className="rounded-none"
                 onChange={(e) => setUserForm({ ...userForm, email: e.target.value })}
             />
             <Input
                 type="password"
                 placeholder="Password"
                 value={userForm.password}
+                className="rounded-none"
                 onChange={(e) =>
                     setUserForm({ ...userForm, password: e.target.value })
                 }
             />
-            <Button onClick={handleCreateOrUpdateUser} className="col-span-3 rounded-none">
+            <div className="space-x-2 col-span-3">
+            <Button onClick={handleCreateOrUpdateUser} className="rounded-none">
               {isEditing ? 'Update User' : 'Create User'}
             </Button>
+              {isEditing && (
+                  <Button variant="outline" onClick={resetForm} className={"rounded-none"}>
+                    Cancel
+                  </Button>
+              )}
+            </div>
           </div>
           <Table>
             <TableHeader>
@@ -196,9 +208,11 @@ const UsersPanel: React.FC = () => {
                     <TableCell>{user.phoneNumber}</TableCell>
                     <TableCell>{user.role}</TableCell>
                     <TableCell>
+                      <div className="space-x-2">
                       <Button
                           onClick={() => handleUpdateClick(user)}
                           className="mr-2 rounded-none"
+                          variant="default"
                       >
                         Update
                       </Button>
@@ -209,6 +223,7 @@ const UsersPanel: React.FC = () => {
                       >
                         Delete
                       </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
               ))}
@@ -223,6 +238,7 @@ const UsersPanel: React.FC = () => {
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 0}
                   variant="outline"
+                  className={"rounded-none"}
               >
                 Previous
               </Button>
@@ -233,6 +249,7 @@ const UsersPanel: React.FC = () => {
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages - 1}
                   variant="outline"
+                  className={"rounded-none"}
               >
                 Next
               </Button>

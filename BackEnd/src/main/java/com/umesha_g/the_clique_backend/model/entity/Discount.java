@@ -7,8 +7,6 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import java.util.Set;
-
 @Entity
 @Data
 @Table(name = "discounts")
@@ -32,21 +30,21 @@ public class Discount {
     @Column(nullable = false)
     private LocalDateTime endDate;
 
-    @ManyToMany
-    @JoinTable(
-            name = "discount_categories",
-            joinColumns = @JoinColumn(name = "discount_id"),
-            inverseJoinColumns = @JoinColumn(name = "category_id")
-    )
-    private Set<Category> applicableCategories;
+//    @ManyToMany
+//    @JoinTable(
+//            name = "discount_categories",
+//            joinColumns = @JoinColumn(name = "discount_id"),
+//            inverseJoinColumns = @JoinColumn(name = "category_id")
+//    )
+//    private Set<Category> applicableCategories;
 
-    @ManyToMany
-    @JoinTable(
-            name = "discount_products",
-            joinColumns = @JoinColumn(name = "discount_id"),
-            inverseJoinColumns = @JoinColumn(name = "product_id")
-    )
-    private Set<Product> applicableProducts;
+//    @ManyToMany
+//    @JoinTable(
+//            name = "discount_products",
+//            joinColumns = @JoinColumn(name = "discount_id"),
+//            inverseJoinColumns = @JoinColumn(name = "product_id")
+//    )
+//    private Set<Product> applicableProducts;
 
     private boolean isActive;
 

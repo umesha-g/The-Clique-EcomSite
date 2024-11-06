@@ -31,11 +31,6 @@ public class AdminDiscountController {
         return new ResponseEntity<>(discountService.createDiscount(request), HttpStatus.CREATED);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<DiscountResponse> getDiscount(@PathVariable String id) throws ResourceNotFoundException {
-        return ResponseEntity.ok(discountService.getDiscount(id));
-    }
-
     @GetMapping
     public ResponseEntity<List<DiscountResponse>> getAllDiscounts() {
         return ResponseEntity.ok(discountService.getAllDiscounts());
@@ -51,6 +46,13 @@ public class AdminDiscountController {
             @PathVariable String id,
             @Valid @RequestBody DiscountRequest request) throws ResourceNotFoundException {
         return ResponseEntity.ok(discountService.updateDiscount(id, request));
+    }
+
+    @PutMapping("state/{id}/{state}")
+    public ResponseEntity<DiscountResponse> updateDiscountState(
+            @PathVariable String id,
+            @PathVariable Boolean state) throws ResourceNotFoundException {
+        return ResponseEntity.ok(discountService.setDiscountState(id, state));
     }
 
     @DeleteMapping("/{id}")

@@ -188,16 +188,18 @@ const OrdersPanel: React.FC = () => {
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 0}
                 variant="outline"
+                className={"rounded-none"}
             >
               Previous
             </Button>
-            <span className="flex items-center px-4">
+            <span className="flex items-center px-4 ">
               Page {currentPage + 1} of {totalPages}
             </span>
             <Button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages - 1}
                 variant="outline"
+                className={"rounded-none"}
             >
               Next
             </Button>

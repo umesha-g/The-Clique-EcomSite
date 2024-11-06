@@ -1,7 +1,9 @@
 import {api} from "@/utils/apiConfig";
+import {MiniDiscountResponse} from "@/api/discount-api";
 
 export interface CategoryRequest {
   name: string;
+  discountId?:string;
   description?: string;
 }
 
@@ -9,6 +11,7 @@ export interface CategoryResponse {
   id: string;
   name: string;
   description: string;
+  discount?:MiniDiscountResponse;
 }
 
 export const createCategory = async (

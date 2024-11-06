@@ -1,5 +1,4 @@
 import {api} from "@/utils/apiConfig";
-import {DiscountResponse} from "@/api/admin/admin-discount-api";
 
 export interface MiniDiscountResponse {
     id: string;

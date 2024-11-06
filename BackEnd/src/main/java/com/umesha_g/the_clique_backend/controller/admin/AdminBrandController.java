@@ -2,6 +2,7 @@ package com.umesha_g.the_clique_backend.controller.admin;
 
 import com.umesha_g.the_clique_backend.dto.request.BrandRequest;
 import com.umesha_g.the_clique_backend.dto.response.BrandResponse;
+import com.umesha_g.the_clique_backend.exception.ResourceNotFoundException;
 import com.umesha_g.the_clique_backend.service.BrandService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ public class AdminBrandController {
     }
 
     @PostMapping
-    public ResponseEntity<BrandResponse> createBrand(@Valid @ModelAttribute BrandRequest brandRequest) {
+    public ResponseEntity<BrandResponse> createBrand(@Valid @ModelAttribute BrandRequest brandRequest) throws ResourceNotFoundException {
         BrandResponse createdBrand = brandService.createBrand(brandRequest);
         return new ResponseEntity<>(createdBrand, HttpStatus.CREATED);
     }

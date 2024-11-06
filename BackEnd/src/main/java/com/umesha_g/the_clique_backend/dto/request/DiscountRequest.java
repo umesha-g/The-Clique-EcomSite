@@ -4,7 +4,6 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Set;
 
 @Data
 public class DiscountRequest {
@@ -13,6 +12,6 @@ public class DiscountRequest {
     private BigDecimal discountPercentage;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
-    private Set<String> applicableCategoryIds;
+   // private Set<String> applicableCategoryIds;
     private boolean isActive;
 }

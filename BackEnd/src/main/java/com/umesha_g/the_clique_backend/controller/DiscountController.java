@@ -5,6 +5,7 @@ import com.umesha_g.the_clique_backend.dto.response.MiniDiscountResponse;
 import com.umesha_g.the_clique_backend.exception.ResourceNotFoundException;
 import com.umesha_g.the_clique_backend.service.DiscountService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,13 +21,14 @@ public class DiscountController {
 
     private DiscountService discountService;
 
+    @Autowired
     public DiscountController(DiscountService discountService) {
         this.discountService = discountService;
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DiscountResponse> getDiscount(@PathVariable String id) throws ResourceNotFoundException {
-        return ResponseEntity.ok(discountService.getDiscount(id));
+    public ResponseEntity<DiscountResponse> findDiscount(@PathVariable String id) throws ResourceNotFoundException {
+        return ResponseEntity.ok(discountService.findDiscount(id));
     }
 
     @GetMapping("/active")

@@ -91,7 +91,7 @@ public class ModelMapperConfig {
                     mapper.map(DiscountRequest::getDescription, Discount::setDescription);
                     mapper.map(DiscountRequest::isActive, Discount::setActive);
                     mapper.map(DiscountRequest::getDiscountPercentage, Discount::setDiscountPercentage);
-                    mapper.map(DiscountRequest::getApplicableCategoryIds, Discount::setApplicableCategories);
+                    //mapper.map(DiscountRequest::getApplicableCategoryIds, Discount::setApplicableCategories);
                     mapper.map(DiscountRequest::getStartDate, Discount::setStartDate);
                     mapper.map(DiscountRequest::getEndDate, Discount::setEndDate);
                 });
@@ -280,15 +280,50 @@ public class ModelMapperConfig {
                     mapper.map(Discount::getDescription, MiniDiscountResponse::setDescription);
                 });
 
-        //Brand mapping
-        modelMapper.createTypeMap(Brand.class,BrandResponse.class)
-                .addMappings(mapper -> {
-                    mapper.map(Brand::getId,BrandResponse::setId);
-                    mapper.map(Brand::getName,BrandResponse::setName);
-                    mapper.map(Brand::getDescription,BrandResponse::setDescription);
-                    mapper.map(Brand::getLogoUrl,BrandResponse::setLogoUrl);
-                    mapper.map(Brand::isActive,BrandResponse::setActive);
-                });
+        Converter<Discount, MiniDiscountResponse> discountToMiniDiscountResponseConverter = ctx ->
+                ctx.getSource() == null ? null : modelMapper.map(ctx.getSource(), MiniDiscountResponse.class);
+
+//        //Brand mapping
+//        modelMapper.createTypeMap(Brand.class,BrandResponse.class)
+//                .addMappings(mapper -> {
+//                    mapper.map(Brand::getId,BrandResponse::setId);
+//                    mapper.map(Brand::getName,BrandResponse::setName);
+//                    mapper.map(Brand::getDescription,BrandResponse::setDescription);
+//                    mapper.map(Brand::getDiscount,BrandResponse::setDiscount);
+//                    mapper.map(Brand::getLogoUrl,BrandResponse::setLogoUrl);
+//                    mapper.map(Brand::isActive,BrandResponse::setActive);
+//                });
+
+        modelMapper.addMappings(new PropertyMap<Brand, BrandResponse>() {
+            @Override
+            protected void configure() {
+                map().setId(source.getId());
+                map().setName(source.getName());
+                map().setDescription(source.getDescription());
+                map().setLogoUrl(source.getLogoUrl());
+                map().setActive(source.isActive());
+                using(discountToMiniDiscountResponseConverter).map(source.getDiscount()).setDiscount(null);
+            }
+        });
+
+        //Category mapping
+//        modelMapper.createTypeMap(Category.class, CategoryResponse.class)
+//                .addMappings(mapper -> {
+//                    mapper.map(Category::getId,CategoryResponse::setId);
+//                    mapper.map(Category::getName,CategoryResponse::setName);
+//                    mapper.map(Category::getDescription,CategoryResponse::setDescription);
+//                    mapper.map(Category::getDiscount,CategoryResponse::setDiscount);
+//                });
+
+        modelMapper.addMappings(new PropertyMap<Category, CategoryResponse>() {
+            @Override
+            protected void configure() {
+                map().setId(source.getId());
+                map().setName(source.getName());
+                map().setDescription(source.getDescription());
+                using(discountToMiniDiscountResponseConverter).map(source.getDiscount()).setDiscount(null);
+            }
+        });
 
         //File Reference mapping
         modelMapper.createTypeMap(FileReference.class,FileRefResponse.class)

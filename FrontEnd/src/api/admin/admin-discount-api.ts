@@ -7,7 +7,6 @@ export interface DiscountRequest {
   startDate: string;
   endDate: string;
   applicableCategoryIds: string[];
-  isActive: boolean;
 }
 
 export interface DiscountResponse {
@@ -17,7 +16,7 @@ export interface DiscountResponse {
   discountPercentage: number;
   startDate: string;
   endDate: string;
-  isActive: boolean;
+  active: boolean;
 }
 
 export const createDiscount = async (
@@ -60,6 +59,21 @@ export const updateDiscount = async (
     const response = await api.put(
       `/admin/discounts/${id}`,
       request,
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error updating discount:', error);
+    throw error;
+  }
+};
+
+export const updateDiscountState = async (
+    id: string,
+    state:Boolean,
+): Promise<DiscountResponse> => {
+  try {
+    const response = await api.put(
+        `/admin/discounts/state/${id}/${state}`,
     );
     return response.data;
   } catch (error) {
