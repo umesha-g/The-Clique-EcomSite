@@ -15,9 +15,11 @@ import java.util.List;
 @ConfigurationProperties(prefix = "file.storage")
 @Data
 public class FileStorageConfig {
-    private String uploadDir;
+    private String productDir;
+    private String logoDir;
+    private String reviewDir;
     private long maxFileSize = 5242880; // 5MB
-    private List<String> allowedFileTypes = Arrays.asList("image/jpeg", "image/png", "image/webp");
+    private List<String> allowedFileTypes = Arrays.asList("image/jpeg", "image/png", "image/webp", "image/jpg");
     private int imageQuality = 90; // JPEG compression quality
     private ImageSize thumbnailSize = new ImageSize(200, 200);
     private ImageSize standardSize = new ImageSize(800, 800);
@@ -30,7 +32,17 @@ public class FileStorageConfig {
     }
 
     @Bean
-    public Path fileStorageLocation() {
-        return Paths.get(uploadDir).toAbsolutePath().normalize();
+    public Path productStorageLocation() {
+        return Paths.get(productDir).toAbsolutePath().normalize();
+    }
+
+    @Bean
+    public Path logoStorageLocation() {
+        return Paths.get(logoDir).toAbsolutePath().normalize();
+    }
+
+    @Bean
+    public Path reviewStorageLocation() {
+        return Paths.get(reviewDir).toAbsolutePath().normalize();
     }
 }

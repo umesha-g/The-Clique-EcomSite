@@ -1,10 +1,9 @@
-import axios from 'axios';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
+import {api} from "@/utils/apiConfig";
 
 export const downloadFile = async (fileName: string): Promise<Blob> => {
   try {
-    const response = await axios.get(`${API_URL}/files/${fileName}`, {
+    const response = await api.get(`/files/${fileName}`, {
       responseType: 'blob',
     });
     return response.data;

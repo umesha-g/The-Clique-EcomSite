@@ -14,6 +14,12 @@ export interface CategoryResponse {
   discount?:MiniDiscountResponse;
 }
 
+export interface MiniCategoryResponse {
+  id: string;
+  name: string;
+}
+
+
 export const createCategory = async (
   categoryRequest: CategoryRequest,
 ): Promise<CategoryResponse> => {

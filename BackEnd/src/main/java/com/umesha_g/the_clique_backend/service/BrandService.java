@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,14 +39,12 @@ public class BrandService {
         if (brandRepository.existsByName(brandRequest.getName())) {
             throw new RuntimeException("Brand with this name already exists");
         }
-        Discount discount = discountService.getDiscount(brandRequest.getDiscountId());
+
         Brand brand = modelMapper.map(brandRequest, Brand.class);
         brand.setActive(true);
-        brand.setDiscount(discount);
 
         return brandLogoProcess(brandRequest, brand);
     }
-
 
     public List<BrandResponse> getAllBrands() {
         return brandRepository.findAll().stream()
@@ -66,39 +65,71 @@ public class BrandService {
     }
 
     @Transactional
-    public BrandResponse updateBrand(String id, BrandRequest request) {
+    public BrandResponse updateBrand(String id, BrandRequest request) throws ResourceNotFoundException, FileStorageException {
         Brand brand = brandRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Brand not found"));
 
         brand.setName(request.getName());
         brand.setDescription(request.getDescription());
-        brand.setActive(request.isActive());
 
-        // Handle logo file update
+        if (!brand.getLogoUrl().isEmpty() && request.getLogoFile() !=null){
+            System.out.println("file name = "+ brand.getLogoUrl().substring(14));
+            fileStorageService.deleteFile(brand.getLogoUrl().substring(14));
+        }
+
         return brandLogoProcess(request, brand);
     }
 
     @Transactional
-    public void deleteBrand(String id) {
-        if (!brandRepository.existsById(id)) {
-            throw new RuntimeException("Brand not found");
-        }
-        brandRepository.deleteById(id);
-    }
+    public BrandResponse setBrandState(String id, Boolean state) {
+        Brand brand = brandRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Brand not found"));
 
-    private BrandResponse brandLogoProcess(BrandRequest request, Brand brand) {
-        if (request.getLogoFile() != null && !request.getLogoFile().isEmpty()) {
-            String prefix = "brand_logo_" + brand.getId();
-            String fileName = null;
-            try {
-                fileName = fileStorageService.storeLogoFile(request.getLogoFile(), prefix);
-            } catch (FileStorageException e) {
-                throw new RuntimeException(e);
-            }
-            brand.setLogoUrl("/api/v1/files/brand_logo_" + fileName);
-        }
+        brand.setActive(state);
+
         Brand savedBrand =  brandRepository.save(brand);
         return modelMapper.map(savedBrand,BrandResponse.class);
     }
 
+    @Transactional
+    public void deleteBrand(String id) throws FileStorageException {
+        if (!brandRepository.existsById(id)) {
+            throw new RuntimeException("Brand not found");
+        }
+        Brand brand = brandRepository.findById(id).orElse(null);
+        assert brand != null;
+        if (!brand.getLogoUrl().isEmpty()){
+            System.out.println("file name = " +  brand.getLogoUrl().substring(14));
+            fileStorageService.deleteFile(Objects.requireNonNull(brand.getLogoUrl().substring(14)));
+        }
+
+        brandRepository.deleteById(id);
+    }
+
+    private BrandResponse brandLogoProcess(BrandRequest request, Brand brand) throws ResourceNotFoundException {
+        if (request.getLogoFile() != null && !request.getLogoFile().isEmpty()) {
+            String prefix = "brand_logo_" + brand.getId();
+            String fileName;
+            try {
+                fileName = fileStorageService.storeLogoFile(request.getLogoFile(), prefix);
+                brand.setLogoUrl("/api/v1/files/" + fileName);
+            } catch (FileStorageException e) {
+                throw new RuntimeException(e);
+            }
+        } else if (request.getExistingLogoUrl() != null && !request.getExistingLogoUrl().isEmpty()) {
+            brand.setLogoUrl(request.getExistingLogoUrl());
+        } else {
+            brand.setLogoUrl("");
+        }
+
+        if (!request.getDiscountId().isEmpty()) {
+            Discount discount = discountService.getDiscount(request.getDiscountId());
+            brand.setDiscount(discount);
+        } else {
+            brand.setDiscount(null);
+        }
+
+        Brand savedBrand = brandRepository.save(brand);
+        return modelMapper.map(savedBrand, BrandResponse.class);
+    }
 }

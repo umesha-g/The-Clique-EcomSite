@@ -1,7 +1,7 @@
-import { DiscountResponse } from './admin-discount-api';
 import {api} from "@/utils/apiConfig";
-import axios from "axios";
-import {ProductCardResponse} from "@/api/product-api";
+import {MiniBrandResponse} from "@/api/admin/admin-brand-api";
+import {MiniCategoryResponse} from "@/api/admin/admin-category-api";
+import {MiniDiscountResponse} from "@/api/discount-api";
 
 export interface ProductRequest {
   name: string;
@@ -11,7 +11,7 @@ export interface ProductRequest {
   brandId?: string;
   categoryId: string;
   discountId?: string;
-  gender: string;
+  gender: Gender;
   sizes: string[];
   colors: string[];
 }
@@ -23,28 +23,35 @@ export interface ProductResponse {
   stock: number;
   rating: number;
   description: string;
-  brandName?: string;
-  categoryName: string;
+  brand?: MiniBrandResponse;
+  category: MiniCategoryResponse;
   detailImageUrls: string[];
   cardImageUrl: string;
-  gender: string;
+  gender: Gender;
   sizes: string[];
   colors: string[];
   purchaseCount: number;
   createdAt: Date;
-  activeDiscount?: DiscountResponse;
+  discount?: MiniDiscountResponse;
 }
 
-enum ImageStatus {
+export enum ImageStatus {
   PENDING,
   ACTIVE,
   DELETED,
 }
 
+export enum Gender {
+  MEN = "MEN",
+  WOMEN = "WOMEN",
+  UNISEX = "UNISEX",
+}
+
 export interface FileRefResponse {
+  id:string;
   thumbnailUrl: string;
   standardUrl: string;
-  isCardImage: boolean;
+  cardImage: boolean;
   displayOrder?: number;
   status: ImageStatus;
 }

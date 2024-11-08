@@ -81,7 +81,6 @@ public class ModelMapperConfig {
                 .addMappings(mapper -> {
                     mapper.map(BrandRequest::getName, Brand::setName);
                     mapper.map(BrandRequest::getDescription, Brand::setDescription);
-                    mapper.map(BrandRequest::isActive, Brand::setActive);
                 });
 
         // Discount Request mapping
@@ -89,7 +88,6 @@ public class ModelMapperConfig {
                 .addMappings(mapper -> {
                     mapper.map(DiscountRequest::getName, Discount::setName);
                     mapper.map(DiscountRequest::getDescription, Discount::setDescription);
-                    mapper.map(DiscountRequest::isActive, Discount::setActive);
                     mapper.map(DiscountRequest::getDiscountPercentage, Discount::setDiscountPercentage);
                     //mapper.map(DiscountRequest::getApplicableCategoryIds, Discount::setApplicableCategories);
                     mapper.map(DiscountRequest::getStartDate, Discount::setStartDate);
@@ -124,45 +122,6 @@ public class ModelMapperConfig {
         Converter<Address, AddressResponse> addressToResponseConverter = ctx ->
                 ctx.getSource() == null ? null : modelMapper.map(ctx.getSource(), AddressResponse.class);
 
-        // Product mapping
-        modelMapper.createTypeMap(Product .class, ProductResponse.class)
-                .addMappings(mapper -> {
-                    mapper.map(Product::getId, ProductResponse::setId);
-                    mapper.map(Product::getName, ProductResponse::setName);
-                    mapper.map(Product::getPrice, ProductResponse::setPrice);
-                    mapper.map(Product::getStock, ProductResponse::setStock);
-                    mapper.map(Product::getRating, ProductResponse::setRating);
-                    mapper.map(Product::getDescription, ProductResponse::setDescription);
-                    mapper.map(src -> src.getBrand().getName(), ProductResponse::setBrandName);
-                    mapper.map(src -> src.getCategory().getName(), ProductResponse::setCategoryName);
-                    mapper.map(Product::getDetailImageUrls, ProductResponse::setDetailImageUrls);
-                    mapper.map(Product::getCardImageUrl, ProductResponse::setCardImageUrl);
-                    mapper.map(Product::getGender, ProductResponse::setGender);
-                    mapper.map(Product::getSizes, ProductResponse::setSizes);
-                    mapper.map(Product::getColors, ProductResponse::setColors);
-                    //mapper.map(Product::getViewCount, ProductResponse::setViewCount);
-                    mapper.map(Product::getPurchaseCount, ProductResponse::setPurchaseCount);
-                    mapper.map(Product::getDiscount, ProductResponse::setActiveDiscount);
-                });
-
-        Converter<Product, ProductResponse> producttoProductResponseConverter = ctx ->
-                ctx.getSource() == null ? null : modelMapper.map(ctx.getSource(), ProductResponse.class);
-
-        modelMapper.createTypeMap(Product .class, ProductCardResponse.class)
-                .addMappings(mapper -> {
-                    mapper.map(Product::getId, ProductCardResponse::setId);
-                    mapper.map(Product::getName, ProductCardResponse::setName);
-                    mapper.map(Product::getPrice, ProductCardResponse::setPrice);
-                    mapper.map(Product::getStock, ProductCardResponse::setStock);
-                    mapper.map(Product::getRating, ProductCardResponse::setRating);
-                    mapper.map(Product::getCardImageUrl, ProductCardResponse::setCardImageUrl);
-                    mapper.map(Product::getPurchaseCount, ProductCardResponse::setPurchaseCount);
-                    mapper.map(Product::getDiscount, ProductCardResponse::setActiveDiscount);
-                });
-
-        Converter<Product, ProductCardResponse> producttoProductCardResponseConverter = ctx ->
-                ctx.getSource() == null ? null : modelMapper.map(ctx.getSource(), ProductCardResponse.class);
-
         // Order mapping
         modelMapper.addMappings(new PropertyMap<Order, OrderResponse>() {
             @Override
@@ -187,18 +146,6 @@ public class ModelMapperConfig {
                 }).map(source.getOrderItems(), destination.getOrderItems());
             }
         });
-
-        // OrderItem mapping
-        modelMapper.addMappings(new PropertyMap<OrderItem, OrderItemResponse>() {
-                @Override
-                protected void configure() {
-                    map().setId(source.getId());
-                    map().setQuantity(source.getQuantity());
-                    map().setSubTotal(source.getSubTotal());
-                    using(producttoProductCardResponseConverter).map(source.getProduct()).setProduct(null);
-                }
-            });
-
 
         // Review mapping
         modelMapper.createTypeMap(Review.class, ReviewResponse.class)
@@ -277,22 +224,11 @@ public class ModelMapperConfig {
                 .addMappings(mapper -> {
                     mapper.map(Discount::getId, MiniDiscountResponse::setId);
                     mapper.map(Discount::getName, MiniDiscountResponse::setName);
-                    mapper.map(Discount::getDescription, MiniDiscountResponse::setDescription);
+                    mapper.map(Discount::getDiscountPercentage,MiniDiscountResponse::setDiscountPercentage);
                 });
 
         Converter<Discount, MiniDiscountResponse> discountToMiniDiscountResponseConverter = ctx ->
                 ctx.getSource() == null ? null : modelMapper.map(ctx.getSource(), MiniDiscountResponse.class);
-
-//        //Brand mapping
-//        modelMapper.createTypeMap(Brand.class,BrandResponse.class)
-//                .addMappings(mapper -> {
-//                    mapper.map(Brand::getId,BrandResponse::setId);
-//                    mapper.map(Brand::getName,BrandResponse::setName);
-//                    mapper.map(Brand::getDescription,BrandResponse::setDescription);
-//                    mapper.map(Brand::getDiscount,BrandResponse::setDiscount);
-//                    mapper.map(Brand::getLogoUrl,BrandResponse::setLogoUrl);
-//                    mapper.map(Brand::isActive,BrandResponse::setActive);
-//                });
 
         modelMapper.addMappings(new PropertyMap<Brand, BrandResponse>() {
             @Override
@@ -306,14 +242,14 @@ public class ModelMapperConfig {
             }
         });
 
-        //Category mapping
-//        modelMapper.createTypeMap(Category.class, CategoryResponse.class)
-//                .addMappings(mapper -> {
-//                    mapper.map(Category::getId,CategoryResponse::setId);
-//                    mapper.map(Category::getName,CategoryResponse::setName);
-//                    mapper.map(Category::getDescription,CategoryResponse::setDescription);
-//                    mapper.map(Category::getDiscount,CategoryResponse::setDiscount);
-//                });
+        modelMapper.createTypeMap(Brand.class,MiniBrandResponse.class)
+                .addMappings(mapper -> {
+                    mapper.map(Brand::getId,MiniBrandResponse::setId);
+                    mapper.map(Brand::getName,MiniBrandResponse::setName);;
+                });
+
+        Converter<Brand, MiniBrandResponse> brandToMiniBrandResponseConverter = ctx ->
+                ctx.getSource() == null ? null : modelMapper.map(ctx.getSource(), MiniBrandResponse.class);
 
         modelMapper.addMappings(new PropertyMap<Category, CategoryResponse>() {
             @Override
@@ -325,15 +261,83 @@ public class ModelMapperConfig {
             }
         });
 
+        modelMapper.createTypeMap(Category.class, MiniCategoryResponse.class)
+                .addMappings(mapper -> {
+                    mapper.map(Category::getId,MiniCategoryResponse::setId);
+                    mapper.map(Category::getName,MiniCategoryResponse::setName);
+                });
+
+        Converter<Category, MiniCategoryResponse> categoryToMiniCategoryResponseConverter = ctx ->
+                ctx.getSource() == null ? null : modelMapper.map(ctx.getSource(), MiniCategoryResponse.class);
+
         //File Reference mapping
         modelMapper.createTypeMap(FileReference.class,FileRefResponse.class)
                 .addMappings(mapper -> {
+                    mapper.map(FileReference::getId,FileRefResponse::setId);
                     mapper.map(FileReference::getThumbnailUrl,FileRefResponse::setThumbnailUrl);
                     mapper.map(FileReference::getStandardUrl,FileRefResponse::setStandardUrl);
                     mapper.map(FileReference::isCardImage,FileRefResponse::setCardImage);
                     mapper.map(FileReference::getDisplayOrder,FileRefResponse::setDisplayOrder);
                     mapper.map(FileReference::getStatus,FileRefResponse::setStatus);
 
+        });
+
+        // Product mappings
+        modelMapper.addMappings(new PropertyMap<Product, ProductResponse>() {
+            @Override
+            protected void configure() {
+                map().setId(source.getId());
+                map().setName(source.getName());
+                map().setPrice(source.getPrice());
+                map().setStock(source.getStock());
+                map().setRating(source.getRating());
+                map().setDescription(source.getDescription());
+                using(brandToMiniBrandResponseConverter).map(source.getBrand(), destination.getBrand());
+                using(categoryToMiniCategoryResponseConverter).map(source.getCategory(), destination.getCategory());
+                map().setDetailImageUrls(source.getDetailImageUrls());
+                map().setCardImageUrl(source.getCardImageUrl());
+                map().setGender(source.getGender());
+                map().setSizes(source.getSizes());
+                map().setColors(source.getColors());
+                // map().setViewCount(source.getViewCount());
+                map().setPurchaseCount(source.getPurchaseCount());
+                map().setCreatedAt(source.getCreatedAt());
+                // map().setUpdatedAt(source.getUpdatedAt());
+                using(discountToMiniDiscountResponseConverter).map(source.getDiscount(),destination.getDiscount());
+            }
+        });
+
+        Converter<Product, ProductResponse> producttoProductResponseConverter = ctx ->
+                ctx.getSource() == null ? null : modelMapper.map(ctx.getSource(), ProductResponse.class);
+
+        modelMapper.addMappings(new PropertyMap<Product, ProductCardResponse>() {
+            @Override
+            protected void configure() {
+                map().setId(source.getId());
+                map().setName(source.getName());
+                map().setPrice(source.getPrice());
+                map().setRating(source.getRating());
+                map().setCardImageUrl(source.getCardImageUrl());
+                map().setPurchaseCount(source.getPurchaseCount());
+                map().setStock(source.getStock());
+
+                // Map Discount if present
+                using(discountToMiniDiscountResponseConverter).map(source.getDiscount(), destination.getDiscount());
+            }
+        });
+
+        Converter<Product, ProductCardResponse> producttoProductCardResponseConverter = ctx ->
+                ctx.getSource() == null ? null : modelMapper.map(ctx.getSource(), ProductCardResponse.class);
+
+        // OrderItem mapping
+        modelMapper.addMappings(new PropertyMap<OrderItem, OrderItemResponse>() {
+            @Override
+            protected void configure() {
+                map().setId(source.getId());
+                map().setQuantity(source.getQuantity());
+                map().setSubTotal(source.getSubTotal());
+                using(producttoProductCardResponseConverter).map(source.getProduct()).setProduct(null);
+            }
         });
     }
 }

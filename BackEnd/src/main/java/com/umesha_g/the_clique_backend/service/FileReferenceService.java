@@ -29,7 +29,7 @@ public class FileReferenceService {
 
         try {
             String fileName = fileStorageService.storeFile(file,
-                    imageType.toString().toLowerCase() + "_" + entityId);
+                    imageType.toString().toLowerCase() + "_" + entityId,imageType);
 
             FileReference fileReference = new FileReference();
             fileReference.setFileName(fileName);
@@ -72,6 +72,11 @@ public class FileReferenceService {
                 imageType, entityId, FileEnums.ImageStatus.ACTIVE);
     }
 
+    public List<FileReference> getALlFilesByEntity(ImageType imageType, String entityId) {
+        return fileReferenceRepository.findByImageTypeAndEntityId(
+                imageType, entityId);
+    }
+
     @Transactional
     public void updateDisplayOrder(String fileReferenceId, int newOrder) {
         FileReference fileReference = fileReferenceRepository.findById(fileReferenceId)
@@ -105,15 +110,25 @@ public class FileReferenceService {
         }
     }
 
-    public FileReference getFileReference(String fileReferenceId) {
+    public FileReference getFileReference( String fileReferenceId) {
       return fileReferenceRepository.findById(fileReferenceId).orElse(null);
     }
 
     @Transactional
-    public FileReference convertToCardImage(String fileId) {
-        FileReference fileReference = fileReferenceRepository.findById(fileId)
+    public FileReference convertToCardImage(String productId, String fileId) {
+        FileReference newFileReference = fileReferenceRepository.findById(fileId)
                 .orElseThrow(() -> new RuntimeException("File reference not found"));
-        fileReference.setImageType(ImageType.PRODUCT_CARD);
-        return fileReferenceRepository.save(fileReference);
+
+        FileReference oldFileReference = fileReferenceRepository.findByIsCardImageTrueAndEntityId(productId);
+        if(oldFileReference != null)
+        {
+            oldFileReference.setCardImage(false);
+            oldFileReference.setImageType(ImageType.PRODUCT_DETAIL);
+            fileReferenceRepository.save(oldFileReference);
+        }
+
+        newFileReference.setImageType(ImageType.PRODUCT_CARD);
+        newFileReference.setCardImage(true);
+        return fileReferenceRepository.save(newFileReference);
     }
 }

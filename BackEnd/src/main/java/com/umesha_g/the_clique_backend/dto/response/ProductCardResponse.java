@@ -16,5 +16,5 @@ public class ProductCardResponse {
     private Integer stock;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private DiscountResponse activeDiscount;
+    private MiniDiscountResponse discount;
 }

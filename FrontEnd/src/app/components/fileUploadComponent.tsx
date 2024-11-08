@@ -1,15 +1,13 @@
 import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { X, Upload, Image as ImageIcon } from 'lucide-react';
+import {FileRefResponse} from "@/api/admin/admin-product-api";
+import {prefix} from "@/utils/apiConfig";
 
 interface FileUploadProps {
   maxFiles: number;
   onUpload: (files: File[]) => Promise<void>;
-  existingFiles?: Array<{
-    id: string;
-    thumbnailUrl: string;
-    isCardImage?: boolean;
-  }>;
+  existingFiles?: FileRefResponse[];
   onRemove?: (fileId: string) => Promise<void>;
   onSetAsCard?: (fileId: string) => Promise<void>;
   allowCardImage?: boolean;
@@ -53,10 +51,10 @@ const FileUpload:React.FC<FileUploadProps> = ({
   });
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6 ">
       <div
         {...getRootProps()}
-        className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer
+        className={`border-2 border-dashed rounded-none p-8 text-center cursor-pointer 
           ${isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300'}
           ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}
       >
@@ -77,19 +75,19 @@ const FileUpload:React.FC<FileUploadProps> = ({
       {existingFiles.length > 0 && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {existingFiles.map((file) => (
-            <div key={file.id} className="relative group">
+            <div key={prefix + file.standardUrl} className="relative group">
               <img
-                src={file.thumbnailUrl}
+                src={prefix + file.thumbnailUrl}
                 alt="Uploaded file"
                 className="rounded-lg object-cover w-full aspect-square"
               />
               
-              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all rounded-lg">
+              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all rounded-none">
                 <div className="absolute top-2 right-2 space-x-2 opacity-0 group-hover:opacity-100 transition-all">
-                  {allowCardImage && !file.isCardImage && (
+                  {allowCardImage && !file.cardImage && (
                     <button
                       onClick={() => onSetAsCard?.(file.id)}
-                      className="p-1 bg-white rounded-full hover:bg-gray-100"
+                      className="p-2 bg-white rounded-full hover:bg-gray-100"
                       title="Set as card image"
                     >
                       <ImageIcon className="w-4 h-4" />
@@ -97,15 +95,15 @@ const FileUpload:React.FC<FileUploadProps> = ({
                   )}
                   <button
                     onClick={() => onRemove?.(file.id)}
-                    className="p-1 bg-white rounded-full hover:bg-gray-100"
+                    className="p-2 bg-white rounded-full hover:bg-gray-100"
                   >
                     <X className="w-4 h-4" />
                   </button>
                 </div>
               </div>
               
-              {file.isCardImage && (
-                <div className="absolute top-2 left-2 px-2 py-1 bg-blue-500 text-white text-xs rounded">
+              {file.cardImage && (
+                <div className="absolute top-2 left-2 px-2 py-1 bg-gray-800 text-white text-sm rounded-none">
                   Card Image
                 </div>
               )}

@@ -13,4 +13,8 @@ public interface FileReferenceRepository extends JpaRepository<FileReference,Str
     List<FileReference> findByImageTypeAndEntityIdAndStatusOrderByDisplayOrderAsc(
             FileEnums.ImageType imageType, String entityId, FileEnums.ImageStatus imageStatus);
 
+    FileReference findByIsCardImageTrueAndEntityId(String entityId);
+
+    List<FileReference> findByImageTypeAndEntityId (FileEnums.ImageType imageType, String entityId);
+
 }

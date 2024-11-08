@@ -27,11 +27,12 @@ const CategoriesPanel: React.FC = () => {
   const [activeDiscounts, setActiveDiscounts] = useState<MiniDiscountResponse[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
-  const [formData, setFormData] = useState<CategoryRequest & {discountName?:string}>({
+  const [formData, setFormData] = useState<CategoryRequest & {discountName?:string} & {discountPercentage?:number}>({
     name: '',
     description: '',
     discountId: '',
     discountName:'',
+    discountPercentage:0,
   });
 
   useEffect(() => {
@@ -63,6 +64,7 @@ const CategoriesPanel: React.FC = () => {
       description: '',
       discountId: '',
       discountName:'',
+      discountPercentage:0,
     });
     setIsEditing(false);
     setSelectedCategoryId(null);
@@ -70,7 +72,7 @@ const CategoriesPanel: React.FC = () => {
 
   const handleSubmit = async () => {
     try {
-      const newRequest : CategoryRequest = {name:formData.name, discountId: formData.discountId, description: formData.description}
+      const newRequest : CategoryRequest = {name:formData.name, discountId: formData.discountId||"", description: formData.description}
       if(newRequest.discountId==" ")
       {
         newRequest.discountId="";
@@ -96,6 +98,7 @@ const CategoriesPanel: React.FC = () => {
       description: category.description,
       discountId: category.discount?.id,
       discountName:category.discount?.name,
+      discountPercentage:category.discount?.discountPercentage,
     });
   };
 
@@ -139,10 +142,10 @@ const CategoriesPanel: React.FC = () => {
                 <SelectValue placeholder={formData.discountName || "Select a Discount"} />
               </SelectTrigger>
               <SelectContent className={"rounded-none"}>
-                <SelectItem className={"rounded-none"} value=" ">No Discount</SelectItem> {/* Add option to clear discount */}
+                <SelectItem className={"rounded-none"} value=" ">No Discount</SelectItem>
                 {activeDiscounts.map((discount) => (
                     <SelectItem className={"rounded-none"} key={discount.id} value={discount.id}>
-                      {discount.name}
+                      {discount.name} ( {discount.discountPercentage}% off )
                     </SelectItem>
                 ))}
               </SelectContent>

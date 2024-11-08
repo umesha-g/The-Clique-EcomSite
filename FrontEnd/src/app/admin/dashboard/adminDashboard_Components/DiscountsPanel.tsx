@@ -23,7 +23,6 @@ import {Textarea} from "@/components/ui/textarea";
 const DiscountsPanel: React.FC = () => {
   const [discounts, setDiscounts] = useState<DiscountResponse[]>([]);
   const [isEditing, setIsEditing] = useState(false);
-  const [state, setState] = useState(true);
   const [selectedDiscountId, setSelectedDiscountId] = useState<string | null>(null);
   const [formData, setFormData] = useState<DiscountRequest>({
     name: '',
@@ -31,7 +30,6 @@ const DiscountsPanel: React.FC = () => {
     discountPercentage: 0,
     startDate: '',
     endDate: '',
-    applicableCategoryIds: ['']
   });
 
   // Convert ISO string to YYYY-MM-DD format for input
@@ -66,7 +64,6 @@ const DiscountsPanel: React.FC = () => {
       discountPercentage: 0,
       startDate: '',
       endDate: '',
-      applicableCategoryIds: ['']
     });
     setIsEditing(false);
     setSelectedDiscountId(null);
@@ -102,7 +99,6 @@ const DiscountsPanel: React.FC = () => {
       discountPercentage: discount.discountPercentage,
       startDate: formatDateForInput(discount.startDate),
       endDate: formatDateForInput(discount.endDate),
-      applicableCategoryIds: [''],
     });
   };
 
@@ -113,7 +109,7 @@ const DiscountsPanel: React.FC = () => {
     }
     catch (error) {
     console.error('Error deleting discount:', error);
-  }
+    }
   }
 
   const handleDeleteDiscount = async (id: string) => {

@@ -7,3 +7,5 @@ export const api = axios.create({
         'Content-Type': 'application/json',
     },
 });
+
+export const prefix = 'http://localhost:8080'

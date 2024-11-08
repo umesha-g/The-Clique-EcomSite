@@ -8,8 +8,9 @@ import org.springframework.web.multipart.MultipartFile;
 public class BrandRequest {
     @NotBlank(message = "Brand name is required")
     private String name;
+
     private String description;
     private MultipartFile logoFile;
     private String discountId;
-    private boolean isActive;
+    private String existingLogoUrl;
 }

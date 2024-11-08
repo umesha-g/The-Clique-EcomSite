@@ -17,8 +17,8 @@ public class ProductResponse {
     private Integer stock;
     private Double rating;
     private String description;
-    private String brandName;
-    private String categoryName;
+    private MiniBrandResponse brand;
+    private MiniCategoryResponse category;
     private List<String> detailImageUrls;
     private String cardImageUrl;
     private Gender gender;
@@ -30,5 +30,5 @@ public class ProductResponse {
     //private LocalDateTime updatedAt;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private DiscountResponse activeDiscount;
+    private MiniDiscountResponse discount;
 }

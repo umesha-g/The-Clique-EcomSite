@@ -2,6 +2,7 @@ package com.umesha_g.the_clique_backend.controller.admin;
 
 import com.umesha_g.the_clique_backend.dto.request.BrandRequest;
 import com.umesha_g.the_clique_backend.dto.response.BrandResponse;
+import com.umesha_g.the_clique_backend.exception.FileStorageException;
 import com.umesha_g.the_clique_backend.exception.ResourceNotFoundException;
 import com.umesha_g.the_clique_backend.service.BrandService;
 import jakarta.validation.Valid;
@@ -32,13 +33,20 @@ public class AdminBrandController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BrandResponse> updateBrand(@PathVariable String id, @Valid @ModelAttribute BrandRequest brandRequest) {
+    public ResponseEntity<BrandResponse> updateBrand(@PathVariable String id, @Valid @ModelAttribute BrandRequest brandRequest) throws ResourceNotFoundException, FileStorageException {
         BrandResponse updatedBrand = brandService.updateBrand(id, brandRequest);
         return ResponseEntity.ok(updatedBrand);
     }
 
+    @PutMapping("state/{id}/{state}")
+    public ResponseEntity<BrandResponse> updateBrandState(
+            @PathVariable String id,
+            @PathVariable Boolean state) {
+        return ResponseEntity.ok(brandService.setBrandState(id, state));
+    }
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBrand(@PathVariable String id) {
+    public ResponseEntity<Void> deleteBrand(@PathVariable String id) throws FileStorageException {
         brandService.deleteBrand(id);
         return ResponseEntity.noContent().build();
     }

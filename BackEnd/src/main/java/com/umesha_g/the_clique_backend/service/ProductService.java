@@ -6,9 +6,11 @@ import com.umesha_g.the_clique_backend.dto.response.ProductResponse;
 import com.umesha_g.the_clique_backend.exception.ResourceNotFoundException;
 import com.umesha_g.the_clique_backend.model.entity.Brand;
 import com.umesha_g.the_clique_backend.model.entity.Category;
+import com.umesha_g.the_clique_backend.model.entity.Discount;
 import com.umesha_g.the_clique_backend.model.entity.Product;
 import com.umesha_g.the_clique_backend.repository.BrandRepository;
 import com.umesha_g.the_clique_backend.repository.CategoryRepository;
+import com.umesha_g.the_clique_backend.repository.DiscountRepository;
 import com.umesha_g.the_clique_backend.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -27,27 +29,42 @@ public class ProductService {
     private  ProductRepository productRepository;
     private  CategoryRepository categoryRepository;
     private  BrandRepository brandRepository;
+    private  DiscountRepository discountRepository;
     private  ModelMapper modelMapper;
 
+    private ProductImageService productImageService;
+
     @Autowired
-    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository, BrandRepository brandRepository, ModelMapper modelMapper) {
+    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository, BrandRepository brandRepository, DiscountRepository discountRepository, ModelMapper modelMapper, ProductImageService productImageService) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.brandRepository = brandRepository;
+        this.discountRepository = discountRepository;
         this.modelMapper = modelMapper;
+        this.productImageService = productImageService;
     }
 
     @Transactional
     public ProductResponse createProduct(ProductRequest request) throws ResourceNotFoundException {
         Product product = modelMapper.map(request, Product.class);
 
+        if(!request.getCategoryId().isEmpty())
+        {
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
-        Brand brand = brandRepository.findById(request.getBrandId())
-                .orElseThrow(() -> new ResourceNotFoundException("Brand not found"));
-
         product.setCategory(category);
-        product.setBrand(brand);
+        }
+        if(!request.getBrandId().isEmpty()) {
+            Brand brand = brandRepository.findById(request.getBrandId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Brand not found"));
+            product.setBrand(brand);
+        }
+
+        if(!request.getDiscountId().isEmpty()) {
+            Discount discount = discountRepository.findById(request.getDiscountId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Discount not found"));
+            product.setDiscount(discount);
+        }
 
         Product savedProduct = productRepository.save(product);
         return modelMapper.map(savedProduct, ProductResponse.class);
@@ -90,6 +107,7 @@ public class ProductService {
         if (!productRepository.existsById(id)) {
             throw new ResourceNotFoundException("Product not found");
         }
+        productImageService.removeAllImagesOfAProduct(id);
         productRepository.deleteById(id);
     }
 

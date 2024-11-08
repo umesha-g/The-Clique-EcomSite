@@ -6,7 +6,6 @@ export interface DiscountRequest {
   discountPercentage: number;
   startDate: string;
   endDate: string;
-  applicableCategoryIds: string[];
 }
 
 export interface DiscountResponse {

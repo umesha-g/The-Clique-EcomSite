@@ -1,19 +1,26 @@
-import axios from 'axios';
 import {api} from "@/utils/apiConfig";
+import {MiniDiscountResponse} from "@/api/discount-api";
 
 export interface BrandRequest {
   name: string;
   description?: string;
+  discountId?:string;
   logoFile: File | null;
-  isActive: boolean;
+  existingLogoUrl?: string;
 }
 
 export interface BrandResponse {
   id: string;
   name: string;
   description: string;
+  discount?:MiniDiscountResponse;
   logoUrl: string;
-  isActive: boolean;
+  active: boolean;
+}
+
+export interface MiniBrandResponse {
+  id: string;
+  name: string;
 }
 
 export const createBrand = async (
@@ -36,25 +43,43 @@ export const createBrand = async (
 };
 
 export const updateBrand = async (
-  id: string,
-  brandRequest: BrandRequest,
+    id: string,
+    brandRequest: BrandRequest,
 ): Promise<BrandResponse> => {
   try {
     const formData = new FormData();
     Object.entries(brandRequest).forEach(([key, value]) => {
-      formData.append(key, value);
+      if (key === 'logoFile' && (!value || (value instanceof File && value.size === 0))) {
+      } else {
+        formData.append(key, value);
+      }
     });
 
     const response = await api.put(
-      `/admin/brands/${id}`,
-      formData,
-      {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      },
+        `/admin/brands/${id}`,
+        formData,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        },
     );
     return response.data;
   } catch (error) {
     console.error('Error updating brand:', error);
+    throw error;
+  }
+};
+
+export const updateBrandState = async (
+    id: string,
+    state:Boolean,
+): Promise<BrandResponse> => {
+  try {
+    const response = await api.put(
+        `/admin/brands/state/${id}/${state}`,
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error updating discount:', error);
     throw error;
   }
 };

@@ -4,6 +4,7 @@ export interface MiniDiscountResponse {
     id: string;
     name: string;
     description: string;
+    discountPercentage:number;
 }
 
 export const getActiveDiscounts = async (): Promise<MiniDiscountResponse[]> => {

@@ -2,6 +2,7 @@ package com.umesha_g.the_clique_backend.service;
 
 import com.umesha_g.the_clique_backend.config.FileStorageConfig;
 import com.umesha_g.the_clique_backend.exception.FileStorageException;
+import com.umesha_g.the_clique_backend.model.enums.FileEnums;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import net.coobird.thumbnailator.Thumbnails;
@@ -15,12 +16,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -28,36 +29,44 @@ import java.util.UUID;
 public class FileStorageService {
 
     private  FileStorageConfig storageConfig;
-    private  Path fileStorageLocation;
+    private  Path productStorageLocation;
+
+    private  Path logoStorageLocation;
+
+    private  Path reviewStorageLocation;
     @Autowired
-    public FileStorageService(FileStorageConfig storageConfig, Path fileStorageLocation) {
+    public FileStorageService(FileStorageConfig storageConfig, Path productStorageLocation, Path logoStorageLocation, Path reviewStorageLocation) {
         this.storageConfig = storageConfig;
-        this.fileStorageLocation = fileStorageLocation;
+        this.productStorageLocation = productStorageLocation;
+        this.logoStorageLocation = logoStorageLocation;
+        this.reviewStorageLocation = reviewStorageLocation;
     }
 
     @PostConstruct
     public void init() throws FileStorageException {
         try {
-            Files.createDirectories(fileStorageLocation);
+            Files.createDirectories(productStorageLocation);
+            Files.createDirectories(logoStorageLocation);
+            Files.createDirectories(reviewStorageLocation);
         } catch (IOException ex) {
             throw new FileStorageException("Could not create upload directory", ex);
         }
     }
 
     @Transactional
-    public String storeFile(MultipartFile file, String prefix) throws FileStorageException {
+    public String storeFile(MultipartFile file, String prefix, FileEnums.ImageType imageType) throws FileStorageException {
         validateFile(file);
 
         String fileName = generateFileName(file, prefix);
         try {
-            Path targetLocation = fileStorageLocation.resolve(fileName);
+            Path targetLocation = pathSelector(imageType).resolve(fileName);
 
             // Create different sizes of the image
             BufferedImage originalImage = ImageIO.read(file.getInputStream());
 
             // Store thumbnail
             String thumbnailName = "thumb_" + fileName;
-            Path thumbnailLocation = fileStorageLocation.resolve(thumbnailName);
+            Path thumbnailLocation = pathSelector(imageType).resolve(thumbnailName);
             saveResizedImage(originalImage, thumbnailLocation,
                     storageConfig.getThumbnailSize());
 
@@ -77,19 +86,14 @@ public class FileStorageService {
 
         String fileName = generateFileName(file, prefix);
         try {
-            //Path targetLocation = fileStorageLocation.resolve(fileName);
-
             // Create different sizes of the image
             BufferedImage originalImage = ImageIO.read(file.getInputStream());
 
             // Store logo
-            Path logoLocation = fileStorageLocation.resolve(fileName);
+            Path logoLocation = logoStorageLocation.resolve(fileName);
             saveResizedImage(originalImage, logoLocation,
                     storageConfig.getThumbnailSize());
 
-            // Store standard size
-            //saveResizedImage(originalImage, targetLocation,
-            //        storageConfig.getStandardSize());
             return fileName;
         } catch (IOException ex) {
             throw new FileStorageException("Could not store file " + fileName, ex);
@@ -98,29 +102,56 @@ public class FileStorageService {
 
     public Resource loadFileAsResource(String fileName) throws FileStorageException {
         try {
-            Path filePath = fileStorageLocation.resolve(fileName).normalize();
-            Resource resource = new UrlResource(filePath.toUri());
+            Path logoPath = logoStorageLocation.resolve(fileName).normalize();
+            Path productPath = productStorageLocation.resolve(fileName).normalize();
+            Path reviewPath = reviewStorageLocation.resolve(fileName).normalize();
+            Resource resource = null;
+            if(logoPath.toFile().exists()){
+                resource = new UrlResource(logoPath.toUri());
+            }
+            else if(productPath.toFile().exists()){
+                resource = new UrlResource(productPath.toUri());
+            }
+            else if(reviewPath.toFile().exists()){
+                resource = new UrlResource(reviewPath.toUri());
+            }
 
-            if (resource.exists()) {
+            if (resource != null && resource.exists()) {
                 return resource;
-            } else {
-                throw new FileNotFoundException("File not found: " + fileName);
             }
         } catch (Exception ex) {
             throw new FileStorageException("File not found " + fileName, ex);
         }
+        return null;
     }
 
     @Transactional
     public void deleteFile(String fileName) throws FileStorageException {
         try {
-            Path filePath = fileStorageLocation.resolve(fileName);
-            Files.deleteIfExists(filePath);
+            Path logoPath = logoStorageLocation.resolve(fileName).normalize();
+            Path productPath = productStorageLocation.resolve(fileName).normalize();
+            Path reviewPath = reviewStorageLocation.resolve(fileName).normalize();
+            if(logoPath.toFile().exists()){
+                Files.deleteIfExists(logoPath);
+            }
+            else if(productPath.toFile().exists()){
+                Files.deleteIfExists(productPath);
+            }
+            else if(reviewPath.toFile().exists()){
+                Files.deleteIfExists(reviewPath);
+            }
 
             // Delete thumbnail if exists
             String thumbnailName = "thumb_" + fileName;
-            Path thumbnailPath = fileStorageLocation.resolve(thumbnailName);
-            Files.deleteIfExists(thumbnailPath);
+            Path productThumbnailPath = productStorageLocation.resolve(thumbnailName);
+            Path reviewThumbnailPath = reviewStorageLocation.resolve(thumbnailName);
+            if(productThumbnailPath.toFile().exists()){
+                Files.deleteIfExists(productThumbnailPath);
+            }
+            else if(reviewThumbnailPath.toFile().exists()){
+                Files.deleteIfExists(reviewThumbnailPath);
+            }
+
         } catch (IOException ex) {
             throw new FileStorageException("Could not delete file " + fileName, ex);
         }
@@ -139,6 +170,18 @@ public class FileStorageService {
         }
     }
 
+    private Path pathSelector (FileEnums.ImageType imageType){
+        switch (imageType){
+            case REVIEW ->{
+                return reviewStorageLocation;
+            }
+            case PRODUCT_CARD, PRODUCT_DETAIL ->{
+                return productStorageLocation;
+            }
+            default -> throw new IllegalArgumentException("Invalid file type: " + imageType);
+        }
+    }
+
     private void saveResizedImage(
             BufferedImage original,
             Path targetLocation,
@@ -153,7 +196,7 @@ public class FileStorageService {
     }
 
     private String generateFileName(MultipartFile file, String prefix) {
-        String originalFileName = StringUtils.cleanPath(file.getOriginalFilename());
+        String originalFileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
         String fileExtension = getFileExtension(originalFileName);
         String timestamp = LocalDateTime.now().format(
                 DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));

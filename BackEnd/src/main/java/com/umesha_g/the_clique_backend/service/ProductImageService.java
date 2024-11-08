@@ -94,7 +94,7 @@ public class ProductImageService {
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
         // Convert the image to card image
-        FileReference newCardImage = fileReferenceService.convertToCardImage(fileReferenceId);
+        FileReference newCardImage = fileReferenceService.convertToCardImage(productId, fileReferenceId);
 
         // Update product's card image URL
         product.setCardImageUrl(newCardImage.getStandardUrl());
@@ -106,6 +106,20 @@ public class ProductImageService {
 
         Product updatedProduct = productRepository.save(product);
        //modelMapper.map(updatedProduct, ProductResponse.class);
+    }
+
+    public void removeAllImagesOfAProduct(String productId){
+        List<FileReference> cardImages = fileReferenceService
+                .getALlFilesByEntity(ImageType.PRODUCT_CARD, productId);
+        List<FileReference> detailImages = fileReferenceService
+                .getALlFilesByEntity(ImageType.PRODUCT_DETAIL, productId);
+
+        for (FileReference imageRef:detailImages) {
+            fileReferenceService.deleteFile(imageRef.getId());
+        }
+        for (FileReference imageRef:cardImages) {
+            fileReferenceService.deleteFile(imageRef.getId());
+        }
     }
 
     public List<FileRefResponse> getProductImages(String productId) {
