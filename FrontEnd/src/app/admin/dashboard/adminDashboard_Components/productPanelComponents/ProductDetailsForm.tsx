@@ -404,6 +404,7 @@ const ProductDetailsForm: React.FC<ProductDetailsFormProps> = ({
                             </FormItem>
                         )}
                     />
+
                     <FormField
                         control={form.control}
                         name="discountId"
@@ -433,9 +434,7 @@ const ProductDetailsForm: React.FC<ProductDetailsFormProps> = ({
                     />
                 </div>
 
-
-
-                <Button type="submit" className="w-full">
+                <Button type="submit" className="w-full rounded-none">
                     Next
                 </Button>
             </form>

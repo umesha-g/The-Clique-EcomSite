@@ -27,7 +27,6 @@ const AddEditProductDialog: React.FC<AddEditProductDialogProps> = ({
     const [productId, setProductId] = useState<string | null>(null);
     const [productData, setProductData] = useState<ProductRequest | null>(null);
     const { toast } = useToast();
-    const [availableSizes, setAvailableSizes] = useState<string[]>(['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL']);
 
     useEffect(() => {
         if (open) {
@@ -54,7 +53,6 @@ const AddEditProductDialog: React.FC<AddEditProductDialogProps> = ({
 
     const handleDetailsSubmit = async (data: ProductRequest) => {
         try {
-
             if (productId) {
                 await updateProduct(productId, data);
             } else {
@@ -81,8 +79,8 @@ const AddEditProductDialog: React.FC<AddEditProductDialogProps> = ({
     };
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-4xl max-h-[800px] h-full overflow-y-scroll">
+        <Dialog open={open} onOpenChange={onOpenChange} >
+            <DialogContent className="max-w-4xl max-h-[800px] h-full overflow-y-scroll rounded-none">
                 <DialogHeader>
                     <DialogTitle>
                         {product ? 'Edit Product' : 'Add New Product'} - Step {step} of 2

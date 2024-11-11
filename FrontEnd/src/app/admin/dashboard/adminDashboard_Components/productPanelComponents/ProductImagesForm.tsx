@@ -102,11 +102,12 @@ const ProductImagesForm: React.FC<ProductImagesFormProps> = ({
                 allowCardImage={true}
             />
 
-            <div className="flex justify-end">
+            <div className="flex ">
                 <Button
                     type="button"
                     disabled={!canComplete}
                     onClick={onComplete}
+                    className={"rounded-none w-full"}
                 >
                     Complete
                 </Button>

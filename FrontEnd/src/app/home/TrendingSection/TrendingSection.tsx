@@ -1,4 +1,4 @@
-import { getAllProducts } from "@/api/product-api";
+import { getAllProducts } from "@/api/admin/admin-product-api";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import ProductCard from "../ProductCard";
@@ -17,18 +17,6 @@ const TrendingSection: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const router = useRouter();
 
-  useEffect(() => {
-    loadProducts();
-  }, [router]);
-
-  const loadProducts = async () => {
-    try {
-      const fetchedProducts = await getAllProducts();
-      setProducts(fetchedProducts.content);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-    }
-  };
   return (
     <div className=" flex-col flex">
       <h2 className="text-xl md:text-2xl font-semibold mb-2 self-center ">

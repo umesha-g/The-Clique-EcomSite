@@ -1,15 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import {
-  createDiscount,
-  deleteDiscount,
-  updateDiscount,
-  DiscountRequest,
-  DiscountResponse,
-  getAllDiscounts, updateDiscountState,
-} from '@/api/admin/admin-discount-api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import {
   Table,
   TableBody,
@@ -18,110 +9,111 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {Textarea} from "@/components/ui/textarea";
+import { Edit, Trash2 } from "lucide-react";
+import { useToast } from '@/hooks/use-toast';
+import AddEditDiscountDialog from './DiscountPanelComponents/AddEditDiscountDialog';
+import DeleteConfirmationDialog from './DeleteConfirmationDialog';
+import {
+  getAllDiscounts,
+  deleteDiscount,
+  updateDiscountState,
+} from '@/api/admin/admin-discount-api';
+import {Switch} from "@/components/ui/switch";
+
+interface DiscountResponse {
+  id: string;
+  name: string;
+  description: string;
+  discountPercentage: number;
+  startDate: string;
+  endDate: string;
+  active: boolean;
+}
 
 const DiscountsPanel: React.FC = () => {
   const [discounts, setDiscounts] = useState<DiscountResponse[]>([]);
-  const [isEditing, setIsEditing] = useState(false);
-  const [selectedDiscountId, setSelectedDiscountId] = useState<string | null>(null);
-  const [formData, setFormData] = useState<DiscountRequest>({
-    name: '',
-    description: '',
-    discountPercentage: 0,
-    startDate: '',
-    endDate: '',
-  });
-
-  // Convert ISO string to YYYY-MM-DD format for input
-  const formatDateForInput = (dateString: string) => {
-    if (!dateString) return '';
-    return dateString.split('T')[0];
-  };
-
-  // Convert YYYY-MM-DD to ISO string with time for backend
-  const formatDateForBackend = (dateString: string) => {
-    if (!dateString) return '';
-    return new Date(dateString).toISOString();
-  };
-
-  useEffect(() => {
-    fetchDiscounts();
-  }, []);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedDiscount, setSelectedDiscount] = useState<DiscountResponse | null>(null);
+  const { toast } = useToast();
 
   const fetchDiscounts = async () => {
     try {
       const response = await getAllDiscounts();
       setDiscounts(response);
     } catch (error) {
-      console.error('Error fetching discounts:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch discounts",
+        variant: "destructive"
+      });
     }
   };
 
-  const resetForm = () => {
-    setFormData({
-      name: '',
-      description: '',
-      discountPercentage: 0,
-      startDate: '',
-      endDate: '',
-    });
-    setIsEditing(false);
-    setSelectedDiscountId(null);
+  useEffect(() => {
+    fetchDiscounts();
+  }, []);
+
+  const handleAddDiscount = () => {
+    setSelectedDiscount(null);
+    setIsAddDialogOpen(true);
   };
 
-  const handleSubmit = async () => {
+  const handleEditDiscount = (discount: DiscountResponse) => {
+    setSelectedDiscount(discount);
+    setIsAddDialogOpen(true);
+  };
+
+  const handleDeleteClick = (discount: DiscountResponse) => {
+    setSelectedDiscount(discount);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!selectedDiscount) return;
+
     try {
-      // Prepare the request data with converted dates
-      const requestData = {
-        ...formData,
-        startDate: formatDateForBackend(formData.startDate),
-        endDate: formatDateForBackend(formData.endDate),
-      };
-
-      if (isEditing && selectedDiscountId) {
-        await updateDiscount(selectedDiscountId, requestData);
-      } else {
-        await createDiscount(requestData);
-      }
-      await fetchDiscounts();
-      resetForm();
+      await deleteDiscount(selectedDiscount.id);
+      toast({
+        title: "Success",
+        description: "Discount deleted successfully"
+      });
+      fetchDiscounts();
     } catch (error) {
-      console.error('Error saving discount:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete discount",
+        variant: "destructive"
+      });
+    } finally {
+      setIsDeleteDialogOpen(false);
+      setSelectedDiscount(null);
     }
   };
 
-  const handleEdit = (discount: DiscountResponse) => {
-    setIsEditing(true);
-    setSelectedDiscountId(discount.id);
-    setFormData({
-      name: discount.name,
-      description: discount.description,
-      discountPercentage: discount.discountPercentage,
-      startDate: formatDateForInput(discount.startDate),
-      endDate: formatDateForInput(discount.endDate),
-    });
-  };
-
-  const handleStateChange = async (id: string , newState:Boolean)=>{
-    try{
-      await updateDiscountState(id,newState);
-      await fetchDiscounts();
-    }
-    catch (error) {
-    console.error('Error deleting discount:', error);
-    }
-  }
-
-  const handleDeleteDiscount = async (id: string) => {
+  const handleStateChange = async (id: string, newState: boolean) => {
     try {
-      await deleteDiscount(id);
+      await updateDiscountState(id, newState);
       await fetchDiscounts();
-      if (selectedDiscountId === id) {
-        resetForm();
-      }
+      toast({
+        title: "Success",
+        description: `Discount ${newState ? 'activated' : 'deactivated'} successfully`
+      });
     } catch (error) {
-      console.error('Error deleting discount:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update discount state",
+        variant: "destructive"
+      });
     }
+  };
+
+  const formatDateForDisplay = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
   };
 
   return (
@@ -130,62 +122,12 @@ const DiscountsPanel: React.FC = () => {
           <CardTitle>Discounts Management</CardTitle>
         </CardHeader>
         <CardContent>
-          <h4 className={'mb-4 mt-4'}>Add/Update Discounts</h4>
-          <div className="mb-12 grid grid-cols-2 gap-4">
-            <Input
-                placeholder="Name"
-                value={formData.name}
-                className={"rounded-none"}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            />
-            <Input
-              type="number"
-              placeholder="Percentage"
-              value={formData.discountPercentage}
-              className={"rounded-none"}
-              onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    discountPercentage: Number(e.target.value),
-                  })
-              }
-          />
-            <Textarea
-                placeholder="Description"
-                className={"col-span-2 rounded-none"}
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            />
-
-            <Input
-                type="date"
-                placeholder="Valid From"
-                value={formData.startDate}
-                className={"rounded-none"}
-                onChange={(e) =>
-                    setFormData({ ...formData, startDate: e.target.value })
-                }
-            />
-            <Input
-                type="date"
-                placeholder="Valid To"
-                value={formData.endDate}
-                className={"rounded-none"}
-                onChange={(e) =>
-                    setFormData({ ...formData, endDate: e.target.value })
-                }
-            />
-            <div className="space-x-2 col-span-2">
-              <Button onClick={handleSubmit} className={"rounded-none"}>
-                {isEditing ? 'Update Discount' : 'Create Discount'}
-              </Button>
-              {isEditing && (
-                  <Button variant="outline" onClick={resetForm} className={"rounded-none"}>
-                    Cancel
-                  </Button>
-              )}
-            </div>
+          <div className="flex justify-end mb-4">
+            <Button onClick={handleAddDiscount} className="rounded-none">
+              Add Discount
+            </Button>
           </div>
+
           <Table>
             <TableHeader>
               <TableRow>
@@ -194,42 +136,48 @@ const DiscountsPanel: React.FC = () => {
                 <TableHead>Percentage</TableHead>
                 <TableHead>Start Date</TableHead>
                 <TableHead>End Date</TableHead>
-                <TableHead>State</TableHead>
+                <TableHead>Active</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {discounts.map((discount) => (
                   <TableRow key={discount.id}>
-                    <TableCell>{discount.name}</TableCell>
+                    <TableCell className="font-medium">{discount.name}</TableCell>
                     <TableCell>{discount.description}</TableCell>
                     <TableCell>{discount.discountPercentage}%</TableCell>
-                    <TableCell>{formatDateForInput(discount.startDate)}</TableCell>
-                    <TableCell>{formatDateForInput(discount.endDate)}</TableCell>
+                    <TableCell>{formatDateForDisplay(discount.startDate)}</TableCell>
+                    <TableCell>{formatDateForDisplay(discount.endDate)}</TableCell>
                     <TableCell>
-                        <Button
-                          onClick={() => handleStateChange(discount.id , !discount.active)}
-                          variant={discount.active ? "default": "ghost"}
-                          className={` ${discount.active ? 'bg-green-600':''} rounded-none`}
-                      >
-                        {discount.active ? "Active": "Inactive"}
-                      </Button>
+                      <div className="flex flex-col items-start">
+                        {/*<span className={`text-sm ${*/}
+                        {/*    discount.active ? 'text-green-600' : 'text-gray-500'}`}>*/}
+                        {/*    {discount.active ? 'Active' : 'Inactive'}*/}
+                        {/*</span>*/}
+                        <Switch
+                            checked={discount.active}
+                            onCheckedChange={(checked) => handleStateChange(discount.id, checked)}
+                            className="data-[state=checked]:bg-green-600"
+                        />
+                      </div>
                     </TableCell>
                     <TableCell>
-                      <div className="space-x-2">
+                      <div className="flex items-center gap-2">
                         <Button
-                            onClick={() => handleEdit(discount)}
-                            variant="default"
-                            className="mr-2 rounded-none"
+                            onClick={() => handleEditDiscount(discount)}
+                            variant="outline"
+                            size="icon"
+                            className="rounded-none"
                         >
-                          Edit
+                          <Edit className="h-4 w-4" />
                         </Button>
                         <Button
-                            onClick={() => handleDeleteDiscount(discount.id)}
-                            variant="destructive"
-                            className=" rounded-none"
+                            onClick={() => handleDeleteClick(discount)}
+                            variant="outline"
+                            size="icon"
+                            className="rounded-none"
                         >
-                          Delete
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                     </TableCell>
@@ -237,6 +185,19 @@ const DiscountsPanel: React.FC = () => {
               ))}
             </TableBody>
           </Table>
+
+          <AddEditDiscountDialog
+              open={isAddDialogOpen}
+              onOpenChange={setIsAddDialogOpen}
+              discount={selectedDiscount}
+              onSuccess={fetchDiscounts}
+          />
+
+          <DeleteConfirmationDialog
+              open={isDeleteDialogOpen}
+              onOpenChange={setIsDeleteDialogOpen}
+              onConfirm={handleDeleteConfirm}
+          />
         </CardContent>
       </Card>
   );

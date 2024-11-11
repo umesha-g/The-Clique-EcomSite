@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import ProductTable from './productPanelComponents/ProductTable';
 import AddEditProductDialog from './productPanelComponents/AddEditProductDialog';
-import DeleteConfirmationDialog from './productPanelComponents/DeleteConfirmationDialog';
+import DeleteConfirmationDialog from './DeleteConfirmationDialog';
 import { ProductResponse, getAllProducts, deleteProduct } from '@/api/admin/admin-product-api';
 import { useToast } from '@/hooks/use-toast';
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
@@ -90,7 +90,7 @@ const ProductsPanel: React.FC = () => {
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                         <Button className={"rounded-none"} onClick={handleAddProduct}>
-                            Create Product
+                            Add Product
                         </Button>
                     </div>
 
