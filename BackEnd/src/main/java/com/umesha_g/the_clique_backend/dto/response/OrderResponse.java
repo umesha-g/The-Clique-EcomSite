@@ -1,17 +1,16 @@
 package com.umesha_g.the_clique_backend.dto.response;
 
+import com.umesha_g.the_clique_backend.model.enums.OrderStatus;
+import lombok.Data;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Map;
-
-import com.umesha_g.the_clique_backend.model.enums.OrderStatus;
-
-import lombok.Data;
+import java.util.List;
 
 @Data
 public class OrderResponse {
     private String id;
-    private Map<ProductCardResponse, Integer> orderItems;
+    private List<OrderItemResponse> orderItems;
     private AddressResponse shippingAddress;
     private BigDecimal totalAmount;
     private BigDecimal shippingCost;

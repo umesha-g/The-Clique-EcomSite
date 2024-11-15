@@ -7,7 +7,6 @@ import lombok.Data;
 public class FileRefResponse {
 
     private String id;
-    private String thumbnailUrl;
     private String standardUrl;
     private boolean isCardImage;
     private Integer displayOrder;

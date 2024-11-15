@@ -42,16 +42,16 @@ const AuthForm:React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <Card className="w-[350px] shadow-lg">
+        <Card className="w-[350px] shadow-lg rounded-none">
           <CardHeader>
             <CardTitle className="text-2xl font-bold text-center text-gray-800">Welcome</CardTitle>
             <CardDescription className="text-center text-gray-600">Sign in to your account or create a new one</CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="login" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="login">Login</TabsTrigger>
-                <TabsTrigger value="register">Register</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2 rounded-none">
+                <TabsTrigger className={"rounded-none"} value="login">Login</TabsTrigger>
+                <TabsTrigger  className={"rounded-none"} value="register">Register</TabsTrigger>
               </TabsList>
               <TabsContent value="login">
                 <form onSubmit={handleLogin} className="space-y-4">
@@ -60,16 +60,16 @@ const AuthForm:React.FC = () => {
                     placeholder="Email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="rounded-sm"
+                    className="rounded-none"
                   />
                   <Input
                     type="password"
                     placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="rounded-sm"
+                    className="rounded-none"
                   />
-                  <Button type="submit" className="w-full rounded-sm">Login</Button>
+                  <Button type="submit" className="w-full rounded-none">Login</Button>
                 </form>
               </TabsContent>
               <TabsContent value="register">
@@ -79,23 +79,23 @@ const AuthForm:React.FC = () => {
                     placeholder="Name"
                     value={firstName}
                     onChange={(e) => setName(e.target.value)}
-                    className="rounded-sm"
+                    className="rounded-none"
                   />
                   <Input
                     type="email"
                     placeholder="Email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="rounded-sm"
+                    className="rounded-none"
                   />
                   <Input
                     type="password"
                     placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="rounded-sm"
+                    className="rounded-none"
                   />
-                  <Button type="submit" className="w-full rounded-sm">Register</Button>
+                  <Button type="submit" className="w-full rounded-none">Register</Button>
                 </form>
               </TabsContent>
             </Tabs>

@@ -1,8 +1,6 @@
 import axios from 'axios';
 import { OrderResponse } from './admin/admin-order-api';
-
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
+import {api} from "@/utils/apiConfig";
 
 export interface OrderRequest {
   addressId: string;
@@ -18,7 +16,7 @@ export const getUserOrders = async (
   totalElements: number;
 }> => {
   try {
-    const response = await axios.get(`${API_URL}/orders`, {
+    const response = await api.get(`/orders`, {
       params: { page, size, sortBy },
     });
     return response.data;
@@ -30,7 +28,7 @@ export const getUserOrders = async (
 
 export const getOrder = async (id: string): Promise<OrderResponse> => {
   try {
-    const response = await axios.get(`${API_URL}/orders/${id}`);
+    const response = await api.get(`/orders/${id}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching order:', error);
@@ -42,7 +40,7 @@ export const createOrder = async (
   orderRequest: OrderRequest,
 ): Promise<OrderResponse> => {
   try {
-    const response = await axios.post(`${API_URL}/orders`, orderRequest);
+    const response = await api.post(`/orders`, orderRequest);
     return response.data;
   } catch (error) {
     console.error('Error creating order:', error);

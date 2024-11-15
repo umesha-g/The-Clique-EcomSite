@@ -1,6 +1,5 @@
 package com.umesha_g.the_clique_backend.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -14,7 +13,6 @@ public class ProductCardResponse {
     private String cardImageUrl;
     private Long purchaseCount;
     private Integer stock;
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private MiniDiscountResponse discount;
+    private MiniDiscountResponse directDiscount;
+    private MiniDiscountResponse otherDiscount;
 }

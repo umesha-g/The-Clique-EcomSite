@@ -18,11 +18,12 @@ public class FileStorageConfig {
     private String productDir;
     private String logoDir;
     private String reviewDir;
+    private String userDpDir;
     private long maxFileSize = 5242880; // 5MB
     private List<String> allowedFileTypes = Arrays.asList("image/jpeg", "image/png", "image/webp", "image/jpg");
     private int imageQuality = 90; // JPEG compression quality
     private ImageSize thumbnailSize = new ImageSize(200, 200);
-    private ImageSize standardSize = new ImageSize(800, 800);
+    private ImageSize standardSize = new ImageSize(1000, 1000);
 
     @Data
     @AllArgsConstructor
@@ -44,5 +45,10 @@ public class FileStorageConfig {
     @Bean
     public Path reviewStorageLocation() {
         return Paths.get(reviewDir).toAbsolutePath().normalize();
+    }
+
+    @Bean
+    public Path userDPStorageLocation() {
+        return Paths.get(userDpDir).toAbsolutePath().normalize();
     }
 }

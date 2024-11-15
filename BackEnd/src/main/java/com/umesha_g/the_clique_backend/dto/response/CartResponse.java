@@ -4,12 +4,12 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Map;
+import java.util.List;
 
 @Data
 public class CartResponse {
     private String id;
-    private Map<ProductCardResponse, Integer> cartItems;
+    private List<CartItemResponse> cartItems;
     private BigDecimal totalAmount;
     private LocalDateTime createdAt;
 }

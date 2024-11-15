@@ -30,16 +30,17 @@ public class FileStorageService {
 
     private  FileStorageConfig storageConfig;
     private  Path productStorageLocation;
-
     private  Path logoStorageLocation;
-
     private  Path reviewStorageLocation;
+    private Path userDPStorageLocation;
+
     @Autowired
-    public FileStorageService(FileStorageConfig storageConfig, Path productStorageLocation, Path logoStorageLocation, Path reviewStorageLocation) {
+    public FileStorageService(FileStorageConfig storageConfig, Path productStorageLocation, Path logoStorageLocation, Path reviewStorageLocation, Path userDPStorageLocation) {
         this.storageConfig = storageConfig;
         this.productStorageLocation = productStorageLocation;
         this.logoStorageLocation = logoStorageLocation;
         this.reviewStorageLocation = reviewStorageLocation;
+        this.userDPStorageLocation = userDPStorageLocation;
     }
 
     @PostConstruct
@@ -48,6 +49,7 @@ public class FileStorageService {
             Files.createDirectories(productStorageLocation);
             Files.createDirectories(logoStorageLocation);
             Files.createDirectories(reviewStorageLocation);
+            Files.createDirectories(userDPStorageLocation);
         } catch (IOException ex) {
             throw new FileStorageException("Could not create upload directory", ex);
         }
@@ -64,35 +66,9 @@ public class FileStorageService {
             // Create different sizes of the image
             BufferedImage originalImage = ImageIO.read(file.getInputStream());
 
-            // Store thumbnail
-            String thumbnailName = "thumb_" + fileName;
-            Path thumbnailLocation = pathSelector(imageType).resolve(thumbnailName);
-            saveResizedImage(originalImage, thumbnailLocation,
-                    storageConfig.getThumbnailSize());
-
             // Store standard size
             saveResizedImage(originalImage, targetLocation,
                     storageConfig.getStandardSize());
-
-            return fileName;
-        } catch (IOException ex) {
-            throw new FileStorageException("Could not store file " + fileName, ex);
-        }
-    }
-
-    @Transactional
-    public String storeLogoFile(MultipartFile file, String prefix) throws FileStorageException {
-        validateFile(file);
-
-        String fileName = generateFileName(file, prefix);
-        try {
-            // Create different sizes of the image
-            BufferedImage originalImage = ImageIO.read(file.getInputStream());
-
-            // Store logo
-            Path logoLocation = logoStorageLocation.resolve(fileName);
-            saveResizedImage(originalImage, logoLocation,
-                    storageConfig.getThumbnailSize());
 
             return fileName;
         } catch (IOException ex) {
@@ -105,16 +81,21 @@ public class FileStorageService {
             Path logoPath = logoStorageLocation.resolve(fileName).normalize();
             Path productPath = productStorageLocation.resolve(fileName).normalize();
             Path reviewPath = reviewStorageLocation.resolve(fileName).normalize();
+            Path userDpPath = userDPStorageLocation.resolve(fileName).normalize();
             Resource resource = null;
+
             if(logoPath.toFile().exists()){
                 resource = new UrlResource(logoPath.toUri());
             }
             else if(productPath.toFile().exists()){
                 resource = new UrlResource(productPath.toUri());
             }
+            else if(userDpPath.toFile().exists()){
+                resource = new UrlResource(userDpPath.toUri());
+            }
             else if(reviewPath.toFile().exists()){
                 resource = new UrlResource(reviewPath.toUri());
-            }
+        }
 
             if (resource != null && resource.exists()) {
                 return resource;
@@ -131,6 +112,8 @@ public class FileStorageService {
             Path logoPath = logoStorageLocation.resolve(fileName).normalize();
             Path productPath = productStorageLocation.resolve(fileName).normalize();
             Path reviewPath = reviewStorageLocation.resolve(fileName).normalize();
+            Path userDpPath = userDPStorageLocation.resolve(fileName).normalize();
+
             if(logoPath.toFile().exists()){
                 Files.deleteIfExists(logoPath);
             }
@@ -140,16 +123,8 @@ public class FileStorageService {
             else if(reviewPath.toFile().exists()){
                 Files.deleteIfExists(reviewPath);
             }
-
-            // Delete thumbnail if exists
-            String thumbnailName = "thumb_" + fileName;
-            Path productThumbnailPath = productStorageLocation.resolve(thumbnailName);
-            Path reviewThumbnailPath = reviewStorageLocation.resolve(thumbnailName);
-            if(productThumbnailPath.toFile().exists()){
-                Files.deleteIfExists(productThumbnailPath);
-            }
-            else if(reviewThumbnailPath.toFile().exists()){
-                Files.deleteIfExists(reviewThumbnailPath);
+            else if(userDpPath.toFile().exists()){
+                Files.deleteIfExists(userDpPath);
             }
 
         } catch (IOException ex) {
@@ -174,6 +149,12 @@ public class FileStorageService {
         switch (imageType){
             case REVIEW ->{
                 return reviewStorageLocation;
+            }
+            case BRAND ->{
+                return logoStorageLocation;
+            }
+            case USER_DP ->{
+                return userDPStorageLocation;
             }
             case PRODUCT_CARD, PRODUCT_DETAIL ->{
                 return productStorageLocation;

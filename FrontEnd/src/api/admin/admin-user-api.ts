@@ -1,19 +1,14 @@
 import {api} from "@/utils/apiConfig";
-export interface RegisterRequest {
-  firstName: string;
-  lastName?: string;
-  email: string;
-  password: string;
-  phoneNumber?: string;
-}
 
-export interface UserProfileUpdateRequest {
-  firstName: string;
+export interface UserRequest {
+  firstName?: string;
   lastName?: string;
-  email: string;
+  email?: string;
   currentPassword?: string;
   newPassword?: string;
   phoneNumber?: string;
+  userPDFile? : File | null;
+  existingDPUrl?: string;
 }
 
 enum Role {
@@ -23,16 +18,17 @@ enum Role {
 
 export interface UserResponse {
   id: string;
-  firstName: string;
-  lastName?: string;
   email: string;
-  phoneNumber?: string;
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
   role: Role;
+  UserDPUrl:string;
   createdAt: string;
 }
 
 export const createUser = async (
-  request: RegisterRequest,
+  request: UserRequest,
 ): Promise<UserResponse> => {
   try {
     const response = await api.post(`/admin/users`, request);
@@ -55,7 +51,7 @@ export const getUser = async (id: string): Promise<UserResponse> => {
 
 export const updateUserById = async (
   id: string,
-  request: UserProfileUpdateRequest,
+  request: UserRequest,
 ): Promise<UserResponse> => {
   try {
     const response = await api.put(`/admin/users/${id}`, request);

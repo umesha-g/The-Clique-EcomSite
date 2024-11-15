@@ -34,8 +34,12 @@ public class Product {
     private Category category;
 
     @ManyToOne
-    @JoinColumn(name = "discount_id")
-    private Discount discount;
+    @JoinColumn(name = "direct_discount_id")
+    private Discount directDiscount;
+
+    @ManyToOne
+    @JoinColumn(name = "other_discount_id")
+    private Discount otherDiscount;
 
     @ElementCollection
     private List<String> detailImageUrls;
@@ -70,6 +74,5 @@ public class Product {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
-
 
 }

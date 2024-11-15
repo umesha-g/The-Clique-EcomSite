@@ -9,6 +9,7 @@ import DeleteConfirmationDialog from './DeleteConfirmationDialog';
 import { useToast } from '@/hooks/use-toast';
 import {getAllBrands} from "@/api/brand-api";
 import {Switch} from "@/components/ui/switch";
+import {prefix} from "@/utils/apiConfig";
 
 const BrandsPanel: React.FC = () => {
     const [brands, setBrands] = useState<BrandResponse[]>([]);
@@ -77,12 +78,12 @@ const BrandsPanel: React.FC = () => {
     };
 
     return (
-        <Card className="rounded-none">
+        <Card className="rounded-none w-[1500px]">
             <CardHeader>
-                <CardTitle>Brands Management</CardTitle>
+                <CardTitle className={"text-xl"}>Brands Management</CardTitle>
             </CardHeader>
             <CardContent>
-                <div className="flex justify-end items-center mb-4">
+                <div className="flex justify-end items-center mb-10">
                     <Button onClick={handleAddBrand} className="rounded-none">
                         Add Brand
                     </Button>
@@ -105,7 +106,7 @@ const BrandsPanel: React.FC = () => {
                                 <TableCell>
                                     {brand.logoUrl && (
                                         <img
-                                            src={"http://localhost:8080" + brand.logoUrl}
+                                            src={prefix + brand.logoUrl}
                                             alt={`${brand.name} logo`}
                                             className="w-10 h-10 object-contain"
                                         />
@@ -116,10 +117,6 @@ const BrandsPanel: React.FC = () => {
                                 <TableCell>{brand.discount?.name}</TableCell>
                                 <TableCell>
                                     <div className="flex flex-col items-start">
-                                        {/*<span className={`text-sm ${*/}
-                                        {/*    discount.active ? 'text-green-600' : 'text-gray-500'}`}>*/}
-                                        {/*    {discount.active ? 'Active' : 'Inactive'}*/}
-                                        {/*</span>*/}
                                         <Switch
                                             checked={brand.active}
                                             onCheckedChange={(checked) => handleStateChange(brand.id, checked)}
@@ -163,6 +160,7 @@ const BrandsPanel: React.FC = () => {
                     open={isDeleteDialogOpen}
                     onOpenChange={setIsDeleteDialogOpen}
                     onConfirm={handleDeleteConfirm}
+                    type={"Brand"}
                 />
             </CardContent>
         </Card>

@@ -13,13 +13,13 @@ import React, {useCallback, useEffect, useState} from 'react';
 import {Input} from "@/components/ui/input";
 import debounce from "lodash/debounce";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
+import {Pagination} from "@/app/components/PaginationComponent";
 
 const OrdersPanel: React.FC = () => {
   const [orders, setOrders] = useState<OrderResponse[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  const [pageSize] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
   const [status,setStatus] = useState("ALL");
 
@@ -41,7 +41,7 @@ const OrdersPanel: React.FC = () => {
   const fetchOrders = async (searchTerm: string = '',status : string) => {
     try {
       const orderStatus = status as OrderStatus;
-      const response = await getAllOrders(currentPage,pageSize,'createdAt', searchTerm,orderStatus);
+      const response = await getAllOrders(currentPage,15,'createdAt', searchTerm,orderStatus);
       setOrders(response.content);
       setTotalPages(response.totalPages);
       setTotalElements(response.totalElements);
@@ -65,17 +65,17 @@ const OrdersPanel: React.FC = () => {
   };
 
   return (
-    <Card className="rounded-none">
+    <Card className="rounded-none w-[1500px]">
       <CardHeader>
-        <CardTitle>Orders Management</CardTitle>
+        <CardTitle className={"text-xl"}>Orders Management</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className={'flex rounded-none mb-12'}>
+        <div className={'flex justify-between mb-10'}>
           <Input
             placeholder="Search Orders..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className=" mr-5 rounded-none"
+            className=" max-w-sm rounded-none"
         />
           <Select onValueChange={(value) =>{
               setStatus(value)}
@@ -104,7 +104,7 @@ const OrdersPanel: React.FC = () => {
               <TableHead>Order ID</TableHead>
               <TableHead>Tracking Number</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Estimated Delivery Date</TableHead>
+              <TableHead>Est. Delivery Date</TableHead>
               <TableHead>Order Amount</TableHead>
               <TableHead>Shipping Cost</TableHead>
               <TableHead>Total Amount</TableHead>
@@ -179,32 +179,15 @@ const OrdersPanel: React.FC = () => {
             ))}
           </TableBody>
         </Table>
-        <div className="flex justify-between items-center mt-4">
-          <div className="text-sm text-gray-500">
-            Total items: {totalElements}
-          </div>
-          <div className="flex gap-2">
-            <Button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 0}
-                variant="outline"
-                className={"rounded-none"}
-            >
-              Previous
-            </Button>
-            <span className="flex items-center px-4 ">
-              Page {currentPage + 1} of {totalPages}
-            </span>
-            <Button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages - 1}
-                variant="outline"
-                className={"rounded-none"}
-            >
-              Next
-            </Button>
-          </div>
+
+        <div className="mt-8 flex justify-center">
+          <Pagination
+              currentPage = {currentPage + 1}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+          />
         </div>
+
       </CardContent>
     </Card>
   );

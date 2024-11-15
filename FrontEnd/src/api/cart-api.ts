@@ -1,19 +1,25 @@
 import { ProductCardResponse } from './product-api';
 import {api} from "@/utils/apiConfig";
 
-export interface CartItem {
+export interface CartItemResponse {
+  id:string;
   product: ProductCardResponse;
   quantity: number;
+  selectedColour:string;
+  selectedSize:string;
+  subTotal:number;
 }
 
 export interface CartRequest {
   productId: string;
   quantity: number;
+  selectedColour:string;
+  selectedSize:string;
 }
 
 export interface CartResponse {
   id: string;
-  cartItems: CartItem[];
+  cartItems: CartItemResponse[];
   totalAmount: number;
   createdAt: string;
 }

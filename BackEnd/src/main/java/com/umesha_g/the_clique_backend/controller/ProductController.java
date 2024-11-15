@@ -58,14 +58,14 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
-    @GetMapping("/{categoryId}")
-    public  ResponseEntity<Page<ProductCardResponse>> getAllProductsByCategory(
+    @GetMapping("/category/{categoryId}")
+    public ResponseEntity<Page<ProductCardResponse>> getAllProductsByCategory(
+            @PathVariable String categoryId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "createdAt") String sortBy,
-            @PathVariable String categoryId) {
+            @RequestParam(defaultValue = "createdAt") String sortBy) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
-        return ResponseEntity.ok(productService.getAllProductsByCategory(categoryId,pageable));
+        return ResponseEntity.ok(productService.getAllProductsByCategory(categoryId, pageable));
     }
 
     @PostMapping("/{id}/view")

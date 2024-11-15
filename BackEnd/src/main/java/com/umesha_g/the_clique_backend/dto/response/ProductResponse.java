@@ -1,6 +1,5 @@
 package com.umesha_g.the_clique_backend.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.umesha_g.the_clique_backend.model.enums.Gender;
 import lombok.Data;
 
@@ -28,7 +27,6 @@ public class ProductResponse {
     private Long purchaseCount;
     private LocalDateTime createdAt;
     //private LocalDateTime updatedAt;
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private MiniDiscountResponse discount;
+    private MiniDiscountResponse directDiscount;
+    private MiniDiscountResponse otherDiscount;
 }

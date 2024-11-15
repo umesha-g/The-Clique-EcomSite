@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useRef} from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -12,20 +12,25 @@ import {
     FormLabel,
     FormMessage,
 } from '@/components/ui/form';
-import { RegisterRequest } from '@/api/admin/admin-user-api';
+import { UserRequest} from '@/api/admin/admin-user-api';
+import BrandLogoDropzone from "@/app/admin/dashboard/adminDashboard_Components/brandPanelComponents/BrandLogoDropzone";
+import UserPictureDropzone
+    from "@/app/admin/dashboard/adminDashboard_Components/UserPanelComponents/UserPictureDropzone";
 
 const formSchema = z.object({
     firstName: z.string().min(1, 'First name is required'),
     lastName: z.string().min(1, 'Last name is required'),
     email: z.string().email('Invalid email address'),
     phoneNumber: z.string().min(1, 'Phone number is required'),
-    password: z.string().min(1, 'Password is required').optional(),
+    password: z.string().min(8, 'Password must be at least 8 Characters long').optional(),
+    existingDPUrl:z.string().optional(),
+    userPDFile:z.any().optional(),
 });
 
 interface UserDetailsFormProps {
-    initialData: RegisterRequest | null;
+    initialData: UserRequest | null;
     isEditing: boolean;
-    onSubmit: (data: RegisterRequest) => void;
+    onSubmit: (data: UserRequest) => void;
 }
 
 const UserDetailsForm: React.FC<UserDetailsFormProps> = ({
@@ -33,6 +38,7 @@ const UserDetailsForm: React.FC<UserDetailsFormProps> = ({
                                                              isEditing,
                                                              onSubmit,
                                                          }) => {
+    const fileRef = useRef<File | null>(null);
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -41,12 +47,25 @@ const UserDetailsForm: React.FC<UserDetailsFormProps> = ({
             email: initialData?.email || '',
             phoneNumber: initialData?.phoneNumber || '',
             password: '',
+            existingDPUrl:initialData?.existingDPUrl || '',
         },
     });
 
+    const handleFileChange = (file: File | null) => {
+        fileRef.current = file;
+    };
+
+    const handleSubmit = (data: z.infer<typeof formSchema>) => {
+        const userData: UserRequest = {
+            ...data,
+            userPDFile: fileRef.current,
+        };
+        onSubmit(userData);
+    };
+
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
                 <FormField
                     control={form.control}
                     name="firstName"
@@ -103,25 +122,41 @@ const UserDetailsForm: React.FC<UserDetailsFormProps> = ({
                     )}
                 />
 
-                {!isEditing && (
-                    <FormField
-                        control={form.control}
-                        name="password"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Password</FormLabel>
-                                <FormControl>
-                                    <Input
-                                        {...field}
-                                        type="password"
-                                        className="rounded-none"
-                                    />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                )}
+                <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Password</FormLabel>
+                            <FormControl>
+                                <Input
+                                    {...field}
+                                    type="password"
+                                    className="rounded-none"
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="userPDFile"
+                    render={() => (
+                        <FormItem>
+                            <FormLabel>User Display Picture</FormLabel>
+                            <FormControl>
+                                <UserPictureDropzone
+                                    onFileChange={handleFileChange}
+                                    existingLogoUrl={form.getValues('existingDPUrl')}
+                                    file={fileRef.current}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
 
                 <Button type="submit" className="w-full rounded-none">
                     {isEditing ? 'Update User' : 'Create User'}

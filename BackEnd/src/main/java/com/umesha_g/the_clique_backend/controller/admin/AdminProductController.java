@@ -99,7 +99,7 @@ public class AdminProductController {
         }
     }
 
-    @PutMapping("/{productId}/images/{fileId}/set-as-card")
+    @PutMapping("/{productId}/images/{fileId}/setAsCard")
     public ResponseEntity<?> setAsCardImage(@PathVariable String productId,@PathVariable String fileId) {
         try {
             productImageService.setAsCardImage(productId,fileId);

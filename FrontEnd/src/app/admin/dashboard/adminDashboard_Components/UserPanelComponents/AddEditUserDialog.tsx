@@ -6,7 +6,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { RegisterRequest, UserProfileUpdateRequest, UserResponse, createUser, updateUserById } from '@/api/admin/admin-user-api';
+import { UserRequest, UserResponse, createUser, updateUserById } from '@/api/admin/admin-user-api';
 import UserDetailsForm from './UserDetailsForm';
 
 interface AddEditUserDialogProps {
@@ -22,7 +22,7 @@ const AddEditUserDialog: React.FC<AddEditUserDialogProps> = ({
                                                                  user,
                                                                  onSuccess,
                                                              }) => {
-    const [userData, setUserData] = useState<RegisterRequest | null>(null);
+    const [userData, setUserData] = useState<UserRequest | null>(null);
     const { toast } = useToast();
 
     useEffect(() => {
@@ -32,17 +32,18 @@ const AddEditUserDialog: React.FC<AddEditUserDialogProps> = ({
                 lastName: user.lastName || '',
                 email: user.email,
                 phoneNumber: user.phoneNumber || '',
-                password: '', // Clear password field for security
+                currentPassword: '', // Clear password field for security
+                existingDPUrl:user.UserDPUrl || '',
             });
         } else {
             setUserData(null);
         }
     }, [open, user]);
 
-    const handleSubmit = async (data: RegisterRequest) => {
+    const handleSubmit = async (data: UserRequest) => {
         try {
             if (user) {
-                const updateRequest: UserProfileUpdateRequest = {
+                const updateRequest: UserRequest = {
                     firstName: data.firstName,
                     lastName: data.lastName,
                     email: data.email,

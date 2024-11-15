@@ -117,12 +117,12 @@ const DiscountsPanel: React.FC = () => {
   };
 
   return (
-      <Card className="rounded-none">
+      <Card className="rounded-none w-[1500px]">
         <CardHeader>
-          <CardTitle>Discounts Management</CardTitle>
+          <CardTitle className={"text-xl"}>Discounts Management</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex justify-end mb-4">
+          <div className="flex justify-end mb-10">
             <Button onClick={handleAddDiscount} className="rounded-none">
               Add Discount
             </Button>
@@ -150,10 +150,6 @@ const DiscountsPanel: React.FC = () => {
                     <TableCell>{formatDateForDisplay(discount.endDate)}</TableCell>
                     <TableCell>
                       <div className="flex flex-col items-start">
-                        {/*<span className={`text-sm ${*/}
-                        {/*    discount.active ? 'text-green-600' : 'text-gray-500'}`}>*/}
-                        {/*    {discount.active ? 'Active' : 'Inactive'}*/}
-                        {/*</span>*/}
                         <Switch
                             checked={discount.active}
                             onCheckedChange={(checked) => handleStateChange(discount.id, checked)}
@@ -197,6 +193,7 @@ const DiscountsPanel: React.FC = () => {
               open={isDeleteDialogOpen}
               onOpenChange={setIsDeleteDialogOpen}
               onConfirm={handleDeleteConfirm}
+              type={"Discount"}
           />
         </CardContent>
       </Card>

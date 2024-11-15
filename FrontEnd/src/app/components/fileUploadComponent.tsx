@@ -77,7 +77,7 @@ const FileUpload:React.FC<FileUploadProps> = ({
           {existingFiles.map((file) => (
             <div key={prefix + file.standardUrl} className="relative group">
               <img
-                src={prefix + file.thumbnailUrl}
+                src={prefix + file.standardUrl}
                 alt="Uploaded file"
                 className="rounded-lg object-cover w-full aspect-square"
               />

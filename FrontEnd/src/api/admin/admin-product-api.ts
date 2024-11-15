@@ -32,7 +32,8 @@ export interface ProductResponse {
   colors: string[];
   purchaseCount: number;
   createdAt: Date;
-  discount?: MiniDiscountResponse;
+  directDiscount?: MiniDiscountResponse;
+  otherDiscount?: MiniDiscountResponse;
 }
 
 export enum ImageStatus {
@@ -49,7 +50,6 @@ export enum Gender {
 
 export interface FileRefResponse {
   id:string;
-  thumbnailUrl: string;
   standardUrl: string;
   cardImage: boolean;
   displayOrder?: number;
@@ -172,7 +172,7 @@ export const setAsCardImage = async (
 ): Promise<string> => {
   try {
     const response = await api.put(
-      `/admin/products/${productId}/images/${fileId}/set-as-card`,
+      `/admin/products/${productId}/images/${fileId}/setAsCard`,
     );
     return response.data;
   } catch (error) {

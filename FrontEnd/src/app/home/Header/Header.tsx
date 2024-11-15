@@ -4,6 +4,15 @@ import Logo from "../Logo";
 import { CategoriesMenu } from "./CategoriesMenu";
 import { SearchBar, SearchButton } from "./SearchBar";
 import { UserMenu } from "./UserMenu";
+import {
+  Drawer, DrawerClose,
+  DrawerContent,
+  DrawerDescription, DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger
+} from "@/components/ui/drawer";
+import {Button} from "@/components/ui/button";
 
 const HomeHeader: React.FC = () => {
   const [isBgTransparent, setIsBgTransparent] = useState("bg-opacity-0");
@@ -24,6 +33,7 @@ const HomeHeader: React.FC = () => {
     return () => window.removeEventListener("scroll", toggleBgTransparent);
   }, []);
 
+  // @ts-ignore
   return (
     <header
       className={`left-0 right-0 fixed z-50 transition-all ease-in-out bg-white ${isBgTransparent} `}
@@ -44,8 +54,24 @@ const HomeHeader: React.FC = () => {
         </div>
         <Logo />
         <div className="flex items-center space-x-4 justify-end">
+          <Drawer direction={"right"} >
+            <DrawerTrigger>
+              <ShoppingCart className="w-5 h-5 text-neutral-700 hover:text-neutral-950 hover:fill-neutral-950 transition-all ease-in-out" />
+            </DrawerTrigger>
+            <DrawerContent>
+              <DrawerHeader>
+                <DrawerTitle>Cart</DrawerTitle>
+                <DrawerDescription></DrawerDescription>
+              </DrawerHeader>
+              <DrawerFooter>
+                <DrawerClose>
+                  <Button variant="outline">Cancel</Button>
+                </DrawerClose>
+              </DrawerFooter>
+            </DrawerContent>
+          </Drawer>
+
           {/* <Heart className="w-5 h-5 text-neutral-700 hover:text-red-600 hover:fill-red-600 transition-all ease-in-out" /> */}
-          <ShoppingCart className="w-5 h-5 text-neutral-700 hover:text-neutral-950 hover:fill-neutral-950 transition-all ease-in-out" />
 
           <UserMenu />
         </div>

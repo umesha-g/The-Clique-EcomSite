@@ -9,4 +9,5 @@ public class MiniDiscountResponse {
     private String id;
     private String name;
     private BigDecimal discountPercentage;
+    private boolean isActive;
 }

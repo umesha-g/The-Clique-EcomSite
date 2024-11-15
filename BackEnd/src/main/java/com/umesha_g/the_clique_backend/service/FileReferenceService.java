@@ -37,7 +37,6 @@ public class FileReferenceService {
             fileReference.setSize(file.getSize());
             fileReference.setImageType(imageType);
             fileReference.setEntityId(entityId);
-            fileReference.setThumbnailUrl("/api/v1/files/thumb_" + fileName);
             fileReference.setStandardUrl("/api/v1/files/" + fileName);
             fileReference.setCardImage(isCardImage);
 

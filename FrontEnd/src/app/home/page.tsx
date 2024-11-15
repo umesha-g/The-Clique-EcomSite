@@ -7,6 +7,7 @@ import HomeHeader from "./Header/Header";
 import HeroSection from "./HeroSection/HeroSection";
 import TestimonialSection from "./TesimonialSection/TestimonialSection";
 import TrendingSection from "./TrendingSection/TrendingSection";
+import CartButtonWithPanel from "@/app/home/cartButtonWithPanel";
 
 const HomePage: React.FC = () => {
   return (
@@ -33,6 +34,7 @@ const HomePage: React.FC = () => {
         <section className="container relative md:-top-20 lg:-top-16 left-0 right-0 mx-auto px-4 py-12">
           <TrendingSection />
         </section>
+          <CartButtonWithPanel/>
       </main>
 
       <footer className="py-8 bg-neutral-800">

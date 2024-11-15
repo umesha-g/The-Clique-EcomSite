@@ -18,7 +18,6 @@ public class FileReference {
     private String fileType;
     private String entityId;
     private long size;
-    private String thumbnailUrl;
     private String standardUrl;
 
     @Enumerated(EnumType.STRING)

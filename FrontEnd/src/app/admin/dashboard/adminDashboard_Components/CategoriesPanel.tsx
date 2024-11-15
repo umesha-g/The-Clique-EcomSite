@@ -78,12 +78,12 @@ const CategoriesPanel: React.FC = () => {
   };
 
   return (
-      <Card className="rounded-none">
+      <Card className="rounded-none w-[1500px]">
         <CardHeader>
-          <CardTitle>Categories Management</CardTitle>
+          <CardTitle className={"text-xl"}>Categories Management</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex justify-end mb-4">
+          <div className="flex justify-end mb-10">
             <Button onClick={handleAddCategory} className="rounded-none">
               Add Category
             </Button>
@@ -142,6 +142,7 @@ const CategoriesPanel: React.FC = () => {
               open={isDeleteDialogOpen}
               onOpenChange={setIsDeleteDialogOpen}
               onConfirm={handleDeleteConfirm}
+              type={"Category"}
           />
         </CardContent>
       </Card>

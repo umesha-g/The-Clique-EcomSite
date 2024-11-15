@@ -1,7 +1,6 @@
-import axios from 'axios';
-import { DiscountResponse } from './admin/admin-discount-api';
 import { ProductResponse } from './admin/admin-product-api';
 import {api} from "@/utils/apiConfig";
+import {MiniDiscountResponse} from "@/api/discount-api";
 
 export interface ProductCardResponse {
   id: string;
@@ -11,7 +10,8 @@ export interface ProductCardResponse {
   cardImageUrl: string;
   purchaseCount: number;
   stock: number;
-  activeDiscount?: DiscountResponse;
+  directDiscount?: MiniDiscountResponse;
+  otherDiscount?: MiniDiscountResponse;
 }
 
 export interface ProductSearchParams {
@@ -53,17 +53,17 @@ export const searchProducts = async (
 };
 
 export const getAllProductsByCategory = async (
-  categoryId: string,
-  page: number = 0,
-  size: number = 10,
-  sortBy: string = 'createdAt',
+    categoryId: string,
+    page: number = 0,
+    size: number = 10,
+    sortBy: string = 'createdAt',
 ): Promise<{
   content: ProductCardResponse[];
   totalPages: number;
   totalElements: number;
 }> => {
   try {
-    const response = await api.get(`/products/${categoryId}`, {
+    const response = await api.get(`/products/category/${categoryId}`, {
       params: { page, size, sortBy },
     });
     return response.data;

@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -25,30 +26,13 @@ public class Discount {
     private BigDecimal discountPercentage;
 
     @Column(nullable = false)
-    private LocalDateTime startDate;
+    private LocalDate startDate;
 
     @Column(nullable = false)
-    private LocalDateTime endDate;
-
-//    @ManyToMany
-//    @JoinTable(
-//            name = "discount_categories",
-//            joinColumns = @JoinColumn(name = "discount_id"),
-//            inverseJoinColumns = @JoinColumn(name = "category_id")
-//    )
-//    private Set<Category> applicableCategories;
-
-//    @ManyToMany
-//    @JoinTable(
-//            name = "discount_products",
-//            joinColumns = @JoinColumn(name = "discount_id"),
-//            inverseJoinColumns = @JoinColumn(name = "product_id")
-//    )
-//    private Set<Product> applicableProducts;
+    private LocalDate endDate;
 
     private boolean isActive;
 
-    // Audit fields
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -57,7 +41,6 @@ public class Discount {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }
-
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();

@@ -14,20 +14,22 @@ interface DeleteConfirmationDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     onConfirm: () => void;
+    type:string;
 }
 
 const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
                                                                                open,
                                                                                onOpenChange,
                                                                                onConfirm,
+                                                                               type,
                                                                            }) => {
     return (
         <AlertDialog open={open} onOpenChange={onOpenChange}>
             <AlertDialogContent>
                 <AlertDialogHeader>
-                    <AlertDialogTitle>Delete Product</AlertDialogTitle>
+                    <AlertDialogTitle>Delete {type}</AlertDialogTitle>
                     <AlertDialogDescription>
-                        Are you sure you want to delete this product? <br/> <span className={"text-red-500"}>This action cannot be undone.</span>
+                        Are you sure you want to delete this {type.toLowerCase()}? <br/> <span className={"text-red-500"}>This action cannot be undone.</span>
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>

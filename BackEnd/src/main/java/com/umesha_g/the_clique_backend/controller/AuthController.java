@@ -1,7 +1,8 @@
 package com.umesha_g.the_clique_backend.controller;
 
 import com.umesha_g.the_clique_backend.dto.request.LoginRequest;
-import com.umesha_g.the_clique_backend.dto.request.RegisterRequest;
+import com.umesha_g.the_clique_backend.dto.request.UserRequest;
+import com.umesha_g.the_clique_backend.exception.ResourceNotFoundException;
 import com.umesha_g.the_clique_backend.service.AuthService;
 import com.umesha_g.the_clique_backend.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -42,7 +43,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody UserRequest request) throws ResourceNotFoundException {
         if (userService.existUserByEmail(request.getEmail())) {
             return ResponseEntity
                     .badRequest()

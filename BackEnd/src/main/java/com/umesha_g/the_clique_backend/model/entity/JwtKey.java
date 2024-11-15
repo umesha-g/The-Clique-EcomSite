@@ -2,14 +2,12 @@ package com.umesha_g.the_clique_backend.model.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
 @Entity
 @Data
 @Table(name = "jwt_keys")
-@NoArgsConstructor
 public class JwtKey {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

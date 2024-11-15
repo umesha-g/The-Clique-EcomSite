@@ -1,7 +1,6 @@
 package com.umesha_g.the_clique_backend.controller.admin;
 
-import com.umesha_g.the_clique_backend.dto.request.RegisterRequest;
-import com.umesha_g.the_clique_backend.dto.request.UserProfileUpdateRequest;
+import com.umesha_g.the_clique_backend.dto.request.UserRequest;
 import com.umesha_g.the_clique_backend.dto.response.UserResponse;
 import com.umesha_g.the_clique_backend.exception.ResourceNotFoundException;
 import com.umesha_g.the_clique_backend.service.UserService;
@@ -23,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class AdminUserController {
     private final UserService userService;
     @PostMapping
-    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody UserRequest request) throws ResourceNotFoundException {
         UserResponse response = userService.createUser(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(response);
@@ -38,7 +37,7 @@ public class AdminUserController {
     @PutMapping("/{id}")
     public ResponseEntity<UserResponse> updateUser(
             @PathVariable String id,
-            @Valid @RequestBody UserProfileUpdateRequest request) throws ResourceNotFoundException {
+            @Valid @RequestBody UserRequest request) throws ResourceNotFoundException {
         UserResponse response = userService.updateUserById(id, request);
         return ResponseEntity.ok(response);
     }

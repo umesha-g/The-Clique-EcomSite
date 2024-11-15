@@ -6,7 +6,10 @@ import com.umesha_g.the_clique_backend.exception.FileStorageException;
 import com.umesha_g.the_clique_backend.exception.ResourceNotFoundException;
 import com.umesha_g.the_clique_backend.model.entity.Brand;
 import com.umesha_g.the_clique_backend.model.entity.Discount;
+import com.umesha_g.the_clique_backend.model.entity.Product;
+import com.umesha_g.the_clique_backend.model.enums.FileEnums;
 import com.umesha_g.the_clique_backend.repository.BrandRepository;
+import com.umesha_g.the_clique_backend.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,13 +28,17 @@ public class BrandService {
     private BrandRepository brandRepository;
     private FileStorageService fileStorageService;
     private DiscountService discountService;
+    private ProductRepository productRepository;
+    private DiscountPriorityService discountPriorityService;
 
     @Autowired
-    public BrandService(ModelMapper modelMapper, BrandRepository brandRepository, FileStorageService fileStorageService, DiscountService discountService) {
+    public BrandService(ModelMapper modelMapper, BrandRepository brandRepository, FileStorageService fileStorageService, DiscountService discountService, ProductRepository productRepository, DiscountPriorityService discountPriorityService) {
         this.modelMapper = modelMapper;
         this.brandRepository = brandRepository;
         this.fileStorageService = fileStorageService;
         this.discountService = discountService;
+        this.productRepository = productRepository;
+        this.discountPriorityService = discountPriorityService;
     }
 
     @Transactional
@@ -111,7 +118,7 @@ public class BrandService {
             String prefix = "brand_logo_" + brand.getId();
             String fileName;
             try {
-                fileName = fileStorageService.storeLogoFile(request.getLogoFile(), prefix);
+                fileName = fileStorageService.storeFile(request.getLogoFile(), prefix, FileEnums.ImageType.BRAND);
                 brand.setLogoUrl("/api/v1/files/" + fileName);
             } catch (FileStorageException e) {
                 throw new RuntimeException(e);
@@ -130,6 +137,12 @@ public class BrandService {
         }
 
         Brand savedBrand = brandRepository.save(brand);
+
+        List<Product> brandProducts = productRepository.findByBrand(savedBrand);
+        for (Product product : brandProducts) {
+            discountPriorityService.applyHighestPriorityDiscount(product);
+        }
+
         return modelMapper.map(savedBrand, BrandResponse.class);
     }
 }

@@ -26,6 +26,10 @@ public class OrderItem {
 
     private Integer quantity;
 
+    private String selectedColour;
+
+    private String selectedSize;
+
     private BigDecimal subTotal;
 
     @Column(name = "created_at")

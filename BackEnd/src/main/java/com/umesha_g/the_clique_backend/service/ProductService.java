@@ -31,42 +31,26 @@ public class ProductService {
     private  BrandRepository brandRepository;
     private  DiscountRepository discountRepository;
     private  ModelMapper modelMapper;
+    private DiscountPriorityService discountPriorityService;
 
     private ProductImageService productImageService;
 
     @Autowired
-    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository, BrandRepository brandRepository, DiscountRepository discountRepository, ModelMapper modelMapper, ProductImageService productImageService) {
+    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository, BrandRepository brandRepository, DiscountRepository discountRepository, ModelMapper modelMapper, DiscountPriorityService discountPriorityService, ProductImageService productImageService) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.brandRepository = brandRepository;
         this.discountRepository = discountRepository;
         this.modelMapper = modelMapper;
+        this.discountPriorityService = discountPriorityService;
         this.productImageService = productImageService;
     }
 
     @Transactional
     public ProductResponse createProduct(ProductRequest request) throws ResourceNotFoundException {
         Product product = modelMapper.map(request, Product.class);
-
-        if(!request.getCategoryId().isEmpty())
-        {
-        Category category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
-        product.setCategory(category);
-        }
-        if(!request.getBrandId().isEmpty()) {
-            Brand brand = brandRepository.findById(request.getBrandId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Brand not found"));
-            product.setBrand(brand);
-        }
-
-        if(!request.getDiscountId().isEmpty()) {
-            Discount discount = discountRepository.findById(request.getDiscountId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Discount not found"));
-            product.setDiscount(discount);
-        }
-
-        Product savedProduct = productRepository.save(product);
+        Product proceededProduct = advancedDetailsProcess(product,request);
+        Product savedProduct = discountPriorityService.applyHighestPriorityDiscount(proceededProduct);
         return modelMapper.map(savedProduct, ProductResponse.class);
     }
 
@@ -98,7 +82,8 @@ public class ProductService {
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
         modelMapper.map(request, product);
-        Product updatedProduct = productRepository.save(product);
+        Product proceededProduct = advancedDetailsProcess(product,request);
+        Product updatedProduct = discountPriorityService.applyHighestPriorityDiscount(proceededProduct);
         return modelMapper.map(updatedProduct, ProductResponse.class);
     }
 
@@ -135,5 +120,28 @@ public class ProductService {
 
     public Product getProductById (String id){
             return productRepository.findById(id).orElse(null);
+    }
+
+    private Product advancedDetailsProcess (Product product, ProductRequest request) throws ResourceNotFoundException {
+
+        if(!request.getCategoryId().isEmpty())
+        {
+            Category category = categoryRepository.findById(request.getCategoryId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+            product.setCategory(category);
+        }
+
+        if(!request.getBrandId().isEmpty()) {
+            Brand brand = brandRepository.findById(request.getBrandId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Brand not found"));
+            product.setBrand(brand);
+        }
+
+        if(!request.getDiscountId().isEmpty()) {
+            Discount discount = discountRepository.findById(request.getDiscountId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Discount not found"));
+            product.setDirectDiscount(discount);
+        }
+        return product;
     }
 }

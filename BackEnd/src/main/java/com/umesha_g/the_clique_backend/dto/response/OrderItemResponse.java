@@ -9,5 +9,7 @@ public class OrderItemResponse {
     private String id;
     private ProductCardResponse product;
     private Integer quantity;
+    private String selectedColour;
+    private String selectedSize;
     private BigDecimal subTotal;
 }

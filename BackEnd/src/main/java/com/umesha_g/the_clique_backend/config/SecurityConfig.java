@@ -46,7 +46,8 @@ public class SecurityConfig {
             "/api/v1/products/**",
             "/api/v1/files/**",
             "/api/v1/brands/**",
-            "/api/v1/categories/**"
+            "/api/v1/categories/**",
+            "/api/v1/discounts/**",
     };
 
     @Bean
@@ -79,7 +80,7 @@ public class SecurityConfig {
                         .requestMatchers(PUBLIC_URLS).permitAll()
                         .requestMatchers(HttpMethod.GET, PUBLIC_GET_URLS).permitAll()
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/v1/products/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/products/**").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/v1/products/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/products/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/users/**").hasAnyRole("ADMIN", "USER")

@@ -1,6 +1,6 @@
 package com.umesha_g.the_clique_backend.controller;
 
-import com.umesha_g.the_clique_backend.dto.request.UserProfileUpdateRequest;
+import com.umesha_g.the_clique_backend.dto.request.UserRequest;
 import com.umesha_g.the_clique_backend.dto.response.UserResponse;
 import com.umesha_g.the_clique_backend.exception.ResourceNotFoundException;
 import com.umesha_g.the_clique_backend.service.UserService;
@@ -29,7 +29,7 @@ public class UserController {
 
     @PutMapping
     public ResponseEntity<UserResponse> updateUser(
-            @Valid @RequestBody UserProfileUpdateRequest request) throws ResourceNotFoundException {
+            @Valid @RequestBody UserRequest request) throws ResourceNotFoundException {
         UserResponse response = userService.updateUser(request);
         return ResponseEntity.ok(response);
     }

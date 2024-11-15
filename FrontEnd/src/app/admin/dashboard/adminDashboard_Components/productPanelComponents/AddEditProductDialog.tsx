@@ -40,7 +40,7 @@ const AddEditProductDialog: React.FC<AddEditProductDialogProps> = ({
                     description: product.description,
                     brandId: product.brand?.id,
                     categoryId: product.category.id,
-                    discountId: product.discount?.id,
+                    discountId: product.directDiscount?.id,
                     gender: product.gender,
                     sizes: product.sizes,
                     colors: product.colors,
@@ -53,6 +53,8 @@ const AddEditProductDialog: React.FC<AddEditProductDialogProps> = ({
 
     const handleDetailsSubmit = async (data: ProductRequest) => {
         try {
+            if(data.discountId==" ") {data.discountId="";}
+            if(data.brandId==" ") {data.brandId="";}
             if (productId) {
                 await updateProduct(productId, data);
             } else {

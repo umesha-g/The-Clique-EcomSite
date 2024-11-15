@@ -5,7 +5,9 @@ public class FileEnums {
         public enum ImageType {
             PRODUCT_CARD,
             PRODUCT_DETAIL,
-            REVIEW
+            REVIEW,
+            BRAND,
+            USER_DP
         }
 
         public enum ImageStatus {

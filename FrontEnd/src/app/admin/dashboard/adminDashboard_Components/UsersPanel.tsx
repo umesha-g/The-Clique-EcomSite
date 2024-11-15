@@ -20,12 +20,12 @@ import { Edit, Trash2 } from "lucide-react";
 import { useToast } from '@/hooks/use-toast';
 import AddEditUserDialog from './UserPanelComponents/AddEditUserDialog';
 import DeleteConfirmationDialog from './DeleteConfirmationDialog';
+import {Pagination} from "@/app/components/PaginationComponent";
 
 const UsersPanel: React.FC = () => {
   const [users, setUsers] = useState<UserResponse[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
-  const [pageSize] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
   const [totalPages, setTotalPages] = useState(0);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -42,7 +42,7 @@ const UsersPanel: React.FC = () => {
 
   const fetchUsers = async (searchTerm: string = '') => {
     try {
-      const response = await getAllUsers(currentPage, pageSize, 'createdAt', searchTerm);
+      const response = await getAllUsers(currentPage, 15, 'createdAt', searchTerm);
       setUsers(response.content);
       setTotalPages(response.totalPages);
       setTotalElements(response.totalElements);
@@ -106,12 +106,12 @@ const UsersPanel: React.FC = () => {
   };
 
   return (
-      <Card className="rounded-none">
+      <Card className="rounded-none w-[1500px]">
         <CardHeader>
-          <CardTitle>Users Management</CardTitle>
+          <CardTitle className={"text-xl"}>Users Management</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex justify-between mb-4">
+          <div className="flex justify-between mb-10">
             <Input
                 placeholder="Search Users..."
                 value={searchTerm}
@@ -167,31 +167,12 @@ const UsersPanel: React.FC = () => {
             </TableBody>
           </Table>
 
-          <div className="flex justify-between items-center mt-4">
-            <div className="text-sm text-gray-500">
-              Total items: {totalElements}
-            </div>
-            <div className="flex gap-2">
-              <Button
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 0}
-                  variant="outline"
-                  className="rounded-none"
-              >
-                Previous
-              </Button>
-              <span className="flex items-center px-4">
-                            Page {currentPage + 1} of {totalPages}
-                        </span>
-              <Button
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages - 1}
-                  variant="outline"
-                  className="rounded-none"
-              >
-                Next
-              </Button>
-            </div>
+          <div className="mt-8 flex justify-center">
+            <Pagination
+                currentPage = {currentPage + 1}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+            />
           </div>
 
           <AddEditUserDialog
@@ -205,6 +186,7 @@ const UsersPanel: React.FC = () => {
               open={isDeleteDialogOpen}
               onOpenChange={setIsDeleteDialogOpen}
               onConfirm={handleDeleteConfirm}
+              type={"User"}
           />
         </CardContent>
       </Card>

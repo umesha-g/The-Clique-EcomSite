@@ -15,14 +15,18 @@ export enum OrderStatus {
   FAILED = "FAILED"
 }
 
-interface OrderItem {
+interface OrderItemResponse {
+  id:string;
   product: ProductCardResponse;
   quantity: number;
+  selectedColour:string;
+  selectedSize:string;
+  subTotal:number;
 }
 
 export interface OrderResponse {
   id: string;
-  orderItems: OrderItem[];
+  orderItems: OrderItemResponse[];
   shippingAddress: AddressResponse;
   totalAmount: number;
   shippingCost: number;

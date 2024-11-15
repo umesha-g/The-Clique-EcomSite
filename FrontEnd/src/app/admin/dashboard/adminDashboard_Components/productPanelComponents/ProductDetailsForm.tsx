@@ -393,6 +393,7 @@ const ProductDetailsForm: React.FC<ProductDetailsFormProps> = ({
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
+                                        <SelectItem value=" ">No Brand</SelectItem>
                                         {brands.map((brand: any) => (
                                             <SelectItem key={brand.id} value={brand.id}>
                                                 {brand.name}
@@ -421,7 +422,8 @@ const ProductDetailsForm: React.FC<ProductDetailsFormProps> = ({
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                        {discounts.map((discount: any) => (
+                                        <SelectItem value=" ">No Discount</SelectItem>
+                                        {discounts.map((discount) => (
                                             <SelectItem key={discount.id} value={discount.id}>
                                                 {discount.name} ( {discount.discountPercentage}% off )
                                             </SelectItem>

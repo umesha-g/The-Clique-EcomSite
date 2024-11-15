@@ -3,8 +3,8 @@ import {api} from "@/utils/apiConfig";
 export interface MiniDiscountResponse {
     id: string;
     name: string;
-    description: string;
     discountPercentage:number;
+    active:boolean;
 }
 
 export const getActiveDiscounts = async (): Promise<MiniDiscountResponse[]> => {

@@ -23,8 +23,7 @@ public class ProductImageService {
     private  FileReferenceService fileReferenceService;
     private  ProductRepository productRepository;
     private  ModelMapper modelMapper;
-
-    private static final int MAX_PRODUCT_IMAGES = 8;
+    private static final int MAX_PRODUCT_IMAGES = 6;
 
     @Autowired
     public ProductImageService(FileReferenceService fileReferenceService, ProductRepository productRepository, ModelMapper modelMapper) {
@@ -42,7 +41,7 @@ public class ProductImageService {
         List<FileReference> existingImages = fileReferenceService.getActiveFilesByEntity(
                 ImageType.PRODUCT_DETAIL, productId);
 
-        if (!isCardImage && existingImages.size() >= MAX_PRODUCT_IMAGES) {
+        if (existingImages.size() >= MAX_PRODUCT_IMAGES) {
             throw new MaxImagesExceededException("Maximum product images limit reached");
         }
 
@@ -54,16 +53,7 @@ public class ProductImageService {
                 isCardImage
         );
 
-        // Update product's image URLs
-        if (isCardImage) {
-            product.setCardImageUrl(fileReference.getStandardUrl());
-        } else {
-            if (product.getDetailImageUrls() == null) {
-                product.setDetailImageUrls(List.of(fileReference.getStandardUrl()));
-            } else {
-                product.getDetailImageUrls().add(fileReference.getStandardUrl());
-            }
-        }
+        product.getDetailImageUrls().add(fileReference.getStandardUrl());
 
         Product updatedProduct = productRepository.save(product);
         //modelMapper.map(updatedProduct, ProductResponse.class);
@@ -98,11 +88,6 @@ public class ProductImageService {
 
         // Update product's card image URL
         product.setCardImageUrl(newCardImage.getStandardUrl());
-
-        // Remove the URL from detail images if it exists there
-        if (product.getDetailImageUrls() != null) {
-            product.getDetailImageUrls().remove(newCardImage.getStandardUrl());
-        }
 
         Product updatedProduct = productRepository.save(product);
        //modelMapper.map(updatedProduct, ProductResponse.class);

@@ -37,6 +37,9 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Column(name = "DP_URL")
+    private String UserDPUrl;
+
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Cart cart;
 

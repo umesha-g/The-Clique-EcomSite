@@ -1,5 +1,16 @@
 package com.umesha_g.the_clique_backend.service;
 
+import com.umesha_g.the_clique_backend.dto.request.UserRequest;
+import com.umesha_g.the_clique_backend.dto.response.UserResponse;
+import com.umesha_g.the_clique_backend.exception.FileStorageException;
+import com.umesha_g.the_clique_backend.exception.ResourceNotFoundException;
+import com.umesha_g.the_clique_backend.exception.UserException;
+import com.umesha_g.the_clique_backend.model.entity.User;
+import com.umesha_g.the_clique_backend.model.enums.FileEnums;
+import com.umesha_g.the_clique_backend.model.enums.Role;
+import com.umesha_g.the_clique_backend.repository.UserRepository;
+import com.umesha_g.the_clique_backend.util.SecurityUtils;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -7,18 +18,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.umesha_g.the_clique_backend.dto.request.RegisterRequest;
-import com.umesha_g.the_clique_backend.dto.request.UserProfileUpdateRequest;
-import com.umesha_g.the_clique_backend.dto.response.UserResponse;
-import com.umesha_g.the_clique_backend.exception.ResourceNotFoundException;
-import com.umesha_g.the_clique_backend.exception.UserException;
-import com.umesha_g.the_clique_backend.model.entity.User;
-import com.umesha_g.the_clique_backend.model.enums.Role;
-import com.umesha_g.the_clique_backend.repository.UserRepository;
-import com.umesha_g.the_clique_backend.util.SecurityUtils;
-
-import lombok.RequiredArgsConstructor;
 
 @Service
 @Transactional
@@ -28,25 +27,27 @@ public class UserService {
     private  ModelMapper modelMapper;
     private  PasswordEncoder passwordEncoder;
     private SecurityUtils securityUtils;
+    private FileStorageService fileStorageService;
 
     @Autowired
-    public UserService(UserRepository userRepository, ModelMapper modelMapper, PasswordEncoder passwordEncoder, SecurityUtils securityUtils) {
+    public UserService(UserRepository userRepository, ModelMapper modelMapper, PasswordEncoder passwordEncoder, SecurityUtils securityUtils, FileStorageService fileStorageService) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
         this.passwordEncoder = passwordEncoder;
         this.securityUtils = securityUtils;
+        this.fileStorageService = fileStorageService;
     }
 
-    public UserResponse createUser(RegisterRequest request) {
+    public UserResponse createUser(UserRequest request) throws ResourceNotFoundException {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new UserException.ResourceAlreadyExistsException("Email already registered");
         }
 
         User user = modelMapper.map(request, User.class);
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         user.setRole(Role.USER);
 
-        User savedUser = userRepository.save(user);
+        User savedUser = userDPProcess(request,user);
         return modelMapper.map(savedUser, UserResponse.class);
     }
 
@@ -73,14 +74,23 @@ public class UserService {
         return userRepository.existsByEmail(email);
     }
 
-    public UserResponse updateUser(UserProfileUpdateRequest request) throws ResourceNotFoundException {
+    public UserResponse updateUser(UserRequest request) throws ResourceNotFoundException {
         User user = securityUtils.getCurrentUser();
+        if (request.getNewPassword() != null) {
+             if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+                throw new UserException.InvalidPasswordException("Current password is incorrect");
+            }
+            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        }
         return updateUserProcess(user,request);
     }
 
-    public UserResponse updateUserById(String id, UserProfileUpdateRequest request) throws ResourceNotFoundException {
+    public UserResponse updateUserById(String id, UserRequest request) throws ResourceNotFoundException {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        if(securityUtils.getCurrentUser().getRole().equals(Role.ADMIN)){
+            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        }
         return updateUserProcess(user,request);
     }
 
@@ -96,7 +106,7 @@ public class UserService {
         }
         else if (Role.ADMIN.equals(getUserById(id).getRole()))
         {
-            throw new RuntimeException("");
+            throw new RuntimeException("Cannot Delete Admin");
         }
         userRepository.deleteById(id);
     }
@@ -108,7 +118,12 @@ public class UserService {
         return userRepository.findByEmail(email).orElse(null);
     }
 
-    private UserResponse updateUserProcess(User user , UserProfileUpdateRequest request){
+    private User findUserById(String id) throws ResourceNotFoundException {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    }
+
+    private UserResponse updateUserProcess(User user , UserRequest request) throws ResourceNotFoundException {
 
         if (request.getEmail() != null && !request.getEmail().equals(user.getEmail())) {
             if (userRepository.existsByEmail(request.getEmail())) {
@@ -129,23 +144,27 @@ public class UserService {
             user.setPhoneNumber(request.getPhoneNumber());
         }
 
-        if (request.getNewPassword() != null) {
-            if(user.getRole().equals(Role.ADMIN)){
-                user.setPassword(passwordEncoder.encode(request.getNewPassword()));
-            }
-            else if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
-                throw new UserException.InvalidPasswordException("Current password is incorrect");
-            }
-            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
-        }
-
-        User updatedUser = userRepository.save(user);
+        User updatedUser = userDPProcess(request,user);
         return modelMapper.map(updatedUser, UserResponse.class);
 
     }
 
-    private User findUserById(String id) throws ResourceNotFoundException {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    private User userDPProcess(UserRequest request, User user) throws ResourceNotFoundException {
+        if (request.getUserPDFile() != null && !request.getUserPDFile().isEmpty()) {
+            String prefix = "user_DP_" + user.getId();
+            String fileName;
+            try {
+                fileName = fileStorageService.storeFile(request.getUserPDFile(), prefix, FileEnums.ImageType.USER_DP);
+                user.setUserDPUrl("/api/v1/files/" + fileName);
+            } catch (FileStorageException e) {
+                throw new RuntimeException(e);
+            }
+        } else if (request.getExistingDPUrl() != null && !request.getExistingDPUrl().isEmpty()) {
+            user.setUserDPUrl(request.getExistingDPUrl());
+        } else {
+            user.setUserDPUrl("");
+        }
+
+        return userRepository.save(user);
     }
 }

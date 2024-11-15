@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Plus } from 'lucide-react';
+import {Edit, Trash2} from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import ProductTable from './productPanelComponents/ProductTable';
 import AddEditProductDialog from './productPanelComponents/AddEditProductDialog';
 import DeleteConfirmationDialog from './DeleteConfirmationDialog';
 import { ProductResponse, getAllProducts, deleteProduct } from '@/api/admin/admin-product-api';
 import { useToast } from '@/hooks/use-toast';
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
+import {prefix} from "@/utils/apiConfig";
+import {Pagination} from "@/app/components/PaginationComponent";
 
 const ProductsPanel: React.FC = () => {
     const [products, setProducts] = useState<ProductResponse[]>([]);
@@ -21,7 +23,7 @@ const ProductsPanel: React.FC = () => {
 
     const fetchProducts = async () => {
         try {
-            const response = await getAllProducts(currentPage, 10, 'createdAt', searchTerm);
+            const response = await getAllProducts(currentPage, 15, 'createdAt', searchTerm);
             setProducts(response.content);
             setTotalPages(response.totalPages);
         } catch (error) {
@@ -52,6 +54,11 @@ const ProductsPanel: React.FC = () => {
         setIsDeleteDialogOpen(true);
     };
 
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page - 1); // Convert to 0-based index for API
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     const handleDeleteConfirm = async () => {
         if (!selectedProduct) return;
 
@@ -75,14 +82,12 @@ const ProductsPanel: React.FC = () => {
     };
 
     return (
-        <div className="space-y-4 rounded-none">
-
-            <Card className="rounded-none">
+            <Card className="rounded-none w-[1500px]">
                 <CardHeader>
-                    <CardTitle>Products Management</CardTitle>
+                    <CardTitle className={"text-xl"}>Products Management</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="flex justify-between items-center rounded-none">
+                    <div className="flex justify-between mb-10">
                         <Input
                             placeholder="Search products..."
                             className="max-w-sm rounded-none"
@@ -94,34 +99,84 @@ const ProductsPanel: React.FC = () => {
                         </Button>
                     </div>
 
-                    <ProductTable
-                        products={products}
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        onPageChange={setCurrentPage}
-                        onEdit={handleEditProduct}
-                        onDelete={handleDeleteClick}
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Image</TableHead>
+                                <TableHead>Name</TableHead>
+                                <TableHead>Price</TableHead>
+                                <TableHead>Stock</TableHead>
+                                <TableHead>Category</TableHead>
+                                <TableHead>Brand</TableHead>
+                                <TableHead>Rating</TableHead>
+                                <TableHead>Actions</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {products.map((product) => (
+                                <TableRow key={product.id}>
+                                    <TableCell>
+                                        <img
+                                            src={prefix + product.cardImageUrl}
+                                            alt={product.name}
+                                            className="w-12 h-12 object-cover rounded-none"
+                                        />
+                                    </TableCell>
+                                    <TableCell>{product.name}</TableCell>
+                                    <TableCell>Rs.{product.price}</TableCell>
+                                    <TableCell>{product.stock}</TableCell>
+                                    <TableCell>{product.category.name}</TableCell>
+                                    <TableCell>{product.brand?.name}</TableCell>
+                                    <TableCell>{product.rating}</TableCell>
+                                    <TableCell className="space-x-2">
+                                        <Button
+                                            className={"rounded-none"}
+                                            variant="outline"
+                                            size="icon"
+                                            onClick={() => handleEditProduct(product)}
+                                        >
+                                            <Edit className="h-4 w-4" />
+                                        </Button>
+                                        <Button
+                                            className={"rounded-none"}
+                                            variant="outline"
+                                            size="icon"
+                                            onClick={() => handleDeleteClick(product)}
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+
+                    <div className="mt-8 flex justify-center">
+                        <Pagination
+                            currentPage = {currentPage + 1}
+                            totalPages={totalPages}
+                            onPageChange={handlePageChange}
+                        />
+                    </div>
+
+                    <AddEditProductDialog
+                    open={isAddDialogOpen}
+                    onOpenChange={setIsAddDialogOpen}
+                    product={selectedProduct}
+                    onSuccess={() => {
+                        fetchProducts();
+                        setIsAddDialogOpen(false);
+                    }}
                     />
-                    </CardContent>
+
+                    <DeleteConfirmationDialog
+                        open={isDeleteDialogOpen}
+                        onOpenChange={setIsDeleteDialogOpen}
+                        onConfirm={handleDeleteConfirm}
+                        type={"Product"}
+                    />
+                </CardContent>
             </Card>
-
-
-    <AddEditProductDialog
-                open={isAddDialogOpen}
-                onOpenChange={setIsAddDialogOpen}
-                product={selectedProduct}
-                onSuccess={() => {
-                    fetchProducts();
-                    setIsAddDialogOpen(false);
-                }}
-            />
-
-            <DeleteConfirmationDialog
-                open={isDeleteDialogOpen}
-                onOpenChange={setIsDeleteDialogOpen}
-                onConfirm={handleDeleteConfirm}
-            />
-        </div>
     );
 };
 

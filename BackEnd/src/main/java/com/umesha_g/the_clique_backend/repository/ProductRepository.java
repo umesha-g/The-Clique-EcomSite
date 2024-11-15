@@ -2,6 +2,7 @@ package com.umesha_g.the_clique_backend.repository;
 
 import com.umesha_g.the_clique_backend.model.entity.Brand;
 import com.umesha_g.the_clique_backend.model.entity.Category;
+import com.umesha_g.the_clique_backend.model.entity.Discount;
 import com.umesha_g.the_clique_backend.model.entity.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,13 +16,13 @@ import java.util.List;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, String> {
     Page<Product> findByCategory(Category category, Pageable pageable);
-
+    List<Product> findByDirectDiscount(Discount discount);
+    List<Product> findByOtherDiscount(Discount discount);
     Page<Product> findByBrand(Brand brand, Pageable pageable);
-
     Page<Product> findByNameContainingIgnoreCase(String name, Pageable pageable);
-
+    List<Product> findByBrand(Brand brand);
+    List<Product> findByCategory(Category category);
     List<Product> findByStockLessThan(int threshold);
-
     Page<Product> findByPriceBetween(BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable);
 
     @Query("SELECT p FROM Product p WHERE " +

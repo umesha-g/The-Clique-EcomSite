@@ -5,7 +5,9 @@ import com.umesha_g.the_clique_backend.dto.response.CategoryResponse;
 import com.umesha_g.the_clique_backend.exception.ResourceNotFoundException;
 import com.umesha_g.the_clique_backend.model.entity.Category;
 import com.umesha_g.the_clique_backend.model.entity.Discount;
+import com.umesha_g.the_clique_backend.model.entity.Product;
 import com.umesha_g.the_clique_backend.repository.CategoryRepository;
+import com.umesha_g.the_clique_backend.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,16 +22,18 @@ import java.util.stream.Collectors;
 public class CategoryService {
 
     private CategoryRepository categoryRepository;
-
+    private ProductRepository productRepository;
     private ModelMapper modelMapper;
-
     private DiscountService discountService;
+    private DiscountPriorityService discountPriorityService;
 
     @Autowired
-    public CategoryService(CategoryRepository categoryRepository, ModelMapper modelMapper, DiscountService discountService) {
+    public CategoryService(CategoryRepository categoryRepository, ProductRepository productRepository, ModelMapper modelMapper, DiscountService discountService, DiscountPriorityService discountPriorityService) {
         this.categoryRepository = categoryRepository;
+        this.productRepository = productRepository;
         this.modelMapper = modelMapper;
         this.discountService = discountService;
+        this.discountPriorityService = discountPriorityService;
     }
 
     @Transactional
@@ -80,6 +84,11 @@ public class CategoryService {
         }
 
         Category updatedCategory = categoryRepository.save(category);
+
+        List<Product> categoryProducts = productRepository.findByCategory(updatedCategory);
+        for (Product product : categoryProducts) {
+            discountPriorityService.applyHighestPriorityDiscount(product);
+        }
         return modelMapper.map(updatedCategory, CategoryResponse.class);
     }
 

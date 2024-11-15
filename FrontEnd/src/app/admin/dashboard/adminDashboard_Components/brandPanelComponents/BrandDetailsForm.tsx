@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { BrandRequest } from '@/api/admin/admin-brand-api';
-import { getActiveDiscounts } from '@/api/discount-api';
+import {getActiveDiscounts, MiniDiscountResponse} from '@/api/discount-api';
 import BrandLogoDropzone from './BrandLogoDropzone';
 
 const formSchema = z.object({
@@ -41,7 +41,7 @@ const BrandDetailsForm: React.FC<BrandDetailsFormProps> = ({
                                                                initialData,
                                                                onSubmit,
                                                            }) => {
-    const [discounts, setDiscounts] = useState<any[]>([]);
+    const [discounts, setDiscounts] = useState<MiniDiscountResponse[]>([]);
     const fileRef = useRef<File | null>(null);
 
     const form = useForm<z.infer<typeof formSchema>>({
