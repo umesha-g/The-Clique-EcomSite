@@ -63,7 +63,8 @@ const ProductWishlistButton:React.FC<WishlistHeartButtonProps> = ({
         <Button
             onClick={toggleWishlist}
             disabled={isLoading}
-            className={"flex w-full rounded-none space-x-3 h-12 text-lg" }
+            variant={"outline"}
+            className={"flex w-full rounded-none border-2 border-black space-x-3 h-12 text-lg" }
         >
             <motion.div
                 initial={{ scale: 1 }}
@@ -75,7 +76,7 @@ const ProductWishlistButton:React.FC<WishlistHeartButtonProps> = ({
                     className={`${
                         isInWishlist
                             ? "fill-red-500 text-red-500"
-                            : "fill-none text-white"
+                            : "fill-none text-black"
                     } transition-colors duration-300 `}
                 />
             </motion.div>

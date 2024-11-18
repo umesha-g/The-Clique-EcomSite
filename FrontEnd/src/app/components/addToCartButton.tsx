@@ -15,7 +15,12 @@ interface AddToCartButtonProps {
   selectedSize:string;
 }
 
-const AddToCartButton: React.FC<AddToCartButtonProps> = ({ product,quantity,selectedColour,selectedSize  }) => {
+const AddToCartButton: React.FC<AddToCartButtonProps> = ({
+                                                           product,
+                                                           quantity,
+                                                           selectedColour,
+                                                           selectedSize
+}) => {
   const [isLoading, setIsLoading] = useState(false);
   const { refreshCart } = useCart();
 
@@ -23,7 +28,7 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({ product,quantity,sele
     setIsLoading(true);
     try {
       const productId = product.id;
-      const request:CartRequest = {productId ,quantity,selectedColour,selectedSize}
+      const request:CartRequest = {productId , quantity, selectedColour, selectedSize};
       await addToCart(request);
       await refreshCart();
     } catch (error) {

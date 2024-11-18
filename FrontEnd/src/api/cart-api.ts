@@ -57,9 +57,15 @@ export const updateQuantity = async (
   }
 };
 
-export const incrementQuantity = async (productId: string): Promise<CartResponse> => {
+export const incrementQuantity = async (
+    productId: string,
+    color: string,
+    size: string
+): Promise<CartResponse> => {
   try {
-    const response = await api.post(`/cart/items/${productId}/increment`);
+    const response = await api.post(
+        `/cart/items/${productId}/increment?color=${encodeURIComponent(color)}&size=${encodeURIComponent(size)}`
+    );
     return response.data;
   } catch (error) {
     console.error('Error incrementing quantity:', error);
@@ -67,9 +73,15 @@ export const incrementQuantity = async (productId: string): Promise<CartResponse
   }
 };
 
-export const decrementQuantity = async (productId: string): Promise<CartResponse> => {
+export const decrementQuantity = async (
+    productId: string,
+    color: string,
+    size: string
+): Promise<CartResponse> => {
   try {
-    const response = await api.post(`/cart/items/${productId}/decrement`);
+    const response = await api.post(
+        `/cart/items/${productId}/decrement?color=${encodeURIComponent(color)}&size=${encodeURIComponent(size)}`
+    );
     return response.data;
   } catch (error) {
     console.error('Error decrementing quantity:', error);
@@ -77,9 +89,15 @@ export const decrementQuantity = async (productId: string): Promise<CartResponse
   }
 };
 
-export const removeFromCart = async (productId: string): Promise<CartResponse> => {
+export const removeFromCart = async (
+    productId: string,
+    color: string,
+    size: string
+): Promise<CartResponse> => {
   try {
-    const response = await api.delete(`/cart/items/${productId}`);
+    const response = await api.delete(
+        `/cart/items/${productId}?color=${encodeURIComponent(color)}&size=${encodeURIComponent(size)}`
+    );
     return response.data;
   } catch (error) {
     console.error('Error removing from cart:', error);

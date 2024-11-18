@@ -6,15 +6,14 @@ import React from "react";
 import {CartItemResponse} from "@/api/cart-api";
 import {prefix} from "@/utils/apiConfig";
 
-interface CartItemProps{
-    item:CartItemResponse,
-    onIncrease: (id:string)=> Promise<void>,
-    onDecrease:(id:string)=> Promise<void>,
-    onRemove:(id:string)=> Promise<void>,
+interface CartItemProps {
+    item: CartItemResponse,
+    onIncrease: () => Promise<void>,
+    onDecrease: () => Promise<void>,
+    onRemove: () => Promise<void>,
 }
 
-const CartItem:React.FC<CartItemProps> = ({ item, onIncrease, onDecrease, onRemove }) => {
-
+const CartItem: React.FC<CartItemProps> = ({ item, onIncrease, onDecrease, onRemove }) => {
     const activeDiscount = item.product.directDiscount
         ? item.product.directDiscount
         : item.product.otherDiscount;
@@ -38,17 +37,17 @@ const CartItem:React.FC<CartItemProps> = ({ item, onIncrease, onDecrease, onRemo
                 <div className="flex-1 flex flex-col justify-between">
                     <div className="flex justify-between items-start">
                         <div>
-                            <h3 className="font-medium text-sm">{item.product.name}</h3>
-                            <p className="text-xs text-neutral-500 mt-1">
-                                Size: {item.selectedSize} | Color: {item.selectedColour}
+                            <h3 className="font-medium text-base">{item.product.name}</h3>
+                            <p className=" text-sm text-neutral-500 mt-1">
+                                Size: {item.selectedSize} | Color: {item.selectedColour.slice(8)}
                             </p>
                         </div>
                         <Button
                             variant="ghost"
                             className="h-10 w-10 p-0 rounded-none"
-                            onClick={() => onRemove(item.product.id)}
+                            onClick={onRemove}
                         >
-                            <MdDeleteOutline className={"text-xl"} />
+                            <MdDeleteOutline className={"text-2xl"} />
                         </Button>
                     </div>
 
@@ -58,7 +57,7 @@ const CartItem:React.FC<CartItemProps> = ({ item, onIncrease, onDecrease, onRemo
                                 variant="ghost"
                                 size="sm"
                                 className="h-8 w-8 p-0 rounded-none"
-                                onClick={() => onDecrease(item.product.id)}
+                                onClick={onDecrease}
                             >
                                 <Minus className="h-3 w-3" />
                             </Button>
@@ -67,7 +66,7 @@ const CartItem:React.FC<CartItemProps> = ({ item, onIncrease, onDecrease, onRemo
                                 variant="ghost"
                                 size="sm"
                                 className="h-8 w-8 p-0 rounded-none"
-                                onClick={() => onIncrease(item.product.id)}
+                                onClick={onIncrease}
                             >
                                 <Plus className="h-3 w-3" />
                             </Button>

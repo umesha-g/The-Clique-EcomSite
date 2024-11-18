@@ -1,5 +1,6 @@
 package com.umesha_g.the_clique_backend.service;
 
+import com.umesha_g.the_clique_backend.dto.request.CartRequest;
 import com.umesha_g.the_clique_backend.dto.response.CartResponse;
 import com.umesha_g.the_clique_backend.exception.ResourceNotFoundException;
 import com.umesha_g.the_clique_backend.model.entity.*;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -39,30 +42,39 @@ public class CartService {
     }
 
     @Transactional
-    public CartResponse addToCart(String productId, Integer quantity) throws ResourceNotFoundException {
+    public CartResponse addToCart(String productId, CartRequest request) throws ResourceNotFoundException {
         User user = securityUtils.getCurrentUser();
         Cart cart = getOrCreateCart(user);
 
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
-        CartItem existingItem = findCartItem(cart, productId);
+        // Find cart item with matching product, color and size
+        CartItem existingItem = cart.getCartItems().stream()
+                .filter(item -> item.getProduct().getId().equals(productId) &&
+                        item.getSelectedColour().equals(request.getSelectedColour()) &&
+                        item.getSelectedSize().equals(request.getSelectedSize()))
+                .findFirst()
+                .orElse(null);
 
         if (existingItem != null) {
-            existingItem.setQuantity(existingItem.getQuantity() + quantity);
+            // Update quantity if item with same product, color and size exists
+            existingItem.setQuantity(existingItem.getQuantity() + request.getQuantity());
             existingItem.setSubTotal(calDiscountedPrice(product).multiply(new BigDecimal(existingItem.getQuantity())));
             cartItemRepository.save(existingItem);
         } else {
+            // Create new cart item if no matching item exists
             CartItem newItem = new CartItem();
             newItem.setCart(cart);
+            newItem.setSelectedColour(request.getSelectedColour());
+            newItem.setSelectedSize(request.getSelectedSize());
             newItem.setProduct(product);
-            newItem.setQuantity(quantity);
-            newItem.setSubTotal(calDiscountedPrice(product).multiply(new BigDecimal(quantity)));
+            newItem.setQuantity(request.getQuantity());
+            newItem.setSubTotal(calDiscountedPrice(product).multiply(new BigDecimal(request.getQuantity())));
             cart.getCartItems().add(newItem);
         }
 
-        product.setStock((product.getStock() - quantity));
-        System.out.println( "product is" + product.getStock());
+        product.setStock(product.getStock() - request.getQuantity());
         productRepository.save(product);
 
         cart.updateTotalAmount();
@@ -71,21 +83,49 @@ public class CartService {
     }
 
 
-    public CartResponse updateQuantity(String productId, Integer quantity) throws ResourceNotFoundException {
+//    public CartResponse updateQuantity(String productId, Integer quantity) throws ResourceNotFoundException {
+//        User user = securityUtils.getCurrentUser();
+//        Cart cart = getOrCreateCart(user);
+//
+//        CartItem item = findCartItem(cart, productId);
+//        if (item == null) {
+//            throw new ResourceNotFoundException("Product not found in cart");
+//        }
+//
+//        if (quantity <= 0) {
+//            cart.getCartItems().remove(item);
+//        } else {
+//            item.setQuantity(quantity);
+//            item.setSubTotal(calDiscountedPrice(item.getProduct()).multiply(new BigDecimal(item.getQuantity())));
+//        }
+//
+//        cart.updateTotalAmount();
+//        Cart updatedCart = cartRepository.save(cart);
+//        return modelMapper.map(updatedCart, CartResponse.class);
+//    }
+
+    @Transactional
+    public CartResponse incrementQuantity(String productId, String selectedColor, String selectedSize) throws ResourceNotFoundException {
         User user = securityUtils.getCurrentUser();
         Cart cart = getOrCreateCart(user);
 
-        CartItem item = findCartItem(cart, productId);
-        if (item == null) {
-            throw new ResourceNotFoundException("Product not found in cart");
+        CartItem item = cart.getCartItems().stream()
+                .filter(cartItem -> cartItem.getProduct().getId().equals(productId) &&
+                        cartItem.getSelectedColour().equals(selectedColor) &&
+                        cartItem.getSelectedSize().equals(selectedSize))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Product with specified color and size not found in cart"));
+
+        Product product = item.getProduct();
+        if (product.getStock() < 1) {
+            throw new ResourceNotFoundException("Product is out of stock");
         }
 
-        if (quantity <= 0) {
-            cart.getCartItems().remove(item);
-        } else {
-            item.setQuantity(quantity);
-            item.setSubTotal(calDiscountedPrice(item.getProduct()).multiply(new BigDecimal(item.getQuantity())));
-        }
+        product.setStock(product.getStock() - 1);
+        productRepository.save(product);
+
+        item.setQuantity(item.getQuantity() + 1);
+        item.setSubTotal(calDiscountedPrice(product).multiply(new BigDecimal(item.getQuantity())));
 
         cart.updateTotalAmount();
         Cart updatedCart = cartRepository.save(cart);
@@ -93,25 +133,57 @@ public class CartService {
     }
 
     @Transactional
-    public CartResponse incrementQuantity(String productId) throws ResourceNotFoundException {
-        CartItem item = getCartItem(productId);
+    public CartResponse decrementQuantity(String productId, String selectedColor, String selectedSize) throws ResourceNotFoundException {
+        User user = securityUtils.getCurrentUser();
+        Cart cart = getOrCreateCart(user);
 
-        Product product = item.getProduct();
-        product.setStock(product.getStock()  - 1);
-        productRepository.save(product);
+        CartItem item = cart.getCartItems().stream()
+                .filter(cartItem -> cartItem.getProduct().getId().equals(productId) &&
+                        cartItem.getSelectedColour().equals(selectedColor) &&
+                        cartItem.getSelectedSize().equals(selectedSize))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Product with specified color and size not found in cart"));
 
-        return updateQuantity(productId, item.getQuantity() + 1);
-    }
-
-    @Transactional
-    public CartResponse decrementQuantity(String productId) throws ResourceNotFoundException {
-        CartItem item = getCartItem(productId);
+        if (item.getQuantity() <= 1) {
+            return removeFromCart(productId, selectedColor, selectedSize);
+        }
 
         Product product = item.getProduct();
         product.setStock(product.getStock() + 1);
         productRepository.save(product);
 
-        return updateQuantity(productId, item.getQuantity() - 1);
+        item.setQuantity(item.getQuantity() - 1);
+        item.setSubTotal(calDiscountedPrice(product).multiply(new BigDecimal(item.getQuantity())));
+
+        cart.updateTotalAmount();
+        Cart updatedCart = cartRepository.save(cart);
+        return modelMapper.map(updatedCart, CartResponse.class);
+    }
+
+    @Transactional
+    public CartResponse removeFromCart(String productId, String selectedColor, String selectedSize) throws ResourceNotFoundException {
+        User user = securityUtils.getCurrentUser();
+        Cart cart = getOrCreateCart(user);
+
+        // Find the specific cart item with matching product, color and size
+        CartItem itemToRemove = cart.getCartItems().stream()
+                .filter(item -> item.getProduct().getId().equals(productId) &&
+                        item.getSelectedColour().equals(selectedColor) &&
+                        item.getSelectedSize().equals(selectedSize))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Product with specified color and size not found in cart"));
+
+        // Update product stock
+        Product product = itemToRemove.getProduct();
+        product.setStock(product.getStock() + itemToRemove.getQuantity());
+        productRepository.save(product);
+
+        // Remove the specific item
+        cart.getCartItems().remove(itemToRemove);
+        cart.updateTotalAmount();
+
+        Cart updatedCart = cartRepository.save(cart);
+        return modelMapper.map(updatedCart, CartResponse.class);
     }
 
     @Transactional
@@ -119,17 +191,26 @@ public class CartService {
         User user = securityUtils.getCurrentUser();
         Cart cart = getOrCreateCart(user);
 
-        CartItem item = findCartItem(cart, productId);
-        if (item == null) {
+        // Find all items with matching productId
+        List<CartItem> itemsToRemove = cart.getCartItems().stream()
+                .filter(item -> item.getProduct().getId().equals(productId))
+                .collect(Collectors.toList());
+
+        if (itemsToRemove.isEmpty()) {
             throw new ResourceNotFoundException("Product not found in cart");
         }
 
-        Product product = item.getProduct();
-        product.setStock((product.getStock() + item.getQuantity()));
-        productRepository.save(product);
+        // Update product stock for all removed items
+        for (CartItem item : itemsToRemove) {
+            Product product = item.getProduct();
+            product.setStock(product.getStock() + item.getQuantity());
+            productRepository.save(product);
+        }
 
-        cart.getCartItems().remove(item);
+        // Remove all items with matching productId
+        cart.getCartItems().removeAll(itemsToRemove);
         cart.updateTotalAmount();
+
         Cart updatedCart = cartRepository.save(cart);
         return modelMapper.map(updatedCart, CartResponse.class);
     }

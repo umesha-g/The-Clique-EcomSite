@@ -1,6 +1,6 @@
 import React from "react";
 import { ShoppingCart } from "lucide-react";
-import { AnimatePresence } from "framer-motion";
+import {AnimatePresence} from "framer-motion";
 import {
     Sheet,
     SheetContent,
@@ -17,34 +17,34 @@ import CartItem from "@/app/components/HeaderComponents/CartItem";
 const CartDrawer = () => {
     const { cartItems, cartItemCount, totalPrice, refreshCart } = useCart();
 
-    const handleRemove = async (itemId: string) => {
+    const handleRemove = async (itemId: string, color: string, size: string) => {
         try {
-            await removeFromCart(itemId);
+            await removeFromCart(itemId, color, size);
             await refreshCart();
         } catch (error) {
             console.error("Error removing item from cart:", error);
         }
     };
 
-    const handleIncrease = async (id: string) => {
+    const handleIncrease = async (itemId: string, color: string, size: string) => {
         try {
-            await incrementQuantity(id);
+            // Pass all necessary parameters to identify the specific item
+            await incrementQuantity(itemId, color, size);
             await refreshCart();
         } catch (error) {
             console.error("Error increasing cart item quantity:", error);
         }
     };
 
-    const handleDecrease = async (id: string) => {
+    const handleDecrease = async (itemId: string, color: string, size: string) => {
         try {
-            await decrementQuantity(id);
+            // Pass all necessary parameters to identify the specific item
+            await decrementQuantity(itemId, color, size);
             await refreshCart();
         } catch (error) {
             console.error("Error decreasing cart item quantity:", error);
         }
     };
-
-
 
     const EmptyCart = () => (
         <div className="flex flex-col items-center justify-center h-[50vh] text-center px-4">
@@ -61,8 +61,8 @@ const CartDrawer = () => {
             <SheetTrigger className="relative">
                 {cartItemCount > 0 && (
                     <span className="absolute -top-2 -right-2 bg-red-600 rounded-full w-5 h-5 flex items-center justify-center text-white text-xs">
-            {cartItemCount}
-          </span>
+                        {cartItemCount}
+                    </span>
                 )}
                 <ShoppingCart className="w-5 h-5 text-neutral-700 hover:text-neutral-950 hover:fill-neutral-950 transition-all ease-in-out" />
             </SheetTrigger>
@@ -83,11 +83,11 @@ const CartDrawer = () => {
                             <AnimatePresence>
                                 {cartItems.map((item) => (
                                     <CartItem
-                                        key={item.id}
+                                        key={`${item.product.id}-${item.selectedColour}-${item.selectedSize}`}
                                         item={item}
-                                        onIncrease={handleIncrease}
-                                        onDecrease={handleDecrease}
-                                        onRemove={handleRemove}
+                                        onIncrease={() => handleIncrease(item.product.id, item.selectedColour, item.selectedSize)}
+                                        onDecrease={() => handleDecrease(item.product.id, item.selectedColour, item.selectedSize)}
+                                        onRemove={() => handleRemove(item.product.id, item.selectedColour, item.selectedSize)}
                                     />
                                 ))}
                             </AnimatePresence>
