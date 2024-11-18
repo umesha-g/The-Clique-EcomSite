@@ -1,6 +1,5 @@
 package com.umesha_g.the_clique_backend.controller;
 
-import com.umesha_g.the_clique_backend.dto.request.LoginRequest;
 import com.umesha_g.the_clique_backend.dto.request.UserRequest;
 import com.umesha_g.the_clique_backend.exception.ResourceNotFoundException;
 import com.umesha_g.the_clique_backend.service.AuthService;
@@ -28,12 +27,12 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest request,
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody UserRequest request,
                                               HttpServletResponse response) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
-                        request.getPassword()
+                        request.getCurrentPassword()
                 )
         );
 

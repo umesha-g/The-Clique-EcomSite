@@ -22,7 +22,7 @@ public class FileStorageConfig {
     private long maxFileSize = 5242880; // 5MB
     private List<String> allowedFileTypes = Arrays.asList("image/jpeg", "image/png", "image/webp", "image/jpg");
     private int imageQuality = 90; // JPEG compression quality
-    private ImageSize thumbnailSize = new ImageSize(200, 200);
+    private ImageSize thumbnailSize = new ImageSize(300, 300);
     private ImageSize standardSize = new ImageSize(1000, 1000);
 
     @Data

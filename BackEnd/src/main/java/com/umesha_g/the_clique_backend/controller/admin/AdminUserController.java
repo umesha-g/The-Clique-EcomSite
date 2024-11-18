@@ -2,10 +2,12 @@ package com.umesha_g.the_clique_backend.controller.admin;
 
 import com.umesha_g.the_clique_backend.dto.request.UserRequest;
 import com.umesha_g.the_clique_backend.dto.response.UserResponse;
+import com.umesha_g.the_clique_backend.exception.FileStorageException;
 import com.umesha_g.the_clique_backend.exception.ResourceNotFoundException;
 import com.umesha_g.the_clique_backend.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,26 +22,31 @@ import org.springframework.web.bind.annotation.*;
 @PreAuthorize("hasRole('ADMIN')")
 @RequiredArgsConstructor
 public class AdminUserController {
-    private final UserService userService;
+    private UserService userService;
+
+    @Autowired
+    public AdminUserController(UserService userService) {
+        this.userService = userService;
+    }
+
     @PostMapping
-    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody UserRequest request) throws ResourceNotFoundException {
-        UserResponse response = userService.createUser(request);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(response);
+    public ResponseEntity<UserResponse> createUser(@Valid @ModelAttribute UserRequest request) {
+        UserResponse createdUser = userService.createUser(request);
+        return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getUser(@PathVariable String id) throws ResourceNotFoundException {
-        UserResponse response = userService.getUserById(id);
-        return ResponseEntity.ok(response);
+        UserResponse user = userService.getUserById(id);
+        return ResponseEntity.ok(user);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<UserResponse> updateUser(
             @PathVariable String id,
-            @Valid @RequestBody UserRequest request) throws ResourceNotFoundException {
-        UserResponse response = userService.updateUserById(id, request);
-        return ResponseEntity.ok(response);
+            @Valid @ModelAttribute UserRequest request) throws ResourceNotFoundException, FileStorageException {
+        UserResponse updatedUser = userService.updateUserById(id, request);
+        return ResponseEntity.ok(updatedUser);
     }
 
     @GetMapping
@@ -49,13 +56,13 @@ public class AdminUserController {
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam String searchTerm)  {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
-        Page<UserResponse> response = userService.getAllUsers(pageable ,searchTerm);
-        return ResponseEntity.ok(response);
+        Page<UserResponse> users = userService.getAllUsers(pageable ,searchTerm);
+        return ResponseEntity.ok(users);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable String id) throws ResourceNotFoundException {
+    public ResponseEntity<Void> deleteUser(@PathVariable String id) throws ResourceNotFoundException, FileStorageException {
         userService.deleteUserById(id);
-        return ResponseEntity.ok(null);
+        return ResponseEntity.noContent().build();
     }
 }

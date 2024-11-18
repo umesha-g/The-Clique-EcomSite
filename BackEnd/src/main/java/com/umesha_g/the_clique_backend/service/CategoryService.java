@@ -2,6 +2,7 @@ package com.umesha_g.the_clique_backend.service;
 
 import com.umesha_g.the_clique_backend.dto.request.CategoryRequest;
 import com.umesha_g.the_clique_backend.dto.response.CategoryResponse;
+import com.umesha_g.the_clique_backend.dto.response.MiniCategoryResponse;
 import com.umesha_g.the_clique_backend.exception.ResourceNotFoundException;
 import com.umesha_g.the_clique_backend.model.entity.Category;
 import com.umesha_g.the_clique_backend.model.entity.Discount;
@@ -55,9 +56,15 @@ public class CategoryService {
         return modelMapper.map(savedCategory, CategoryResponse.class);
     }
 
-    public List<CategoryResponse> getAllCategories() {
+    public List<CategoryResponse> getAllCategoriesForAdmin() {
         return categoryRepository.findAll().stream()
                 .map(category -> modelMapper.map(category, CategoryResponse.class))
+                .collect(Collectors.toList());
+    }
+
+    public List<MiniCategoryResponse> getAllCategories() {
+        return categoryRepository.findAll().stream()
+                .map(category -> modelMapper.map(category, MiniCategoryResponse.class))
                 .collect(Collectors.toList());
     }
 

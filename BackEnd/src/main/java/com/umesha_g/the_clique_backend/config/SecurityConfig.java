@@ -84,6 +84,12 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/v1/products/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/products/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/users/**").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers("/api/v1/wishlist/**").hasRole("USER")
+                        .requestMatchers("/api/v1/cart/**").hasRole("USER")
+                        .requestMatchers("/api/v1/addresses/**").hasRole("USER")
+                        .requestMatchers("/api/v1/notifications/**").hasRole("USER")
+                        .requestMatchers("/api/v1/orders/**").hasRole("USER")
+                        .requestMatchers("/api/v1/reviews/**").hasRole("USER")
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
@@ -130,6 +136,6 @@ public class SecurityConfig {
 
     @Bean
     public RateLimitingFilter rateLimitingFilter() {
-        return new RateLimitingFilter(100, 1); // 100 requests per minute
+        return new RateLimitingFilter(10000, 1); // 100 requests per minute
     }
 }

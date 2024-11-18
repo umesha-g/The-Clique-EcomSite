@@ -3,7 +3,7 @@ package com.umesha_g.the_clique_backend.util;
 import com.umesha_g.the_clique_backend.exception.ResourceNotFoundException;
 import com.umesha_g.the_clique_backend.exception.UnauthorizedException;
 import com.umesha_g.the_clique_backend.model.entity.User;
-import com.umesha_g.the_clique_backend.service.UserService;
+import com.umesha_g.the_clique_backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -21,11 +21,7 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class SecurityUtils {
-    private UserService userService;
-
-    public SecurityUtils(UserService userService) {
-        this.userService = userService;
-    }
+    private final UserRepository userRepository;
 
     /**
      * Gets the current user from the SecurityContext
@@ -43,7 +39,8 @@ public class SecurityUtils {
         }
 
         String userEmail = extractUserEmail(authentication);
-        return userService.getUserByEmail(userEmail);
+        return userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
     /**

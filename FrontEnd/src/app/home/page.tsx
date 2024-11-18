@@ -3,23 +3,22 @@ import React from "react";
 import BestSellingSection from "./BestSellingSection/BestSellingSection";
 import FeaturedSection from "./FeaturedSection/FeaturedSection";
 import HomeFooter from "./Footer/Footer";
-import HomeHeader from "./Header/Header";
+import HomeHeader from "@/app/components/Header";
 import HeroSection from "./HeroSection/HeroSection";
 import TestimonialSection from "./TesimonialSection/TestimonialSection";
 import TrendingSection from "./TrendingSection/TrendingSection";
-import CartButtonWithPanel from "@/app/home/cartButtonWithPanel";
 
 const HomePage: React.FC = () => {
   return (
     <div className="min-h-screen text-gray-600 bg-white">
-      <HomeHeader />
+      <HomeHeader  categoryVisibility={"visible"} searchBarWidth={"48"}/>
 
       <main className="relative">
         <section>
           <HeroSection />
         </section>
 
-        <section className="relative md:-top-32 lg:-top-48 left-0 right-0 z-20">
+        <section className="relative md:-top-28 lg:-top-48 left-0 right-0 z-20">
           <FeaturedSection />
         </section>
 
@@ -34,7 +33,6 @@ const HomePage: React.FC = () => {
         <section className="container relative md:-top-20 lg:-top-16 left-0 right-0 mx-auto px-4 py-12">
           <TrendingSection />
         </section>
-          <CartButtonWithPanel/>
       </main>
 
       <footer className="py-8 bg-neutral-800">

@@ -1,7 +1,7 @@
-import { CategoryResponse } from './admin/admin-category-api';
+import {CategoryResponse, MiniCategoryResponse} from './admin/admin-category-api';
 import {api} from "@/utils/apiConfig";
 
-export const getAllCategories = async (): Promise<CategoryResponse[]> => {
+export const getAllCategories = async (): Promise<MiniCategoryResponse[]> => {
   try {
     const response = await api.get('/categories');
     return response.data;

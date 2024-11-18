@@ -21,6 +21,7 @@ import { useToast } from '@/hooks/use-toast';
 import AddEditUserDialog from './UserPanelComponents/AddEditUserDialog';
 import DeleteConfirmationDialog from './DeleteConfirmationDialog';
 import {Pagination} from "@/app/components/PaginationComponent";
+import {prefix} from "@/utils/apiConfig";
 
 const UsersPanel: React.FC = () => {
   const [users, setUsers] = useState<UserResponse[]>([]);
@@ -126,6 +127,7 @@ const UsersPanel: React.FC = () => {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>Display Picture</TableHead>
                 <TableHead>E-mail</TableHead>
                 <TableHead>First Name</TableHead>
                 <TableHead>Last Name</TableHead>
@@ -137,6 +139,15 @@ const UsersPanel: React.FC = () => {
             <TableBody>
               {users.map((user) => (
                   <TableRow key={user.id}>
+                    <TableCell>{user.userDPUrl &&(
+                        <div className={" flex ml-10"}>
+                            <img
+                                src={prefix + user.userDPUrl}
+                                alt={`${user.firstName} DP`}
+                                className="w-12 rounded-full h-12 object-contain"
+                            />
+                        </div>)
+                    }</TableCell>
                     <TableCell>{user.email}</TableCell>
                     <TableCell>{user.firstName}</TableCell>
                     <TableCell>{user.lastName}</TableCell>

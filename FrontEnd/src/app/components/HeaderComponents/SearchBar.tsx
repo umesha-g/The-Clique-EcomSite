@@ -20,9 +20,11 @@ const SearchBar: React.FC = () => {
     if (searchTerm) {
       router.push(`/search?q=${encodeURIComponent(searchTerm)}`);
     }
+    else {
+      router.push(`/search`);
+    }
   };
 
-  // Async function to get search suggestions using axios
   const getSearchSuggestions = async (query: string): Promise<string[]> => {
     try {
       const response = await axios.get(
@@ -109,7 +111,7 @@ const SearchBar: React.FC = () => {
         {suggestions.length > 0 && (
           <Button
             type="button"
-            variant="transparent"
+            variant="ghost"
             onClick={() => setSuggestions([])}
             className="absolute rounded-xl right-2 top-1/2 -translate-y-1/2"
           >

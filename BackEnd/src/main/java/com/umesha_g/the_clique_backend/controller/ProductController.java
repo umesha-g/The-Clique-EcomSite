@@ -3,6 +3,7 @@ package com.umesha_g.the_clique_backend.controller;
 import com.umesha_g.the_clique_backend.dto.response.ProductCardResponse;
 import com.umesha_g.the_clique_backend.dto.response.ProductResponse;
 import com.umesha_g.the_clique_backend.model.entity.Product;
+import com.umesha_g.the_clique_backend.model.enums.Gender;
 import com.umesha_g.the_clique_backend.service.ProductService;
 import com.umesha_g.the_clique_backend.service.ProductStatisticsService;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/products")
@@ -41,7 +43,7 @@ public class ProductController {
             @RequestParam(required = false) String brandId,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
-            @RequestParam(required = false) String gender,
+            @RequestParam(required = false) Gender gender,
             @RequestParam(required = false) String searchTerm,
             @PageableDefault Pageable pageable) {
 
@@ -77,4 +79,10 @@ public class ProductController {
         productStatisticsService.incrementViewCount(product);
         return ResponseEntity.ok("View Count Increased");
     }
+
+    @GetMapping("/price-range")
+    public ResponseEntity<Map<String, BigDecimal>> getPriceRange() {
+        return ResponseEntity.ok(productService.getPriceRange());
+    }
+
 }

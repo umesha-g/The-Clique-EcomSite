@@ -9,7 +9,6 @@ import com.umesha_g.the_clique_backend.model.entity.User;
 import com.umesha_g.the_clique_backend.model.enums.FileEnums;
 import com.umesha_g.the_clique_backend.model.enums.Role;
 import com.umesha_g.the_clique_backend.repository.UserRepository;
-import com.umesha_g.the_clique_backend.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -26,19 +27,17 @@ public class UserService {
     private  UserRepository userRepository;
     private  ModelMapper modelMapper;
     private  PasswordEncoder passwordEncoder;
-    private SecurityUtils securityUtils;
     private FileStorageService fileStorageService;
 
     @Autowired
-    public UserService(UserRepository userRepository, ModelMapper modelMapper, PasswordEncoder passwordEncoder, SecurityUtils securityUtils, FileStorageService fileStorageService) {
+    public UserService(UserRepository userRepository, ModelMapper modelMapper, PasswordEncoder passwordEncoder, FileStorageService fileStorageService) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
         this.passwordEncoder = passwordEncoder;
-        this.securityUtils = securityUtils;
         this.fileStorageService = fileStorageService;
     }
 
-    public UserResponse createUser(UserRequest request) throws ResourceNotFoundException {
+    public UserResponse createUser(UserRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new UserException.ResourceAlreadyExistsException("Email already registered");
         }
@@ -51,47 +50,34 @@ public class UserService {
         return modelMapper.map(savedUser, UserResponse.class);
     }
 
-
-    public UserResponse getUserById(String id) throws ResourceNotFoundException {
-        User user = findUserById(id);
-        return modelMapper.map(user, UserResponse.class);
+    public UserResponse getUser(User currentUser) throws ResourceNotFoundException {
+        return modelMapper.map(currentUser, UserResponse.class);
     }
 
-    public UserResponse getUser() throws ResourceNotFoundException {
-        User user = securityUtils.getCurrentUser();
-        return modelMapper.map(user, UserResponse.class);
-    }
-
-    public void deleteUser() throws ResourceNotFoundException {
-        String id = securityUtils.getCurrentUser().getId();
-        if (!userRepository.existsById(id)) {
+    public void deleteUser(User currentUser) throws ResourceNotFoundException {
+        if (!userRepository.existsById(currentUser.getId())) {
             throw new ResourceNotFoundException("User not found");
         }
-        userRepository.deleteById(id);
+        userRepository.deleteById(currentUser.getId());
+    }
+
+    public User getUserByEmail(String email) throws ResourceNotFoundException {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
     public boolean existUserByEmail(String email){
         return userRepository.existsByEmail(email);
     }
 
-    public UserResponse updateUser(UserRequest request) throws ResourceNotFoundException {
-        User user = securityUtils.getCurrentUser();
+    public UserResponse updateUser(UserRequest request , User currentUser) throws ResourceNotFoundException {
         if (request.getNewPassword() != null) {
-             if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+             if (!passwordEncoder.matches(request.getCurrentPassword(), currentUser.getPassword())) {
                 throw new UserException.InvalidPasswordException("Current password is incorrect");
             }
-            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+            currentUser.setPassword(passwordEncoder.encode(request.getNewPassword()));
         }
-        return updateUserProcess(user,request);
-    }
-
-    public UserResponse updateUserById(String id, UserRequest request) throws ResourceNotFoundException {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        if(securityUtils.getCurrentUser().getRole().equals(Role.ADMIN)){
-            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
-        }
-        return updateUserProcess(user,request);
+        return updateUserProcess(currentUser,request);
     }
 
     public Page<UserResponse> getAllUsers(Pageable pageable , String searchTerm) {
@@ -99,31 +85,41 @@ public class UserService {
         return users.map(user -> modelMapper.map(user, UserResponse.class));
     }
 
-    public void deleteUserById(String id) throws ResourceNotFoundException {
+    public UserResponse getUserById(String id) throws ResourceNotFoundException {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        return modelMapper.map(user, UserResponse.class);
+    }
 
-        if (!userRepository.existsById(id)) {
-            throw new ResourceNotFoundException("User not found");
+    public UserResponse updateUserById(String id, UserRequest request) throws ResourceNotFoundException, FileStorageException {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        if (!user.getUserDPUrl().isEmpty() && request.getUserDPFile() !=null){
+            System.out.println("file name = "+ user.getUserDPUrl().substring(14));
+            fileStorageService.deleteFile(user.getUserDPUrl().substring(14));
         }
-        else if (Role.ADMIN.equals(getUserById(id).getRole()))
-        {
+        return updateUserProcess(user,request);
+    }
+
+    public void deleteUserById(String id) throws ResourceNotFoundException, FileStorageException {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        if (Role.ADMIN.equals(user.getRole())) {
             throw new RuntimeException("Cannot Delete Admin");
+        }
+
+        if (!user.getUserDPUrl().isEmpty()){
+            String fileName = user.getUserDPUrl().substring(14);
+            if (!fileName.equals("default-dp.jpg")) {
+                fileStorageService.deleteFile(Objects.requireNonNull(fileName));
+            }
         }
         userRepository.deleteById(id);
     }
 
-    public User getUserByEmail(String email) throws ResourceNotFoundException {
-        if (!userRepository.existsByEmail(email)) {
-            throw new ResourceNotFoundException("User not found");
-        }
-        return userRepository.findByEmail(email).orElse(null);
-    }
-
-    private User findUserById(String id) throws ResourceNotFoundException {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-    }
-
-    private UserResponse updateUserProcess(User user , UserRequest request) throws ResourceNotFoundException {
+    private UserResponse updateUserProcess(User user , UserRequest request) {
 
         if (request.getEmail() != null && !request.getEmail().equals(user.getEmail())) {
             if (userRepository.existsByEmail(request.getEmail())) {
@@ -149,12 +145,12 @@ public class UserService {
 
     }
 
-    private User userDPProcess(UserRequest request, User user) throws ResourceNotFoundException {
-        if (request.getUserPDFile() != null && !request.getUserPDFile().isEmpty()) {
+    private User userDPProcess(UserRequest request, User user) {
+        if (request.getUserDPFile() != null && !request.getUserDPFile().isEmpty()) {
             String prefix = "user_DP_" + user.getId();
             String fileName;
             try {
-                fileName = fileStorageService.storeFile(request.getUserPDFile(), prefix, FileEnums.ImageType.USER_DP);
+                fileName = fileStorageService.storeFile(request.getUserDPFile(), prefix, FileEnums.ImageType.USER_DP);
                 user.setUserDPUrl("/api/v1/files/" + fileName);
             } catch (FileStorageException e) {
                 throw new RuntimeException(e);
@@ -162,7 +158,7 @@ public class UserService {
         } else if (request.getExistingDPUrl() != null && !request.getExistingDPUrl().isEmpty()) {
             user.setUserDPUrl(request.getExistingDPUrl());
         } else {
-            user.setUserDPUrl("");
+            user.setUserDPUrl("/api/v1/files/default-dp.jpg");
         }
 
         return userRepository.save(user);

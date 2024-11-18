@@ -4,10 +4,12 @@ import com.umesha_g.the_clique_backend.model.entity.Brand;
 import com.umesha_g.the_clique_backend.model.entity.Category;
 import com.umesha_g.the_clique_backend.model.entity.Discount;
 import com.umesha_g.the_clique_backend.model.entity.Product;
+import com.umesha_g.the_clique_backend.model.enums.Gender;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -37,8 +39,11 @@ public interface ProductRepository extends JpaRepository<Product, String> {
             String brandId,
             BigDecimal minPrice,
             BigDecimal maxPrice,
-            String gender,
+            Gender gender,
             String searchTerm,
             Pageable pageable
     );
+
+    @Query("SELECT new org.springframework.data.util.Pair(MIN(p.price), MAX(p.price)) FROM Product p")
+    Pair<BigDecimal, BigDecimal> findPriceRange();
 }

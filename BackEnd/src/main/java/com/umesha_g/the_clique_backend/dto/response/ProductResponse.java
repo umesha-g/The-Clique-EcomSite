@@ -15,6 +15,7 @@ public class ProductResponse {
     private BigDecimal price;
     private Integer stock;
     private Double rating;
+    private int reviewCount;
     private String description;
     private MiniBrandResponse brand;
     private MiniCategoryResponse category;

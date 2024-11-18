@@ -5,6 +5,7 @@ import { ProductCardResponse } from "@/api/product-api";
 import { getAllProductsByCategory } from "@/api/product-api";
 import ProductGrid from "@/app/components/ProductGrid";
 import  {Pagination} from "@/app/components/PaginationComponent";
+import CommonHeader from "@/app/components/Header";
 
 export default function CategoryPage({ params }: { params: { id: string } }) {
     const [products, setProducts] = useState<ProductCardResponse[]>([]);
@@ -12,7 +13,7 @@ export default function CategoryPage({ params }: { params: { id: string } }) {
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const [totalElements, setTotalElements] = useState(0);
-    const pageSize = 12; // Products per page
+    const pageSize = 15; // Products per page
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -42,33 +43,27 @@ export default function CategoryPage({ params }: { params: { id: string } }) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    if (loading) {
-        return (
-            <div className="flex justify-center items-center min-h-screen">
-                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
-            </div>
-        );
-    }
-
     return (
-        <div className="container mx-auto px-4 py-8">
-            <div className="mb-4">
-                <p className="text-gray-600">
-                    Showing {products.length} of {totalElements} products
-                </p>
-            </div>
-
-            <ProductGrid products={products} />
-
-            {/*{totalPages > 1 && ()}*/}
-                <div className="mt-8 flex justify-center">
-                    <Pagination
-                        currentPage={currentPage + 1}
-                        totalPages={totalPages}
-                        onPageChange={handlePageChange}
-                    />
+        <div>
+            <CommonHeader categoryVisibility={"visible"} searchBarWidth={"64"}/>
+            <div className="container max-w-[1200px] mx-auto px-4 py-8">
+                <div className="mb-4 mt-20">
+                    <p className="text-gray-600">
+                        Showing {products.length} of {totalElements} products
+                    </p>
                 </div>
 
+                <ProductGrid products={products} loading={loading} />
+
+                {/*{totalPages > 1 && ()}*/}
+                    <div className="mt-8 flex justify-center">
+                        <Pagination
+                            currentPage={currentPage + 1}
+                            totalPages={totalPages}
+                            onPageChange={handlePageChange}
+                        />
+                    </div>
+            </div>
         </div>
     );
 }

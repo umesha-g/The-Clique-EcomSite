@@ -19,6 +19,15 @@ export interface MiniCategoryResponse {
   name: string;
 }
 
+export const getAllCategoriesForAdmin = async (): Promise<CategoryResponse[]> => {
+  try {
+    const response = await api.get('admin/categories');
+    return response.data;
+  } catch (error) {
+    console.error('Error getting all categories:', error);
+    throw error;
+  }
+};
 
 export const createCategory = async (
   categoryRequest: CategoryRequest,

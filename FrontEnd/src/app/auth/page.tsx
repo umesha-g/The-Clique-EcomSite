@@ -7,16 +7,18 @@ import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { login,register } from '@/api/auth-api';
+import Logo from "@/app/components/Logo";
 
 const AuthForm:React.FC = () => {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [currentPassword, setCurrentPassword] = useState('');
   const [firstName, setName] = useState('');
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await login({ email, password });
+      await login({ email, currentPassword });
       // Handle successful login (e.g., redirect or update UI)
     } catch (error) {
       console.error('Login failed:', error);
@@ -27,7 +29,7 @@ const AuthForm:React.FC = () => {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await register({ firstName, email, password });
+      await register({ firstName, email, newPassword });
       // Handle successful registration (e.g., redirect or update UI)
     } catch (error) {
       console.error('Registration failed:', error);
@@ -36,13 +38,16 @@ const AuthForm:React.FC = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
+    <div className="flex relative items-center justify-center min-h-screen bg-neutral-100">
+      <div className={"absolute  top-10 lg:w-96 lg:left-[37%]"}>
+        <Logo/>
+      </div>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <Card className="w-[350px] shadow-lg rounded-none">
+        <Card className="w-[350px] rounded-none">
           <CardHeader>
             <CardTitle className="text-2xl font-bold text-center text-gray-800">Welcome</CardTitle>
             <CardDescription className="text-center text-gray-600">Sign in to your account or create a new one</CardDescription>
@@ -65,8 +70,8 @@ const AuthForm:React.FC = () => {
                   <Input
                     type="password"
                     placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
                     className="rounded-none"
                   />
                   <Button type="submit" className="w-full rounded-none">Login</Button>
@@ -91,8 +96,8 @@ const AuthForm:React.FC = () => {
                   <Input
                     type="password"
                     placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
                     className="rounded-none"
                   />
                   <Button type="submit" className="w-full rounded-none">Register</Button>

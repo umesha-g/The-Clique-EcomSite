@@ -29,7 +29,10 @@ export const createBrand = async (
   try {
     const formData = new FormData();
     Object.entries(brandRequest).forEach(([key, value]) => {
-      formData.append(key, value);
+      if (key === 'logoFile' && (!value || (value instanceof File && value.size === 0))) {
+      } else {
+        formData.append(key, value);
+      }
     });
 
     const response = await api.post(`/admin/brands`, formData, {

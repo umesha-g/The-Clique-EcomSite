@@ -23,7 +23,7 @@ const HeroSection: React.FC = () => {
 
   return (
     <div
-      className={`relative h-screen md:h-[500px] lg:h-[600px] xl:h-[700px] 2xl:h-[800px] overflow-hidden transition-all ${bgcolors[currentBgColor]} `}
+      className={`relative h-screen md:h-[500px] lg:h-[600px] xl:h-[700px] 2xl:h-[850px] overflow-hidden transition-all ${bgcolors[currentBgColor]} `}
     >
       <motion.div
         className="w-full h-full"

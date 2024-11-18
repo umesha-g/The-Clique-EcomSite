@@ -2,6 +2,7 @@ package com.umesha_g.the_clique_backend.service;
 
 import com.umesha_g.the_clique_backend.dto.request.BrandRequest;
 import com.umesha_g.the_clique_backend.dto.response.BrandResponse;
+import com.umesha_g.the_clique_backend.dto.response.MiniBrandResponse;
 import com.umesha_g.the_clique_backend.exception.FileStorageException;
 import com.umesha_g.the_clique_backend.exception.ResourceNotFoundException;
 import com.umesha_g.the_clique_backend.model.entity.Brand;
@@ -59,9 +60,9 @@ public class BrandService {
                 .collect(Collectors.toList());
     }
 
-    public List<BrandResponse> getActiveBrands() {
+    public List<MiniBrandResponse> getActiveBrands() {
         return brandRepository.findByIsActiveTrue().stream()
-                .map(brand -> modelMapper.map(brand, BrandResponse.class))
+                .map(brand -> modelMapper.map(brand, MiniBrandResponse.class))
                 .collect(Collectors.toList());
     }
 
@@ -100,13 +101,10 @@ public class BrandService {
 
     @Transactional
     public void deleteBrand(String id) throws FileStorageException {
-        if (!brandRepository.existsById(id)) {
-            throw new RuntimeException("Brand not found");
-        }
-        Brand brand = brandRepository.findById(id).orElse(null);
+        Brand brand = brandRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Brand not found"));
         assert brand != null;
         if (!brand.getLogoUrl().isEmpty()){
-            System.out.println("file name = " +  brand.getLogoUrl().substring(14));
             fileStorageService.deleteFile(Objects.requireNonNull(brand.getLogoUrl().substring(14)));
         }
 

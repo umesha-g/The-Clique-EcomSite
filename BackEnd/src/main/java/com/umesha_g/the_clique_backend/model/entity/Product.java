@@ -23,6 +23,7 @@ public class Product {
     private BigDecimal price;
     private Integer stock;
     private Double rating;
+    private int reviewCount;
     private String description;
 
     @ManyToOne

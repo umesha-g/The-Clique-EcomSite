@@ -2,10 +2,7 @@ package com.umesha_g.the_clique_backend.service;
 
 import com.umesha_g.the_clique_backend.dto.response.CartResponse;
 import com.umesha_g.the_clique_backend.exception.ResourceNotFoundException;
-import com.umesha_g.the_clique_backend.model.entity.Cart;
-import com.umesha_g.the_clique_backend.model.entity.CartItem;
-import com.umesha_g.the_clique_backend.model.entity.Product;
-import com.umesha_g.the_clique_backend.model.entity.User;
+import com.umesha_g.the_clique_backend.model.entity.*;
 import com.umesha_g.the_clique_backend.repository.CartItemRepository;
 import com.umesha_g.the_clique_backend.repository.CartRepository;
 import com.umesha_g.the_clique_backend.repository.ProductRepository;
@@ -53,15 +50,20 @@ public class CartService {
 
         if (existingItem != null) {
             existingItem.setQuantity(existingItem.getQuantity() + quantity);
+            existingItem.setSubTotal(calDiscountedPrice(product).multiply(new BigDecimal(existingItem.getQuantity())));
             cartItemRepository.save(existingItem);
         } else {
             CartItem newItem = new CartItem();
             newItem.setCart(cart);
             newItem.setProduct(product);
             newItem.setQuantity(quantity);
-            newItem.setSubTotal(product.getPrice().multiply(new BigDecimal(quantity)));
+            newItem.setSubTotal(calDiscountedPrice(product).multiply(new BigDecimal(quantity)));
             cart.getCartItems().add(newItem);
         }
+
+        product.setStock((product.getStock() - quantity));
+        System.out.println( "product is" + product.getStock());
+        productRepository.save(product);
 
         cart.updateTotalAmount();
         Cart updatedCart = cartRepository.save(cart);
@@ -82,7 +84,7 @@ public class CartService {
             cart.getCartItems().remove(item);
         } else {
             item.setQuantity(quantity);
-            item.setSubTotal(item.getProduct().getPrice().multiply(new BigDecimal(quantity)));
+            item.setSubTotal(calDiscountedPrice(item.getProduct()).multiply(new BigDecimal(item.getQuantity())));
         }
 
         cart.updateTotalAmount();
@@ -93,12 +95,22 @@ public class CartService {
     @Transactional
     public CartResponse incrementQuantity(String productId) throws ResourceNotFoundException {
         CartItem item = getCartItem(productId);
+
+        Product product = item.getProduct();
+        product.setStock(product.getStock()  - 1);
+        productRepository.save(product);
+
         return updateQuantity(productId, item.getQuantity() + 1);
     }
 
     @Transactional
     public CartResponse decrementQuantity(String productId) throws ResourceNotFoundException {
         CartItem item = getCartItem(productId);
+
+        Product product = item.getProduct();
+        product.setStock(product.getStock() + 1);
+        productRepository.save(product);
+
         return updateQuantity(productId, item.getQuantity() - 1);
     }
 
@@ -111,6 +123,11 @@ public class CartService {
         if (item == null) {
             throw new ResourceNotFoundException("Product not found in cart");
         }
+
+        Product product = item.getProduct();
+        product.setStock((product.getStock() + item.getQuantity()));
+        productRepository.save(product);
+
         cart.getCartItems().remove(item);
         cart.updateTotalAmount();
         Cart updatedCart = cartRepository.save(cart);
@@ -148,5 +165,21 @@ public class CartService {
                 .filter(item -> item.getProduct().getId().equals(productId))
                 .findFirst()
                 .orElse(null);
+    }
+
+    private BigDecimal calDiscountedPrice(Product product) {
+        Discount activeDiscount = null;
+        if (product.getDirectDiscount() != null) {
+            activeDiscount = product.getDirectDiscount();
+        } else if (product.getOtherDiscount() != null) {
+            activeDiscount = product.getOtherDiscount();
+        }
+
+        BigDecimal DiscountedPrice = product.getPrice();
+        if (activeDiscount != null) {
+            DiscountedPrice = product.getPrice().subtract(product.getPrice().multiply(activeDiscount.getDiscountPercentage().divide(BigDecimal.valueOf(100))));
+        }
+
+        return DiscountedPrice;
     }
 }

@@ -5,22 +5,25 @@ import { useCart } from "@/contexts/cartContext";
 import { motion } from "framer-motion";
 import { ShoppingCart } from "lucide-react";
 import React, { useState } from "react";
+import {Button} from "@/components/ui/button";
+import {ProductResponse} from "@/api/admin/admin-product-api";
 
 interface AddToCartButtonProps {
-  productId: string;
+  product: ProductResponse;
   quantity: number;
   selectedColour:string;
   selectedSize:string;
 }
 
-const AddToCartButton: React.FC<AddToCartButtonProps> = ({ productId,quantity,selectedColour,selectedSize }) => {
+const AddToCartButton: React.FC<AddToCartButtonProps> = ({ product,quantity,selectedColour,selectedSize  }) => {
   const [isLoading, setIsLoading] = useState(false);
   const { refreshCart } = useCart();
 
   const addItemToCart = async () => {
     setIsLoading(true);
     try {
-      const request:CartRequest = {productId,quantity,selectedColour,selectedSize}
+      const productId = product.id;
+      const request:CartRequest = {productId ,quantity,selectedColour,selectedSize}
       await addToCart(request);
       await refreshCart();
     } catch (error) {
@@ -31,16 +34,15 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({ productId,quantity,se
   };
 
   return (
-    <motion.button
-      className="z-50 bg-black text-sm hover:bg-gray-800 text-white justify-center font-medium py-1 px-4 rounded-none flex items-center w-full self-center"
-      onClick={addItemToCart}
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-      disabled={isLoading}
+      <Button
+          variant={"default"}
+          className="rounded-none w-full h-12 text-lg"
+          onClick={addItemToCart}
+          disabled={isLoading || (product.stock < quantity) }
     >
-      <ShoppingCart className="mr-4" size={20} />
-      {isLoading ? "Adding..." : "Add to Cart"}
-    </motion.button>
+          <ShoppingCart className="mr-3" size={"30"} />
+          {isLoading ? "Adding..." : "Add to Cart"}
+</Button>
   );
 };
 

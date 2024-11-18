@@ -10,11 +10,10 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Edit, Trash2 } from "lucide-react";
-import { CategoryResponse, deleteCategory } from '@/api/admin/admin-category-api';
+import {CategoryResponse, deleteCategory, getAllCategoriesForAdmin} from '@/api/admin/admin-category-api';
 import { useToast } from '@/hooks/use-toast';
 import AddEditCategoryDialog from './categoryPanelComponents/AddEditCategoryDialog';
 import DeleteConfirmationDialog from './DeleteConfirmationDialog';
-import {getAllCategories} from "@/api/category-api"; // Reusing existing component
 
 const CategoriesPanel: React.FC = () => {
   const [categories, setCategories] = useState<CategoryResponse[]>([]);
@@ -25,7 +24,7 @@ const CategoriesPanel: React.FC = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await getAllCategories();
+      const response = await getAllCategoriesForAdmin();
       setCategories(response);
     } catch (error) {
       toast({
@@ -64,7 +63,7 @@ const CategoriesPanel: React.FC = () => {
         title: "Success",
         description: "Category deleted successfully",
       });
-      fetchCategories();
+      await fetchCategories();
     } catch (error) {
       toast({
         title: "Error",

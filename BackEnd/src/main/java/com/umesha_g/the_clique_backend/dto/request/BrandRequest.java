@@ -1,5 +1,6 @@
 package com.umesha_g.the_clique_backend.dto.request;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
@@ -8,8 +9,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class BrandRequest {
     @NotBlank(message = "Brand name is required")
     private String name;
-
     private String description;
+    @Nullable
     private MultipartFile logoFile;
     private String discountId;
     private String existingLogoUrl;

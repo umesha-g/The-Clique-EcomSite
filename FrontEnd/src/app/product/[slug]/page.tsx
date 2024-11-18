@@ -1,92 +1,128 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ProductResponse } from "@/api/admin/admin-product-api";
-import { getProduct } from "@/api/product-api";
 import { extractIdFromSlug } from "@/utils/productSlug";
 import { ProductGallery } from "../ProductComponents/ProductGallery";
 import { ProductInfo } from "../ProductComponents/ProductInfo";
 import { useRouter } from "next/navigation";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft } from "lucide-react";
+import CommonHeader from "@/app/components/Header";
+import {useProductWithCart} from "@/hooks/useProductWithCart";
 
 export default function ProductPage({ params }: { params: { slug: string } }) {
-    const [product, setProduct] = useState<ProductResponse | null>(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
     const router = useRouter();
+    const productId = extractIdFromSlug(params.slug);
+    const { product, error } = useProductWithCart(productId);
 
     useEffect(() => {
-        const fetchProduct = async () => {
-            try {
-                const productId = extractIdFromSlug(params.slug);
-                const productData = await getProduct(productId);
-                setProduct(productData);
-            } catch (err) {
-                setError("Failed to load product");
-                console.error(err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchProduct();
-    }, [params.slug]);
+        setLoading(false);
+    }, [product?.id]);
 
     if (loading) {
         return (
-            <div className="container mx-auto px-4 py-8">
-                <div className="animate-pulse">
-                    <div className="h-64 bg-gray-200 rounded-lg mb-4" />
-                    <div className="h-8 bg-gray-200 rounded w-1/2 mb-4" />
-                    <div className="h-4 bg-gray-200 rounded w-1/4 mb-4" />
-                </div>
+            <div className="container mx-auto p-4 mt-4">
+                <Card className="rounded-none">
+                    <CardContent className="p-6">
+                        <div className="flex flex-col md:flex-row gap-8">
+                            <div className="w-full md:w-1/2">
+                                <Skeleton className="h-96 w-full" />
+                                <div className="flex gap-2 mt-4">
+                                    {[1, 2, 3].map((i) => (
+                                        <Skeleton key={i} className="h-20 w-20" />
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="w-full md:w-1/2 space-y-4">
+                                <Skeleton className="h-10 w-3/4" />
+                                <Skeleton className="h-6 w-1/4" />
+                                <Skeleton className="h-8 w-1/3" />
+                                <Skeleton className="h-40 w-full" />
+                                <Skeleton className="h-10 w-full" />
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
             </div>
         );
     }
 
     if (error || !product) {
         return (
-            <div className="container mx-auto px-4 py-8">
-                <div className="text-center">
-                    <h1 className="text-2xl font-bold">
-                        {error || "Product not found"}
-                    </h1>
-                    <button
-                        className="mt-4 text-gray-500 hover:underline"
-                        onClick={() => router.back()}
-                    >
-                        Go Back
-                    </button>
-                </div>
+            <div className="container mx-auto p-4 mt-4">
+                <Card className="rounded-none">
+                    <CardContent className="p-6">
+                        <div className="flex flex-col items-center justify-center space-y-4">
+                            <h1 className="text-2xl font-bold text-gray-800">
+                                {error || "Product not found"}
+                            </h1>
+                            <Button
+                                variant="outline"
+                                onClick={() => router.back()}
+                                className="flex items-center gap-2"
+                            >
+                                <ChevronLeft className="h-4 w-4" />
+                                Go Back
+                            </Button>
+                        </div>
+                    </CardContent>
+                </Card>
             </div>
         );
     }
 
     return (
-        <div className="container mx-auto px-4 bg-white text-gray-700">
-            <div className="py-4 text-sm breadcrumbs">
-                <ul>
-                    <li>
-                        <a href="/">Home</a>
-                    </li>
-                    <li>
-                        <a href={`/category/${product.category.id}`}>
-                            {product.category.name}
-                        </a>
-                    </li>
-                    <li>{product.name}</li>
-                </ul>
-            </div>
+        <div >
+            <CommonHeader categoryVisibility={"visible"} searchBarWidth={"64"}/>
+            <div className="container mx-auto p-4 min-h-screen ">
+                <Card className="rounded-none mt-28">
+                    <CardHeader className="px-6 py-4 border-b">
+                        <nav className="flex text-sm text-gray-500 space-x-2">
+                            <a href="/home" className="hover:text-gray-800">Home</a>
+                            <span>/</span>
+                            <a
+                                href={`/category/${product.category.id}`}
+                                className="hover:text-gray-800"
+                            >
+                                {product.category.name}
+                            </a>
+                            <span>/</span>
+                            <span className="text-gray-800">{product.name}</span>
+                        </nav>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                        <div className="flex flex-col md:flex-row gap-8">
+                            <Card className="md:w-1/2 rounded-none shadow-sm">
+                                <CardContent className="p-4">
+                                    <ProductGallery images={product.detailImageUrls} />
+                                </CardContent>
+                            </Card>
 
-            <div className="flex flex-col md:flex-row gap-8">
-                <ProductGallery images={product.detailImageUrls} />
-                <ProductInfo
-                    product={product}
-                />
-            </div>
+                            <Card className="md:w-1/2 rounded-none shadow-sm">
+                                <CardContent className="p-4">
+                                    <ProductInfo
+                                        product={product}
+                                    />
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </CardContent>
+                </Card>
 
-            {/* Related Products section would go here */}
-            {/* You'll need to implement an API endpoint to fetch related products */}
-            {/* <RelatedProducts products={relatedProducts} /> */}
+                {/* Related Products Section */}
+                <Card className="mt-8 rounded-none">
+                    <CardHeader className="px-6 py-4 border-b">
+                        <h2 className="text-2xl font-bold text-gray-800">Related Products</h2>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                        {/* RelatedProducts component would go here */}
+                        {/* <RelatedProducts products={relatedProducts} /> */}
+                    </CardContent>
+                </Card>
+            </div>
         </div>
     );
 }

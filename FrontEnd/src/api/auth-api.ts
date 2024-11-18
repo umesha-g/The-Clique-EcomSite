@@ -1,12 +1,7 @@
-import { RegisterRequest } from './admin/admin-user-api';
+import { UserRequest } from './admin/admin-user-api';
 import {api} from "@/utils/apiConfig";
 
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-export const login = async (request: LoginRequest): Promise<void> => {
+export const login = async (request: UserRequest): Promise<void> => {
   try {
     await api.post('/auth/login', request);
   } catch (error) {
@@ -15,7 +10,7 @@ export const login = async (request: LoginRequest): Promise<void> => {
   }
 };
 
-export const register = async (request: RegisterRequest): Promise<void> => {
+export const register = async (request: UserRequest): Promise<void> => {
   try {
     await api.post('/auth/register', request);
   } catch (error) {

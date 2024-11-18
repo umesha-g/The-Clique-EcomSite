@@ -8,6 +8,7 @@ import com.umesha_g.the_clique_backend.model.entity.Brand;
 import com.umesha_g.the_clique_backend.model.entity.Category;
 import com.umesha_g.the_clique_backend.model.entity.Discount;
 import com.umesha_g.the_clique_backend.model.entity.Product;
+import com.umesha_g.the_clique_backend.model.enums.Gender;
 import com.umesha_g.the_clique_backend.repository.BrandRepository;
 import com.umesha_g.the_clique_backend.repository.CategoryRepository;
 import com.umesha_g.the_clique_backend.repository.DiscountRepository;
@@ -17,10 +18,13 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 
@@ -32,7 +36,6 @@ public class ProductService {
     private  DiscountRepository discountRepository;
     private  ModelMapper modelMapper;
     private DiscountPriorityService discountPriorityService;
-
     private ProductImageService productImageService;
 
     @Autowired
@@ -59,7 +62,7 @@ public class ProductService {
             String brandId,
             BigDecimal minPrice,
             BigDecimal maxPrice,
-            String gender,
+            Gender gender,
             String searchTerm,
             Pageable pageable) {
 
@@ -116,6 +119,14 @@ public class ProductService {
         }
         Page<Product> products = productRepository.findByCategory(category,pageable);
         return products.map(product -> modelMapper.map(product,ProductCardResponse.class));
+    }
+
+    public Map<String, BigDecimal> getPriceRange() {
+        Pair<BigDecimal, BigDecimal> priceRange = productRepository.findPriceRange();
+        Map<String, BigDecimal> response = new HashMap<>();
+        response.put("minPrice", priceRange.getFirst());
+        response.put("maxPrice", priceRange.getSecond());
+        return response;
     }
 
     public Product getProductById (String id){

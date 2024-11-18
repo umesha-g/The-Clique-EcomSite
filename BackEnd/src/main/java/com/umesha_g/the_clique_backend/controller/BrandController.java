@@ -1,6 +1,7 @@
 package com.umesha_g.the_clique_backend.controller;
 
 import com.umesha_g.the_clique_backend.dto.response.BrandResponse;
+import com.umesha_g.the_clique_backend.dto.response.MiniBrandResponse;
 import com.umesha_g.the_clique_backend.service.BrandService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +32,8 @@ public class BrandController {
     }
 
     @GetMapping("/active")
-    public ResponseEntity<List<BrandResponse>> getActiveBrands() {
-        List<BrandResponse> brands = brandService.getActiveBrands();
+    public ResponseEntity<List<MiniBrandResponse>> getActiveBrands() {
+        List<MiniBrandResponse> brands = brandService.getActiveBrands();
         return ResponseEntity.ok(brands);
     }
 

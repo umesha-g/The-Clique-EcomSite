@@ -67,8 +67,15 @@ public class FileStorageService {
             BufferedImage originalImage = ImageIO.read(file.getInputStream());
 
             // Store standard size
-            saveResizedImage(originalImage, targetLocation,
-                    storageConfig.getStandardSize());
+            if(imageType.equals(FileEnums.ImageType.PRODUCT_DETAIL) || imageType.equals(FileEnums.ImageType.PRODUCT_CARD)) {
+                saveResizedImage(originalImage, targetLocation,
+                        storageConfig.getStandardSize());
+            }
+            // Store thumbnail size
+            else {
+                saveResizedImage(originalImage, targetLocation,
+                        storageConfig.getThumbnailSize());
+            }
 
             return fileName;
         } catch (IOException ex) {

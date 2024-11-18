@@ -22,7 +22,6 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Gender, ProductRequest } from '@/api/admin/admin-product-api';
-import { getAllCategories } from '@/api/category-api';
 import { getActiveBrands } from '@/api/brand-api';
 import {getActiveDiscounts, MiniDiscountResponse} from '@/api/discount-api';
 import {
@@ -31,8 +30,8 @@ import {
     PopoverTrigger,
 } from '@/components/ui/popover';
 import { ChromePicker } from 'react-color';
-import {CategoryResponse} from "@/api/admin/admin-category-api";
-import {BrandResponse} from "@/api/admin/admin-brand-api";
+import {CategoryResponse, getAllCategoriesForAdmin} from "@/api/admin/admin-category-api";
+import {MiniBrandResponse} from "@/api/admin/admin-brand-api";
 
 const formSchema = z.object({
     name: z.string().min(1, 'Name is required'),
@@ -57,7 +56,7 @@ const ProductDetailsForm: React.FC<ProductDetailsFormProps> = ({
                                                                    onSubmit,
                                                                }) => {
     const [categories, setCategories] = useState<CategoryResponse[]>([]);
-    const [brands, setBrands] = useState<BrandResponse[]>([]);
+    const [brands, setBrands] = useState<MiniBrandResponse[]>([]);
     const [discounts, setDiscounts] = useState<MiniDiscountResponse[]>([]);
     const [selectedColor, setSelectedColor] = useState('#000000');
     const [selectedColorName, setSelectedColorName] = useState('');
@@ -83,7 +82,7 @@ const ProductDetailsForm: React.FC<ProductDetailsFormProps> = ({
         const fetchData = async () => {
             try {
                 const [categoriesData, brandsData, discountsData] = await Promise.all([
-                    getAllCategories(),
+                    getAllCategoriesForAdmin(),
                     getActiveBrands(),
                     getActiveDiscounts(),
                 ]);

@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class WishlistService {
     private  WishlistRepository wishlistRepository;
@@ -31,6 +30,7 @@ public class WishlistService {
         this.securityUtils = securityUtils;
     }
 
+    @Transactional
     public WishlistResponse addToWishlist(String productId) throws ResourceNotFoundException {
         User user = securityUtils.getCurrentUser();
         Wishlist wishlist = getOrCreateWishlist(user);
@@ -38,11 +38,14 @@ public class WishlistService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
-        wishlist.getProducts().add(product);
+        if(!wishlist.getProducts().contains(product)){
+            wishlist.getProducts().add(product);
+        }
         Wishlist updatedWishlist = wishlistRepository.save(wishlist);
         return modelMapper.map(updatedWishlist, WishlistResponse.class);
     }
 
+    @Transactional
     public WishlistResponse removeFromWishlist(String productId) throws ResourceNotFoundException {
         User user = securityUtils.getCurrentUser();
         Wishlist wishlist = getOrCreateWishlist(user);

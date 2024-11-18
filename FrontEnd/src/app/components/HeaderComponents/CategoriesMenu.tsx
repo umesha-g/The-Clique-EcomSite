@@ -44,7 +44,8 @@ const components: { title: string; href: string; description: string }[] = [
   },
 ];
 
-export function CategoriesMenu() {
+const CategoriesMenu :React.FC = () => {
+
   return (
     <NavigationMenu>
       <NavigationMenuList className="rounded-none">
@@ -72,10 +73,12 @@ export function CategoriesMenu() {
   );
 }
 
-const ListItem = React.forwardRef<
-  React.ElementRef<"a">,
-  React.ComponentPropsWithoutRef<"a">
->(({ className, title, children, ...props }, ref) => {
+const ListItem = React.forwardRef<React.ElementRef<"a">, React.ComponentPropsWithoutRef<"a">>(({
+                                                                                                 className,
+                                                                                                 title,
+                                                                                                 children,
+                                                                                                 ...props },
+                                                                                               ref) => {
   return (
     <li>
       <NavigationMenuLink className="rounded-none" asChild>
@@ -97,3 +100,5 @@ const ListItem = React.forwardRef<
   );
 });
 ListItem.displayName = "ListItem";
+
+export default CategoriesMenu;

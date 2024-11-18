@@ -32,8 +32,8 @@ const AddEditUserDialog: React.FC<AddEditUserDialogProps> = ({
                 lastName: user.lastName || '',
                 email: user.email,
                 phoneNumber: user.phoneNumber || '',
-                currentPassword: '', // Clear password field for security
-                existingDPUrl:user.UserDPUrl || '',
+                newPassword: '', // Clear password field for security
+                existingDPUrl:user.userDPUrl || '',
             });
         } else {
             setUserData(null);
@@ -48,7 +48,9 @@ const AddEditUserDialog: React.FC<AddEditUserDialogProps> = ({
                     lastName: data.lastName,
                     email: data.email,
                     phoneNumber: data.phoneNumber,
-                    currentPassword: '',
+                    newPassword: data.newPassword,
+                    existingDPUrl:data.existingDPUrl,
+                    userDPFile:data.userDPFile
                 };
                 await updateUserById(user.id, updateRequest);
                 toast({

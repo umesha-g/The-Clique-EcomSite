@@ -8,14 +8,16 @@ import {
 import { motion } from "framer-motion";
 import { Heart } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import {cn} from "@/lib/utils";
 
 interface WishlistHeartButtonProps {
   productId: string;
 }
 
-const WishlistHeartButton: React.FC<WishlistHeartButtonProps> = ({
-  productId,
-}) => {
+const WishlistHeartButton = ({
+                               productId,
+                               className
+                              }: WishlistHeartButtonProps & { className?: string }) => {
   const [isInWishlist, setIsInWishlist] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -58,7 +60,9 @@ const WishlistHeartButton: React.FC<WishlistHeartButtonProps> = ({
 
   return (
     <motion.button
-      className="absolute top-4 right-4 z-10 dark:bg-gray-800 rounded-full  "
+        className={cn(
+            className
+        )}
       onClick={toggleWishlist}
       initial={{ scale: 0.9 }}
       whileHover={{ scale: 1.1 }}
@@ -67,7 +71,7 @@ const WishlistHeartButton: React.FC<WishlistHeartButtonProps> = ({
     >
       <motion.div
         initial={{ scale: 1 }}
-        animate={{ scale: isInWishlist ? [1, 1.2, 1] : 1 }}
+        animate={{ scale: isInWishlist ? [1, 2, 1] : 1 }}
         transition={{ duration: 0.3 }}
       >
         <Heart

@@ -13,7 +13,6 @@ import {
     FormMessage,
 } from '@/components/ui/form';
 import { UserRequest} from '@/api/admin/admin-user-api';
-import BrandLogoDropzone from "@/app/admin/dashboard/adminDashboard_Components/brandPanelComponents/BrandLogoDropzone";
 import UserPictureDropzone
     from "@/app/admin/dashboard/adminDashboard_Components/UserPanelComponents/UserPictureDropzone";
 
@@ -22,9 +21,9 @@ const formSchema = z.object({
     lastName: z.string().min(1, 'Last name is required'),
     email: z.string().email('Invalid email address'),
     phoneNumber: z.string().min(1, 'Phone number is required'),
-    password: z.string().min(8, 'Password must be at least 8 Characters long').optional(),
+    newPassword: z.string().min(8, 'Password must be at least 8 Characters long').optional(),
     existingDPUrl:z.string().optional(),
-    userPDFile:z.any().optional(),
+    userDPFile:z.any().optional(),
 });
 
 interface UserDetailsFormProps {
@@ -46,7 +45,7 @@ const UserDetailsForm: React.FC<UserDetailsFormProps> = ({
             lastName: initialData?.lastName || '',
             email: initialData?.email || '',
             phoneNumber: initialData?.phoneNumber || '',
-            password: '',
+            newPassword: '',
             existingDPUrl:initialData?.existingDPUrl || '',
         },
     });
@@ -58,7 +57,7 @@ const UserDetailsForm: React.FC<UserDetailsFormProps> = ({
     const handleSubmit = (data: z.infer<typeof formSchema>) => {
         const userData: UserRequest = {
             ...data,
-            userPDFile: fileRef.current,
+            userDPFile: fileRef.current,
         };
         onSubmit(userData);
     };
@@ -124,7 +123,7 @@ const UserDetailsForm: React.FC<UserDetailsFormProps> = ({
 
                 <FormField
                     control={form.control}
-                    name="password"
+                    name="newPassword"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Password</FormLabel>
@@ -142,7 +141,7 @@ const UserDetailsForm: React.FC<UserDetailsFormProps> = ({
 
                 <FormField
                     control={form.control}
-                    name="userPDFile"
+                    name="userDPFile"
                     render={() => (
                         <FormItem>
                             <FormLabel>User Display Picture</FormLabel>

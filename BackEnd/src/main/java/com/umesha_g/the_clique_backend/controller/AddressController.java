@@ -3,6 +3,7 @@ package com.umesha_g.the_clique_backend.controller;
 import com.umesha_g.the_clique_backend.dto.request.AddressRequest;
 import com.umesha_g.the_clique_backend.dto.response.AddressResponse;
 import com.umesha_g.the_clique_backend.exception.ResourceNotFoundException;
+import com.umesha_g.the_clique_backend.model.entity.User;
 import com.umesha_g.the_clique_backend.service.AddressService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -55,9 +56,9 @@ public class AddressController {
 
     @DeleteMapping("/{addressId}")
     public ResponseEntity<Void> deleteAddress(
-            @AuthenticationPrincipal String userId,
+            @AuthenticationPrincipal User user,
             @PathVariable String addressId) throws ResourceNotFoundException {
-        addressService.deleteAddress(userId, addressId);
+        addressService.deleteAddress(user.getId(), addressId);
         return ResponseEntity.noContent().build();
     }
 }

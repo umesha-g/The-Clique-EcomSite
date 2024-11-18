@@ -10,6 +10,10 @@ import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Configuration
 public class ModelMapperConfig {
 
@@ -87,9 +91,6 @@ public class ModelMapperConfig {
                     mapper.map(DiscountRequest::getName, Discount::setName);
                     mapper.map(DiscountRequest::getDescription, Discount::setDescription);
                     mapper.map(DiscountRequest::getDiscountPercentage, Discount::setDiscountPercentage);
-                    //mapper.map(DiscountRequest::getApplicableCategoryIds, Discount::setApplicableCategories);
-                    //mapper.map(DiscountRequest::getStartDate, Discount::setStartDate);
-                    //mapper.map(DiscountRequest::getEndDate, Discount::setEndDate);
                 });
 
         // Category Request mapping
@@ -146,12 +147,21 @@ public class ModelMapperConfig {
         Converter<Product, ProductCardResponse> productToProductCardResponseConverter = ctx ->
                 ctx.getSource() == null ? null : modelMapper.map(ctx.getSource(), ProductCardResponse.class);
 
+        Converter<List<Product>, List<ProductCardResponse>> productListToCardResponseConverter = ctx -> {
+            if (ctx.getSource() == null) {
+                return Collections.emptyList();
+            }
+            return ctx.getSource().stream()
+                    .map(product -> modelMapper.map(product, ProductCardResponse.class))
+                    .collect(Collectors.toList());
+        };
+
         //Wishlist mapping
         modelMapper.addMappings(new PropertyMap<Wishlist, WishlistResponse>() {
             @Override
             protected void configure() {
                 map().setId(source.getId());
-                using(productToProductCardResponseConverter).map(source.getProducts()).setProducts(null);
+                using(productListToCardResponseConverter).map(source.getProducts(),destination.getProducts());
             }
         });
 
@@ -164,13 +174,19 @@ public class ModelMapperConfig {
                 map().setQuantity(source.getQuantity());
                 map().setSelectedColour(source.getSelectedColour());
                 map().setSelectedSize(source.getSelectedSize());
-                using(productToProductCardResponseConverter).map(source.getProduct()).setProduct(null);
+                using(productToProductCardResponseConverter).map(source.getProduct(),destination.getProduct());
             }
         });
 
         // Converter for handling order item -> order item response
-        Converter<OrderItem, OrderItemResponse> orderItemToOrderItemResponseConverter = ctx ->
-                ctx.getSource() == null ? null : modelMapper.map(ctx.getSource(), OrderItemResponse.class);
+        Converter<List<OrderItem>, List<OrderItemResponse>> orderItemToOrderItemResponseConverter = ctx -> {
+            if (ctx.getSource() == null) {
+                return Collections.emptyList();
+            }
+            return ctx.getSource().stream()
+                    .map(item -> modelMapper.map(item, OrderItemResponse.class))
+                    .collect(Collectors.toList());
+        };
 
         // Order mapping
         modelMapper.addMappings(new PropertyMap<Order, OrderResponse>() {
@@ -183,8 +199,8 @@ public class ModelMapperConfig {
                 map().setTrackingNumber(source.getTrackingNumber());
                 map().setCreatedAt(source.getCreatedAt());
                 map().setUpdatedAt(source.getUpdatedAt());
-                using(addressToAddressResponseConverter).map(source.getShippingAddress()).setShippingAddress(null);
-                using(orderItemToOrderItemResponseConverter).map(source.getOrderItems()).setOrderItems(null);
+                using(addressToAddressResponseConverter).map(source.getShippingAddress(),destination.getShippingAddress());
+                using(orderItemToOrderItemResponseConverter).map(source.getOrderItems(),destination.getOrderItems());
             }
         });
 
@@ -197,13 +213,19 @@ public class ModelMapperConfig {
                 map().setQuantity(source.getQuantity());
                 map().setSelectedColour(source.getSelectedColour());
                 map().setSelectedSize(source.getSelectedSize());
-                using(productToProductCardResponseConverter).map(source.getProduct()).setProduct(null);
+                using(productToProductCardResponseConverter).map(source.getProduct(),destination.getProduct());
             }
         });
 
         // Converter for handling cart item -> cart item response
-        Converter<CartItem, CartItemResponse> cartItemToCartItemResponseConverter = ctx ->
-                ctx.getSource() == null ? null : modelMapper.map(ctx.getSource(), CartItemResponse.class);
+        Converter<List<CartItem>, List<CartItemResponse>> cartItemToCartItemResponseConverter = ctx -> {
+            if (ctx.getSource() == null) {
+                return Collections.emptyList();
+            }
+            return ctx.getSource().stream()
+                    .map(item -> modelMapper.map(item, CartItemResponse.class))
+                    .collect(Collectors.toList());
+        };
 
         // Cart mapping
         modelMapper.addMappings(new PropertyMap<Cart, CartResponse>() {
@@ -213,9 +235,10 @@ public class ModelMapperConfig {
                 map().setId(source.getId());
                 map().setTotalAmount(source.getTotalAmount());
                 map().setCreatedAt(source.getCreatedAt());
-                using(cartItemToCartItemResponseConverter).map(source.getCartItems()).setCartItems(null);
+                using(cartItemToCartItemResponseConverter).map(source.getCartItems(),destination.getCartItems());
             }
         });
+
 
         // Discount mapping
         modelMapper.createTypeMap(Discount.class, DiscountResponse.class)
@@ -249,7 +272,7 @@ public class ModelMapperConfig {
                 map().setDescription(source.getDescription());
                 map().setLogoUrl(source.getLogoUrl());
                 map().setActive(source.isActive());
-                using(discountToMiniDiscountResponseConverter).map(source.getDiscount()).setDiscount(null);
+                using(discountToMiniDiscountResponseConverter).map(source.getDiscount(),destination.getDiscount());
             }
         });
 
@@ -270,7 +293,7 @@ public class ModelMapperConfig {
                 map().setId(source.getId());
                 map().setName(source.getName());
                 map().setDescription(source.getDescription());
-                using(discountToMiniDiscountResponseConverter).map(source.getDiscount()).setDiscount(null);
+                using(discountToMiniDiscountResponseConverter).map(source.getDiscount(),destination.getDiscount());
             }
         });
 
@@ -305,8 +328,8 @@ public class ModelMapperConfig {
                 map().setStock(source.getStock());
                 map().setRating(source.getRating());
                 map().setDescription(source.getDescription());
-                using(brandToMiniBrandResponseConverter).map(source.getBrand()).setBrand(null);
-                using(categoryToMiniCategoryResponseConverter).map(source.getCategory()).setCategory(null);
+                using(brandToMiniBrandResponseConverter).map(source.getBrand(),destination.getBrand());
+                using(categoryToMiniCategoryResponseConverter).map(source.getCategory(),destination.getCategory());
                 map().setDetailImageUrls(source.getDetailImageUrls());
                 map().setCardImageUrl(source.getCardImageUrl());
                 map().setGender(source.getGender());
@@ -316,8 +339,8 @@ public class ModelMapperConfig {
                 map().setPurchaseCount(source.getPurchaseCount());
                 map().setCreatedAt(source.getCreatedAt());
                 // map().setUpdatedAt(source.getUpdatedAt());
-                using(discountToMiniDiscountResponseConverter).map(source.getDirectDiscount()).setDirectDiscount(null);
-                using(discountToMiniDiscountResponseConverter).map(source.getOtherDiscount()).setOtherDiscount(null);
+                using(discountToMiniDiscountResponseConverter).map(source.getDirectDiscount(),destination.getDirectDiscount());
+                using(discountToMiniDiscountResponseConverter).map(source.getOtherDiscount(),destination.getOtherDiscount());
             }
         });
 
@@ -335,8 +358,8 @@ public class ModelMapperConfig {
                 map().setCardImageUrl(source.getCardImageUrl());
                 map().setPurchaseCount(source.getPurchaseCount());
                 map().setStock(source.getStock());
-                using(discountToMiniDiscountResponseConverter).map(source.getDirectDiscount()).setDirectDiscount(null);
-                using(discountToMiniDiscountResponseConverter).map(source.getOtherDiscount()).setOtherDiscount(null);
+                using(discountToMiniDiscountResponseConverter).map(source.getDirectDiscount(),destination.getDirectDiscount());
+                using(discountToMiniDiscountResponseConverter).map(source.getOtherDiscount(),destination.getOtherDiscount());
             }
         });
     }

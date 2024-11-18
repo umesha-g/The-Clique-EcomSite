@@ -1,4 +1,4 @@
-import { ProductResponse } from './admin/admin-product-api';
+import {Gender, ProductResponse} from './admin/admin-product-api';
 import {api} from "@/utils/apiConfig";
 import {MiniDiscountResponse} from "@/api/discount-api";
 
@@ -19,12 +19,27 @@ export interface ProductSearchParams {
   brandId?: string;
   minPrice?: number;
   maxPrice?: number;
-  gender?: string;
+  gender?: Gender;
   searchTerm?: string;
   page?: number;
   size?: number;
   sort?: string;
 }
+
+export interface PriceRange {
+  minPrice: number;
+  maxPrice: number;
+}
+
+export const getProductPriceRange = async (): Promise<PriceRange> => {
+  try {
+    const response = await api.get('/products/price-range');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching price range:', error);
+    throw error;
+  }
+};
 
 export const getProduct = async (id: string): Promise<ProductResponse> => {
   try {

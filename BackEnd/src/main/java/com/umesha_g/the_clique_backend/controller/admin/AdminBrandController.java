@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 @PreAuthorize("hasRole('ADMIN')")
 @RequiredArgsConstructor
 public class AdminBrandController {
-
     private BrandService brandService;
 
     @Autowired
@@ -33,7 +32,9 @@ public class AdminBrandController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BrandResponse> updateBrand(@PathVariable String id, @Valid @ModelAttribute BrandRequest brandRequest) throws ResourceNotFoundException, FileStorageException {
+    public ResponseEntity<BrandResponse> updateBrand(
+            @PathVariable String id,
+            @Valid @ModelAttribute BrandRequest brandRequest) throws ResourceNotFoundException, FileStorageException {
         BrandResponse updatedBrand = brandService.updateBrand(id, brandRequest);
         return ResponseEntity.ok(updatedBrand);
     }

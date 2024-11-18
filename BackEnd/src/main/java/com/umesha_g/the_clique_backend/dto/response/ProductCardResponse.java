@@ -10,6 +10,7 @@ public class ProductCardResponse {
     private String name;
     private BigDecimal price;
     private Double rating;
+    private int reviewCount;
     private String cardImageUrl;
     private Long purchaseCount;
     private Integer stock;

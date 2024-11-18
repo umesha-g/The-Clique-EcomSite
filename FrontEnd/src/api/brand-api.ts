@@ -1,4 +1,4 @@
-import { BrandResponse } from './admin/admin-brand-api';
+import {BrandResponse, MiniBrandResponse} from './admin/admin-brand-api';
 import {api} from "@/utils/apiConfig";
 
 export const getAllBrands = async (): Promise<BrandResponse[]> => {
@@ -11,7 +11,7 @@ export const getAllBrands = async (): Promise<BrandResponse[]> => {
   }
 };
 
-export const getActiveBrands = async (): Promise<BrandResponse[]> => {
+export const getActiveBrands = async (): Promise<MiniBrandResponse[]> => {
   try {
     const response = await api.get('/brands/active');
     return response.data;

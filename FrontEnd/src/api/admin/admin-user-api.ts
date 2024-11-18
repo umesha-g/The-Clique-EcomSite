@@ -7,7 +7,7 @@ export interface UserRequest {
   currentPassword?: string;
   newPassword?: string;
   phoneNumber?: string;
-  userPDFile? : File | null;
+  userDPFile? : File | null;
   existingDPUrl?: string;
 }
 
@@ -23,15 +23,24 @@ export interface UserResponse {
   lastName: string;
   phoneNumber: string;
   role: Role;
-  UserDPUrl:string;
+  userDPUrl:string;
   createdAt: string;
 }
 
 export const createUser = async (
-  request: UserRequest,
+  userRequest: UserRequest,
 ): Promise<UserResponse> => {
   try {
-    const response = await api.post(`/admin/users`, request);
+    const formData = new FormData();
+    Object.entries(userRequest).forEach(([key, value]) => {
+      if (key === 'userDPFile' && (!value || (value instanceof File && value.size === 0))) {
+      } else {
+        formData.append(key, value);
+      }
+    });
+    const response = await api.post(`/admin/users`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
     return response.data;
   } catch (error) {
     console.error('Error creating user:', error);
@@ -51,10 +60,22 @@ export const getUser = async (id: string): Promise<UserResponse> => {
 
 export const updateUserById = async (
   id: string,
-  request: UserRequest,
+  userRequest: UserRequest,
 ): Promise<UserResponse> => {
   try {
-    const response = await api.put(`/admin/users/${id}`, request);
+    const formData = new FormData();
+    Object.entries(userRequest).forEach(([key, value]) => {
+      if (key === 'userDPFile' && (!value || (value instanceof File && value.size === 0))) {
+      } else {
+        formData.append(key, value);
+      }
+    });
+
+    const response = await api.put(`/admin/users/${id}`,formData,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        },
+    );
     return response.data;
   } catch (error) {
     console.error('Error updating user:', error);

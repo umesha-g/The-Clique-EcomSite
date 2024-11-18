@@ -1,6 +1,7 @@
 package com.umesha_g.the_clique_backend.controller;
 
 import com.umesha_g.the_clique_backend.dto.response.CategoryResponse;
+import com.umesha_g.the_clique_backend.dto.response.MiniCategoryResponse;
 import com.umesha_g.the_clique_backend.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +26,8 @@ public class CategoryController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CategoryResponse>> getAllCategories() {
-        List<CategoryResponse> categories = categoryService.getAllCategories();
+    public ResponseEntity<List<MiniCategoryResponse>> getAllCategories() {
+        List<MiniCategoryResponse> categories = categoryService.getAllCategories();
         return ResponseEntity.ok(categories);
     }
 
