@@ -1,6 +1,7 @@
 package com.umesha_g.the_clique_backend.model.entity;
 
 import com.umesha_g.the_clique_backend.model.enums.OrderStatus;
+import com.umesha_g.the_clique_backend.model.enums.PaymentMethod;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,7 +17,6 @@ import java.util.List;
 @NoArgsConstructor
 public class Order {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     @ManyToOne
@@ -30,13 +30,16 @@ public class Order {
     @JoinColumn(name = "address_id")
     private Address shippingAddress;
 
+    private BigDecimal subTotal;
     private BigDecimal totalAmount;
     private BigDecimal shippingCost;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
-    private String trackingNumber;
+    @Enumerated(EnumType.STRING)
+    private PaymentMethod paymentMethod;
+
     private LocalDate estimatedDeliveryDate;
 
     @Column(name = "created_at")

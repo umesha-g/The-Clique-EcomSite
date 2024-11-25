@@ -87,7 +87,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/wishlist/**").hasRole("USER")
                         .requestMatchers("/api/v1/cart/**").hasRole("USER")
                         .requestMatchers("/api/v1/addresses/**").hasRole("USER")
-                        .requestMatchers("/api/v1/notifications/**").hasRole("USER")
+                        .requestMatchers("/api/v1/notifications/**").hasAnyRole("ADMIN", "USER")
                         .requestMatchers("/api/v1/orders/**").hasRole("USER")
                         .requestMatchers("/api/v1/reviews/**").hasRole("USER")
                         .anyRequest().authenticated())
@@ -110,7 +110,10 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:3000"
+                "http://localhost:3000",
+                "http://192.168.1.100:3000",
+                "http://192.168.1.101:3000",
+                "http://192.168.1.1:3000"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList(

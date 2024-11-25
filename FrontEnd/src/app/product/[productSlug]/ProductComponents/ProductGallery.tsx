@@ -1,3 +1,4 @@
+"use client";
 import { motion } from "framer-motion";
 import React, { useState } from "react";
 import { prefix } from "@/utils/apiConfig";
@@ -13,9 +14,8 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({ images }) => {
 
     return (
         <div className="w-full space-y-4">
-            {/* Main Image */}
             <motion.div
-                className="relative w-full aspect-square bg-gray-100"
+                className="relative w-full aspect-square border p-6 bg-gray-100"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3 }}
@@ -30,16 +30,15 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({ images }) => {
                 />
             </motion.div>
 
-            {/* Thumbnail Scroll Area */}
             <ScrollArea className="w-full whitespace-nowrap">
-                <div className="flex gap-2 pb-2">
+                <div className="flex gap-2 p-2">
                     {images.map((img, index) => (
                         <motion.div
                             key={index}
-                            className={`relative shrink-0 cursor-pointer 
+                            className={`relative border cursor-pointer 
                                 ${selectedImage === img
-                                ? 'ring-2 ring-black ring-offset-2'
-                                : 'hover:ring-1 hover:ring-gray-300 hover:ring-offset-1'
+                                ? 'ring-2 ring-black ring-offset-1'
+                                : 'hover:ring-1 hover:ring-gray-300'
                             }`}
                             onClick={() => setSelectedImage(img)}
                             whileHover={{ scale: 1.05 }}

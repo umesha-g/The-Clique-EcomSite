@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from 'react';
 import { ProductResponse } from "@/api/admin/admin-product-api";
 import { getProduct } from "@/api/product-api";

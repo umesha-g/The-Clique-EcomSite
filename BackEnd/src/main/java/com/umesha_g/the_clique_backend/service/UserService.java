@@ -9,6 +9,7 @@ import com.umesha_g.the_clique_backend.model.entity.User;
 import com.umesha_g.the_clique_backend.model.enums.FileEnums;
 import com.umesha_g.the_clique_backend.model.enums.Role;
 import com.umesha_g.the_clique_backend.repository.UserRepository;
+import com.umesha_g.the_clique_backend.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -28,13 +30,17 @@ public class UserService {
     private  ModelMapper modelMapper;
     private  PasswordEncoder passwordEncoder;
     private FileStorageService fileStorageService;
+    private SecurityUtils securityUtils;
+    private PlatformStatisticsService platformStatisticsService;
 
     @Autowired
-    public UserService(UserRepository userRepository, ModelMapper modelMapper, PasswordEncoder passwordEncoder, FileStorageService fileStorageService) {
+    public UserService(UserRepository userRepository, ModelMapper modelMapper, PasswordEncoder passwordEncoder, FileStorageService fileStorageService, SecurityUtils securityUtils, PlatformStatisticsService platformStatisticsService) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
         this.passwordEncoder = passwordEncoder;
         this.fileStorageService = fileStorageService;
+        this.securityUtils = securityUtils;
+        this.platformStatisticsService = platformStatisticsService;
     }
 
     public UserResponse createUser(UserRequest request) {
@@ -47,14 +53,20 @@ public class UserService {
         user.setRole(Role.USER);
 
         User savedUser = userDPProcess(request,user);
+        List<User> users = userRepository.findAll();
+        platformStatisticsService.updateActiveUsers(users.size());
+        platformStatisticsService.incrementNewRegistrations();
+
         return modelMapper.map(savedUser, UserResponse.class);
     }
 
-    public UserResponse getUser(User currentUser) throws ResourceNotFoundException {
+    public UserResponse getUser() throws ResourceNotFoundException {
+        User currentUser = securityUtils.getCurrentUser();
         return modelMapper.map(currentUser, UserResponse.class);
     }
 
-    public void deleteUser(User currentUser) throws ResourceNotFoundException {
+    public void deleteUser() throws ResourceNotFoundException {
+        User currentUser = securityUtils.getCurrentUser();
         if (!userRepository.existsById(currentUser.getId())) {
             throw new ResourceNotFoundException("User not found");
         }
@@ -70,7 +82,8 @@ public class UserService {
         return userRepository.existsByEmail(email);
     }
 
-    public UserResponse updateUser(UserRequest request , User currentUser) throws ResourceNotFoundException {
+    public UserResponse updateUser(UserRequest request) throws ResourceNotFoundException {
+        User currentUser = securityUtils.getCurrentUser();
         if (request.getNewPassword() != null) {
              if (!passwordEncoder.matches(request.getCurrentPassword(), currentUser.getPassword())) {
                 throw new UserException.InvalidPasswordException("Current password is incorrect");

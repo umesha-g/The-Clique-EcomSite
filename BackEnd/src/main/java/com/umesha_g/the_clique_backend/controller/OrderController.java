@@ -38,7 +38,7 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<OrderResponse> getOrder(@PathVariable String id) throws ResourceNotFoundException, BadRequestException {
+    public ResponseEntity<OrderResponse> getOrder(@PathVariable String id) throws ResourceNotFoundException {
         return ResponseEntity.ok(orderService.getOrder(id));
     }
 
@@ -46,5 +46,11 @@ public class OrderController {
     public ResponseEntity<OrderResponse> createOrder(@Valid @RequestBody OrderRequest request) throws BadRequestException, ResourceNotFoundException {
         return new ResponseEntity<>(orderService.createOrder(request), HttpStatus.CREATED);
     }
+
+    @GetMapping("/checkId/{id}")
+    ResponseEntity<Boolean> getUserOrderIds(@PathVariable String id) throws ResourceNotFoundException {
+        return new ResponseEntity<>(orderService.checkOrderIds(id), HttpStatus.CREATED);
+    }
+
 
 }

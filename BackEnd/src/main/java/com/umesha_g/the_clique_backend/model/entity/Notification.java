@@ -17,14 +17,16 @@ public class Notification {
     private String id;
 
     private String title;
-    private String message;
+    private String message_1;
+    private String message_2;
+    private String message_3;
     private String link;
 
-    @Column(name = "is_read")  // Changed from 'read' to 'is_read'
+    @Column(name = "is_read")
     private boolean isRead;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "VARCHAR(255)")  // Changed from ENUM to VARCHAR
+    @Column(columnDefinition = "VARCHAR(255)")
     private NotificationType type;
 
     @ManyToOne

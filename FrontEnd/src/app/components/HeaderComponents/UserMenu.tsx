@@ -1,7 +1,5 @@
 "use client";
-
 import * as React from "react";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   NavigationMenu,
@@ -13,10 +11,39 @@ import {
 } from "@/components/ui/navigation-menu-right";
 import { cn } from "@/lib/utils";
 import { User } from "lucide-react";
+import {useEffect, useState} from "react";
+import {createUserSlug} from "@/utils/userSlug";
+import {prefix} from "@/utils/apiConfig";
+import {useAuth} from "@/contexts/authContext";
+import {useRouter} from "next/navigation";
+import {Button} from "@/components/ui/button";
 
-export function UserMenu() {
-  function handleLogOut(): void {
-    throw new Error("Function not implemented.");
+const UserMenu:React.FC = () => {
+  const {user, isAdmin, logout  } = useAuth();
+  const[userSlug,setUserSlug]=useState<string|null>(null);
+  const router = useRouter();
+
+  const handleLoginClick =()=>{
+    const callbackUrl = window.location.pathname;
+    router.push(`/auth?callbackUrl=${encodeURIComponent(callbackUrl)}`)
+  }
+
+  useEffect(() => {
+        if(user){
+          setUserSlug(createUserSlug(user.id, user.firstName))
+        }
+  }, [user]);
+
+  if(user == null) {
+    return (
+        <Button
+            onClick={()=>handleLoginClick()}
+            variant={"default"}
+            className={"border-neutral-900 rounded-full hover:bg-beige-300 border text-neutral-900 bg-white"}
+        >
+          Sign In
+        </Button>
+      );
   }
 
   return (
@@ -29,39 +56,46 @@ export function UserMenu() {
             }
           </NavigationMenuTrigger>
           <NavigationMenuContent>
-            <ul className="grid gap-3 p-4 md:w-[200px] lg:w-[300px] lg:grid-cols-[.75fr_1fr] ">
-              <li className="row-span-4 w-[150px]">
+            <ul className="grid gap-3 py-4 pl-0 md:w-[200px] lg:w-[340px] lg:grid-cols-[.75fr_1fr] ">
+              <li className="row-span-4 px-3 w-[180px]">
                 <NavigationMenuLink asChild>
-                  <a
-                    className="flex h-full w-full select-none flex-col justify-center items-center text-center content-center rounded-none p-3 no-underline border-b md:border-b-0 md:border-r border-neutral-700"
-                    href="#"
-                  >
-                    <Avatar className=" ring-1 ring-offset-4 ring-neutral-700 h-20 w-20">
-                      <AvatarImage
-                        src="https://github.com/shadcn.png"
-                        alt="@shadcn"
-                      />
-                      <AvatarFallback>CN</AvatarFallback>
-                    </Avatar>
-                    <div className="mb-2 mt-4 text-md text-neutral-700 font-medium">
-                      User Name
+                  <div  className="grid grid-cols-1 h-full w-auto justify-center rounded-none pr-3 no-underline  border-b lg:border-b-0 lg:border-r border-neutral-700">
+                    <div className={"flex flex-col items-center justify-center bg-beige-100 px-0 py-6"}>
+                      <a href={`/user/${userSlug}/account`}>
+                        <Avatar className=" ring-1 ring-offset-4 ring-neutral-700 h-20 w-20">
+                          <AvatarImage
+                              src={prefix + user.userDPUrl}
+                              alt={user.firstName}
+                          />
+                          <AvatarFallback>DP</AvatarFallback>
+                        </Avatar>
+                        <div className="mb-2 mt-4 text-md text-center text-neutral-700 font-medium">
+                          {user.firstName}<br/>{user.lastName}
+                        </div>
+                        <p className="text-sm leading-tight text-neutral-700 text-muted-foreground">
+
+                        </p>
+                      </a>
+                      <button
+                          onClick={logout}
+                          className="px-4 py-1 text-sm rounded-none mt-5 border border-red-700 text-red-700 hover:bg-red-100 "
+                      >
+                        Log Out
+                      </button>
                     </div>
-                    <p className="text-sm leading-tight text-neutral-700 text-muted-foreground">
-                      email@abc.com
-                    </p>
-                    <button
-                      onClick={handleLogOut}
-                      className="px-4 py-1 text-sm rounded-none mt-5 border border-red-700 text-red-700 hover:bg-red-100 "
-                    >
-                      Log Out
-                    </button>
-                  </a>
+                </div>
                 </NavigationMenuLink>
               </li>
-              <ListItem href="#" title="Purchase History"></ListItem>
-              <ListItem href="#" title="Wishlist"></ListItem>
-              <ListItem href="#" title="Track Order"></ListItem>
-              <ListItem href="#" title="Help Center"></ListItem>
+              {isAdmin ? (
+                  <ListItem href={`/admin/dashboard`} title="Dashboard"></ListItem>
+              ):(
+                  <div className={"mt-1 space-y-2"}>
+                    <ListItem href={`/user/${userSlug}/orders`} title="My Orders"></ListItem>
+                    <ListItem href={`/user/${userSlug}/wishlist`} title="My Wishlist"></ListItem>
+                    <ListItem href="#" title="Track Order"></ListItem>
+                    <ListItem href="#" title="Help Center"></ListItem>
+                  </div>
+              )}
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
@@ -95,3 +129,5 @@ const ListItem = React.forwardRef<
   );
 });
 ListItem.displayName = "ListItem";
+
+export default UserMenu;

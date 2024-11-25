@@ -31,7 +31,7 @@ const ProductImagesForm: React.FC<ProductImagesFormProps> = ({
         } catch (error) {
             toast({
                 title: "Error",
-                description: "Failed to fetch images",
+                description: "Failed to fetch images"+error,
                 variant: "destructive"
             });
         }
@@ -50,7 +50,7 @@ const ProductImagesForm: React.FC<ProductImagesFormProps> = ({
         } catch (error) {
             toast({
                 title: "Error",
-                description: "Failed to upload images",
+                description: "Failed to upload images"+error,
                 variant: "destructive"
             });
         }
@@ -63,7 +63,7 @@ const ProductImagesForm: React.FC<ProductImagesFormProps> = ({
         } catch (error) {
             toast({
                 title: "Error",
-                description: "Failed to remove image",
+                description: "Failed to remove image"+error,
                 variant: "destructive"
             });
         }
@@ -76,7 +76,7 @@ const ProductImagesForm: React.FC<ProductImagesFormProps> = ({
         } catch (error) {
             toast({
                 title: "Error",
-                description: "Failed to set card image",
+                description: "Failed to set card image"+error,
                 variant: "destructive"
             });
         }

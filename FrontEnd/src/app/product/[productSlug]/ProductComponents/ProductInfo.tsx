@@ -1,3 +1,4 @@
+"use client";
 import { FaStar } from "react-icons/fa";
 import {
     Select,
@@ -15,14 +16,14 @@ import {
 import { ProductResponse } from "@/api/admin/admin-product-api";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { addToWishlist } from "@/api/wishlist-api";
 import { Input } from "@/components/ui/input";
 import {
     Card,
     CardContent,
 } from "@/components/ui/card";
 import AddToCartButton from "@/app/components/addToCartButton";
-import ProductWishlistButton from "@/app/product/ProductComponents/ProductWishlistButton";
+import ProductWishlistButton from "@/app/product/[productSlug]/ProductComponents/ProductWishlistButton";
+import {ActiveDiscount, calculateDiscountedPrice} from "@/utils/DIscountCalculator";
 
 interface ProductInfoProps {
     product: ProductResponse;
@@ -33,20 +34,11 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({ product }) => {
     const [selectedSize, setSelectedSize] = useState(product.sizes[0]);
     const [quantity, setQuantity] = useState(1);
 
-    const activeDiscount = product.directDiscount
-        ? product.directDiscount
-        : product.otherDiscount;
-
-    const discountedPrice = activeDiscount
-        ? product.price * (1 - activeDiscount.discountPercentage / 100)
-        : product.price;
-
     return (
         <div className="space-y-6">
-            {/* Product Title and Rating */}
             <div className="space-y-4">
                 <div className={"flex space-x-4 content-center"}>
-                    <h1 className="text-3xl font-bold text-gray-900">{product.name}</h1>
+                    <h1 className="text-2xl font-bold text-gray-900">{product.name}</h1>
                     {(product.stock > 0) ?
                         (<p className={`bg-green-600  text-white  py-1 px-3 rounded-full`}>{product.stock} In Stock</p>)
                         : (<p className={`bg-red-600  text-white  py-1 px-3 rounded-full`}>Out Of Stock</p>)
@@ -73,20 +65,18 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({ product }) => {
 
             <Card className="rounded-none bg-gray-50">
                 <CardContent className="p-4 space-y-2">
-                    <div className="flex items-baseline space-x-4">
-                        <span className="text-3xl font-bold text-gray-900">
-                            Rs. {discountedPrice.toFixed(2)}
+                    <div className="flex flex-col sm:flex-row items-baseline space-x-4">
+                        <span className="text-2xl font-bold text-gray-900">
+                            Rs. {calculateDiscountedPrice(product).toFixed(2)}
                         </span>
-                        {activeDiscount && (
-                            <div className="space-x-2">
+                        {(product.directDiscount || product.otherDiscount) && <div className="space-x-2">
                                 <span className="text-lg text-gray-500 line-through">
                                     Rs. {product.price.toFixed(2)}
                                 </span>
                                 <span className="text-lg font-semibold text-red-500">
-                                    -{activeDiscount.discountPercentage}%
+                                    {ActiveDiscount(product)?.discountPercentage}% OFF
                                 </span>
-                            </div>
-                        )}
+                            </div>}
                     </div>
                 </CardContent>
             </Card>
@@ -147,7 +137,6 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({ product }) => {
                 </div>
             </div>
 
-            {/* Action Buttons */}
             <div className="space-y-3 lg:space-y-0 flex-col lg:space-x-3 flex lg:flex-row">
                 <div className={"w-full h-12 text-lg rounded-none"}>
                     <ProductWishlistButton productId={product.id}/>

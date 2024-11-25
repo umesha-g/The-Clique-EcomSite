@@ -43,7 +43,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
       const cart = await getCart();
       setCartItems(cart.cartItems);
 
-      // Call the optional refetch callback if it exists
       if (refetchCallback) {
         await refetchCallback();
       }

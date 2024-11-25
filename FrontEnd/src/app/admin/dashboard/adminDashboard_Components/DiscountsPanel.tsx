@@ -44,7 +44,7 @@ const DiscountsPanel: React.FC = () => {
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to fetch discounts",
+        description: "Failed to fetch discounts"+error,
         variant: "destructive"
       });
     }
@@ -52,7 +52,7 @@ const DiscountsPanel: React.FC = () => {
 
   useEffect(() => {
     fetchDiscounts();
-  }, []);
+  },[] );
 
   const handleAddDiscount = () => {
     setSelectedDiscount(null);
@@ -82,7 +82,7 @@ const DiscountsPanel: React.FC = () => {
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to delete discount",
+        description: "Failed to delete discount"+error,
         variant: "destructive"
       });
     } finally {
@@ -102,7 +102,7 @@ const DiscountsPanel: React.FC = () => {
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to update discount state",
+        description: "Failed to update discount state"+error,
         variant: "destructive"
       });
     }

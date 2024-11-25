@@ -71,13 +71,9 @@ public class ProductController {
     }
 
     @PostMapping("/{id}/view")
-    public ResponseEntity<String> incrementViewCount(@PathVariable String id) {
+    public void incrementViewCount(@PathVariable String id) {
         Product product = productService.getProductById(id);
-        if (product == null) {
-            return ResponseEntity.notFound().build();
-        }
         productStatisticsService.incrementViewCount(product);
-        return ResponseEntity.ok("View Count Increased");
     }
 
     @GetMapping("/price-range")

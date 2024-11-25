@@ -20,10 +20,6 @@ public class PlatformStatisticsService {
         this.platformStatisticsRepository = platformStatisticsRepository;
     }
 
-    public void incrementTotalOrders() {
-        updatePlatformStatistics(stats -> stats.setTotalOrders(stats.getTotalOrders() + 1));
-    }
-
     public void incrementTotalProducts() {
         updatePlatformStatistics(stats -> stats.setTotalProducts(stats.getTotalProducts() + 1));
     }
@@ -42,6 +38,10 @@ public class PlatformStatisticsService {
 
     public void incrementNewRegistrations() {
         updatePlatformStatistics(stats -> stats.setNewRegistrations(stats.getNewRegistrations() + 1));
+    }
+
+    public void incrementTotalOrders() {
+        updatePlatformStatistics(stats -> stats.setTotalOrders(stats.getTotalOrders() + 1));
     }
 
     private void updatePlatformStatistics(StatisticsUpdater updater) {

@@ -39,7 +39,6 @@ public class FileController {
             contentType = request.getServletContext()
                     .getMimeType(resource.getFile().getAbsolutePath());
         } catch (IOException ex) {
-            // Default content type if type could not be determined
             contentType = "application/octet-stream";
         }
 

@@ -1,21 +1,10 @@
-import { getAllProducts } from "@/api/admin/admin-product-api";
-import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+"use client";
+import React, { useState } from "react";
 import ProductCard from "@/app/components/ProductCard";
-
-interface Product {
-  id: string;
-  name: string;
-  price: number;
-  rating: number;
-  cardImageUrl: string;
-  purchaseCount: number;
-  stock: number;
-}
+import {ProductCardResponse} from "@/api/product-api";
 
 const BestSellingSection: React.FC = () => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const router = useRouter();
+  const [products] = useState<ProductCardResponse[]>([]);
 
   return (
     <div className="flex-col flex">

@@ -68,7 +68,7 @@ export const updateDiscount = async (
 
 export const updateDiscountState = async (
     id: string,
-    state:Boolean,
+    state:boolean,
 ): Promise<DiscountResponse> => {
   try {
     const response = await api.put(

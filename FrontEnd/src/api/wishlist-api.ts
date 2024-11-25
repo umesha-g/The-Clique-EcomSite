@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { ProductCardResponse } from './product-api';
 import {api} from "@/utils/apiConfig";
 

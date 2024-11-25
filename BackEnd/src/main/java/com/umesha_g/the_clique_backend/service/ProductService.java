@@ -37,9 +37,10 @@ public class ProductService {
     private  ModelMapper modelMapper;
     private DiscountPriorityService discountPriorityService;
     private ProductImageService productImageService;
+    private PlatformStatisticsService platformStatisticsService;
 
     @Autowired
-    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository, BrandRepository brandRepository, DiscountRepository discountRepository, ModelMapper modelMapper, DiscountPriorityService discountPriorityService, ProductImageService productImageService) {
+    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository, BrandRepository brandRepository, DiscountRepository discountRepository, ModelMapper modelMapper, DiscountPriorityService discountPriorityService, ProductImageService productImageService, PlatformStatisticsService platformStatisticsService) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.brandRepository = brandRepository;
@@ -47,6 +48,7 @@ public class ProductService {
         this.modelMapper = modelMapper;
         this.discountPriorityService = discountPriorityService;
         this.productImageService = productImageService;
+        this.platformStatisticsService = platformStatisticsService;
     }
 
     @Transactional
@@ -54,6 +56,7 @@ public class ProductService {
         Product product = modelMapper.map(request, Product.class);
         Product proceededProduct = advancedDetailsProcess(product,request);
         Product savedProduct = discountPriorityService.applyHighestPriorityDiscount(proceededProduct);
+        platformStatisticsService.incrementTotalProducts();
         return modelMapper.map(savedProduct, ProductResponse.class);
     }
 

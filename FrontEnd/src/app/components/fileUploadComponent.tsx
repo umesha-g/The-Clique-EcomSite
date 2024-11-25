@@ -1,8 +1,10 @@
+"use client";
 import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { X, Upload, Image as ImageIcon } from 'lucide-react';
 import {FileRefResponse} from "@/api/admin/admin-product-api";
 import {prefix} from "@/utils/apiConfig";
+import Image from "next/image";
 
 interface FileUploadProps {
   maxFiles: number;
@@ -76,10 +78,12 @@ const FileUpload:React.FC<FileUploadProps> = ({
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {existingFiles.map((file) => (
             <div key={prefix + file.standardUrl} className="relative group">
-              <img
+              <Image
                 src={prefix + file.standardUrl}
                 alt="Uploaded file"
                 className="rounded-lg object-cover w-full aspect-square"
+                width={100}
+                height={100}
               />
               
               <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all rounded-none">

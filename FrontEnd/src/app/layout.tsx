@@ -1,18 +1,9 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 import "./globals.css";
 import {CartProvider} from "@/contexts/cartContext";
-
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
+import {AuthProvider} from "@/contexts/authContext";
+import {NotificationsProvider} from "@/contexts/notificationContext";
+import {Toaster} from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -26,9 +17,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-    <CartProvider>
-      <body className={`antialiased font-literata bg-white`}>{children}</body>
-    </CartProvider>
+      <AuthProvider>
+        <CartProvider>
+          <NotificationsProvider>
+            <body className={`antialiased font-literata bg-white`}>
+              <main>{children}</main>
+              <Toaster />
+            </body>
+          </NotificationsProvider>
+        </CartProvider>
+      </AuthProvider>
     </html>
   );
 }

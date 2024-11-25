@@ -1,30 +1,28 @@
 import axios from 'axios';
+import {api} from "@/utils/apiConfig";
 
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
-
-enum NotificationType {
-  INFO,
-  WARNING,
-  ERROR,
-  SUCCESS,
+export enum NotificationType {
+  INFO ="INFO",
+  WARNING ="WARNING",
+  ERROR = "ERROR",
+  SUCCESS = "SUCCESS",
 }
 
 export interface NotificationResponse {
   id: string;
   title: string;
-  message: string;
+  message_1: string;
+  message_2?: string;
+  message_3?: string;
   link?: string;
   read: boolean;
   type: NotificationType;
   createdAt: string;
 }
 
-export const getUnreadNotifications = async (): Promise<
-  NotificationResponse[]
-> => {
+export const getAllNotifications = async (): Promise<NotificationResponse[]> => {
   try {
-    const response = await axios.get(`${API_URL}/notifications/unread`);
+    const response = await api.get(`/notifications/all`);
     return response.data;
   } catch (error) {
     console.error('Error fetching unread notifications:', error);
@@ -32,9 +30,20 @@ export const getUnreadNotifications = async (): Promise<
   }
 };
 
-export const markAsRead = async (id: string): Promise<void> => {
+export const getUnreadNotifications = async (): Promise<NotificationResponse[]> => {
   try {
-    await axios.put(`${API_URL}/notifications/${id}/read`);
+    const response = await api.get(`/notifications/unread`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching unread notifications:', error);
+    throw error;
+  }
+};
+
+export const markAsRead = async (id: string): Promise<NotificationResponse> => {
+  try {
+   const response = await api.put(`/notifications/${id}/read`);
+   return response.data;
   } catch (error) {
     console.error('Error marking notification as read:', error);
     throw error;

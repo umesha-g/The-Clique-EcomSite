@@ -3,7 +3,6 @@ package com.umesha_g.the_clique_backend.controller;
 import com.umesha_g.the_clique_backend.dto.response.NotificationResponse;
 import com.umesha_g.the_clique_backend.exception.ResourceNotFoundException;
 import com.umesha_g.the_clique_backend.service.NotificationService;
-import com.umesha_g.the_clique_backend.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,18 +16,20 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NotificationController {
     private  NotificationService notificationService;
-    private  SecurityUtils securityUtils;
 
     @Autowired
-    public NotificationController(NotificationService notificationService, SecurityUtils securityUtils) {
+    public NotificationController(NotificationService notificationService) {
         this.notificationService = notificationService;
-        this.securityUtils = securityUtils;
     }
 
     @GetMapping("/unread")
     public ResponseEntity<List<NotificationResponse>> getUnreadNotifications() throws ResourceNotFoundException {
-        String userId = securityUtils.getCurrentUser().getId();
-        return ResponseEntity.ok(notificationService.getUnreadNotifications(userId));
+        return ResponseEntity.ok(notificationService.getUnreadNotifications());
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<NotificationResponse>> getAllNotifications() throws ResourceNotFoundException {
+        return ResponseEntity.ok(notificationService.getAllNotifications());
     }
 
     @PutMapping("/{id}/read")

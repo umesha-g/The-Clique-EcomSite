@@ -1,5 +1,4 @@
 "use client";
-
 import {
   addToWishlist,
   getWishlist,
@@ -9,6 +8,8 @@ import { motion } from "framer-motion";
 import { Heart } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import {cn} from "@/lib/utils";
+import {useAuth} from "@/contexts/authContext";
+import {useRouter} from "next/navigation";
 
 interface WishlistHeartButtonProps {
   productId: string;
@@ -20,6 +21,8 @@ const WishlistHeartButton = ({
                               }: WishlistHeartButtonProps & { className?: string }) => {
   const [isInWishlist, setIsInWishlist] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const {user } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     const checkWishlistStatus = async () => {
@@ -40,21 +43,25 @@ const WishlistHeartButton = ({
   }, [productId]);
 
   const toggleWishlist = async () => {
-    setIsLoading(true);
-    try {
-      let success;
-      if (isInWishlist) {
-        success = await removeFromWishlist(productId);
-      } else {
-        success = await addToWishlist(productId);
+    if(!user){
+      router.push("/auth")}
+    else {
+      setIsLoading(true);
+      try {
+        let success;
+        if (isInWishlist) {
+          success = await removeFromWishlist(productId);
+        } else {
+          success = await addToWishlist(productId);
+        }
+        if (success) {
+          setIsInWishlist(!isInWishlist);
+        }
+      } catch (error) {
+        console.error("Error toggling wishlist:", error);
+      } finally {
+        setIsLoading(false);
       }
-      if (success) {
-        setIsInWishlist(!isInWishlist);
-      }
-    } catch (error) {
-      console.error("Error toggling wishlist:", error);
-    } finally {
-      setIsLoading(false);
     }
   };
 

@@ -3,11 +3,12 @@ package com.umesha_g.the_clique_backend.controller.admin;
 import com.umesha_g.the_clique_backend.model.entity.admin.ProductStatistics;
 import com.umesha_g.the_clique_backend.repository.ProductStatisticsRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -24,11 +25,8 @@ public class AdminProductStatisticsController {
 
     @GetMapping("/{productId}")
     public ResponseEntity<List<ProductStatistics>> getProductStatistics(
-            @PathVariable String productId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-
-        List<ProductStatistics> statistics = productStatisticsRepository.findAll();
+            @PathVariable String productId){
+        List<ProductStatistics> statistics = productStatisticsRepository.findByProductId(productId);
         return ResponseEntity.ok(statistics);
     }
 }

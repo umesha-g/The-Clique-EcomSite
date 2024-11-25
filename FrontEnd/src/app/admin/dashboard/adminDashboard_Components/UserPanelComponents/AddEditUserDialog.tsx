@@ -69,7 +69,7 @@ const AddEditUserDialog: React.FC<AddEditUserDialogProps> = ({
         } catch (error) {
             toast({
                 title: "Error",
-                description: "Failed to save user details",
+                description: "Failed to save user details"+error,
                 variant: "destructive"
             });
         }

@@ -1,12 +1,12 @@
 "use client";
-
 import {addToCart, CartRequest} from "@/api/cart-api";
 import { useCart } from "@/contexts/cartContext";
-import { motion } from "framer-motion";
 import { ShoppingCart } from "lucide-react";
 import React, { useState } from "react";
 import {Button} from "@/components/ui/button";
 import {ProductResponse} from "@/api/admin/admin-product-api";
+import {useAuth} from "@/contexts/authContext";
+import {useRouter} from "next/navigation";
 
 interface AddToCartButtonProps {
   product: ProductResponse;
@@ -22,19 +22,26 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
                                                            selectedSize
 }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const {user  } = useAuth();
+  const router = useRouter();
   const { refreshCart } = useCart();
 
   const addItemToCart = async () => {
-    setIsLoading(true);
-    try {
-      const productId = product.id;
-      const request:CartRequest = {productId , quantity, selectedColour, selectedSize};
-      await addToCart(request);
-      await refreshCart();
-    } catch (error) {
-      console.error("Error adding to cart:", error);
-    } finally {
-      setIsLoading(false);
+    if(!user){
+      const callbackUrl = window.location.pathname;
+      router.push(`/auth?callbackUrl=${encodeURIComponent(callbackUrl)}`)}
+    else {
+      setIsLoading(true);
+      try {
+        const productId = product.id;
+        const request: CartRequest = {productId, quantity, selectedColour, selectedSize};
+        await addToCart(request);
+        await refreshCart();
+      } catch (error) {
+        console.error("Error adding to cart:", error);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 

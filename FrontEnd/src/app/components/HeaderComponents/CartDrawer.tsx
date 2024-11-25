@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+import React, {useEffect, useState} from "react";
 import { ShoppingCart } from "lucide-react";
 import {AnimatePresence} from "framer-motion";
 import {
@@ -13,9 +14,22 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/cartContext";
 import { decrementQuantity, incrementQuantity, removeFromCart } from "@/api/cart-api";
 import CartItem from "@/app/components/HeaderComponents/CartItem";
+import {useRouter} from "next/navigation";
+import { v4 as uuidv4 } from 'uuid';
+import {createUserSlug} from "@/utils/userSlug";
+import {useAuth} from "@/contexts/authContext";
 
 const CartDrawer = () => {
     const { cartItems, cartItemCount, totalPrice, refreshCart } = useCart();
+    const router = useRouter();
+    const { user } = useAuth();
+    const[userSlug,setUserSlug]=useState<string|null>(null);
+
+    useEffect(() => {
+        if(user){
+            setUserSlug(createUserSlug(user.id, user.firstName))
+        }
+    }, [user]);
 
     const handleRemove = async (itemId: string, color: string, size: string) => {
         try {
@@ -46,6 +60,11 @@ const CartDrawer = () => {
         }
     };
 
+    const handleProceedToCheckout = () => {
+        const newOrderSlug = uuidv4();
+        router.push(`/user/${userSlug}/newOrder/${newOrderSlug}`);
+    };
+
     const EmptyCart = () => (
         <div className="flex flex-col items-center justify-center h-[50vh] text-center px-4">
             <div className="w-16 h-16 bg-neutral-100 dark:bg-neutral-800 rounded-full flex items-center justify-center mb-4">
@@ -60,7 +79,7 @@ const CartDrawer = () => {
         <Sheet>
             <SheetTrigger className="relative">
                 {cartItemCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-red-600 rounded-full w-5 h-5 flex items-center justify-center text-white text-xs">
+                    <span className="absolute -top-2.5 -right-2.5 bg-red-600 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">
                         {cartItemCount}
                     </span>
                 )}
@@ -79,7 +98,7 @@ const CartDrawer = () => {
                     <EmptyCart />
                 ) : (
                     <>
-                        <ScrollArea className="flex-1 px-6 -mx-6 h-[75vh]">
+                        <ScrollArea className="flex-1 px-6 -mx-6 h-[65vh]">
                             <AnimatePresence>
                                 {cartItems.map((item) => (
                                     <CartItem
@@ -98,7 +117,7 @@ const CartDrawer = () => {
                                 <span className="text-sm text-neutral-500">Subtotal</span>
                                 <span className="font-medium">${totalPrice.toFixed(2)}</span>
                             </div>
-                            <Button className="w-full rounded-none" size="lg">
+                            <Button onClick={()=> handleProceedToCheckout()} className="w-full rounded-none" size="lg">
                                 Proceed to Checkout
                             </Button>
                         </div>

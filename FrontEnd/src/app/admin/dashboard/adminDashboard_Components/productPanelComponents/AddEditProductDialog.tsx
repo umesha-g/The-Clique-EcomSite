@@ -66,7 +66,7 @@ const AddEditProductDialog: React.FC<AddEditProductDialogProps> = ({
         } catch (error) {
             toast({
                 title: "Error",
-                description: "Failed to save product details",
+                description: "Failed to save product details"+error,
                 variant: "destructive"
             });
         }

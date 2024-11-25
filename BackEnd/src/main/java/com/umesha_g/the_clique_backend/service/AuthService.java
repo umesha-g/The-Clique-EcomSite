@@ -2,12 +2,12 @@ package com.umesha_g.the_clique_backend.service;
 
 import com.umesha_g.the_clique_backend.config.JwtConfig;
 import com.umesha_g.the_clique_backend.util.Jwt.JwtTokenProvider;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-
-import jakarta.servlet.http.HttpServletResponse;
 
 @Service
 @RequiredArgsConstructor
@@ -23,22 +23,44 @@ public class AuthService {
 
     public void setAuthenticationCookie(HttpServletResponse response, Authentication authentication) {
         String jwt = tokenProvider.generateToken(authentication);
-        String cookieValue = String.format("%s=%s; HttpOnly; Path=/; Max-Age=%d; SameSite=Lax",
-                jwtConfig.getCookieName(),
-                jwt,
-                (int) (jwtConfig.getExpiration() / 1000));
 
-        if (jwtConfig.isSecure()) {
-            cookieValue += "; Secure";
-        }
+        Cookie authCookie = new Cookie(jwtConfig.getCookieName(), jwt);
+        authCookie.setHttpOnly(true);
+        authCookie.setPath("/");
+        authCookie.setMaxAge((int) (jwtConfig.getExpiration() / 1000));
+        authCookie.setSecure(jwtConfig.isSecure());
+        authCookie.setAttribute("SameSite", "Lax");
 
-        response.setHeader("Set-Cookie", cookieValue);
+        response.addCookie(authCookie);
+
+        Cookie frontendCookie = new Cookie("isAuthenticated", "true");
+        frontendCookie.setHttpOnly(false);
+        frontendCookie.setPath("/");
+        frontendCookie.setMaxAge((int) (jwtConfig.getExpiration() / 1000));
+        frontendCookie.setSecure(jwtConfig.isSecure());
+        frontendCookie.setAttribute("SameSite", "Lax");
+
+        response.addCookie(frontendCookie);
+
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
     }
 
     public void clearAuthenticationCookie(HttpServletResponse response) {
-        String cookieValue = String.format("%s=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax; Secure",
-                jwtConfig.getCookieName());
+        // Clear auth cookie
+        Cookie authCookie = new Cookie(jwtConfig.getCookieName(), "");
+        authCookie.setHttpOnly(true);
+        authCookie.setPath("/");
+        authCookie.setMaxAge(0);
+        authCookie.setSecure(jwtConfig.isSecure());
+        response.addCookie(authCookie);
 
-        response.setHeader("Set-Cookie", cookieValue);
+        // Clear frontend cookie
+        Cookie frontendCookie = new Cookie("isAuthenticated", "false");
+        frontendCookie.setHttpOnly(false);
+        frontendCookie.setPath("/");
+        frontendCookie.setMaxAge(0);
+        frontendCookie.setSecure(jwtConfig.isSecure());
+        response.addCookie(frontendCookie);
     }
 }

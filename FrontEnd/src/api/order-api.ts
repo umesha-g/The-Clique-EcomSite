@@ -1,9 +1,17 @@
-import axios from 'axios';
 import { OrderResponse } from './admin/admin-order-api';
 import {api} from "@/utils/apiConfig";
 
+export enum PaymentMethod{
+  COD,
+  CREDIT_CARD,
+  BANK
+}
+
 export interface OrderRequest {
+  id:string;
+  shippingCost:number;
   addressId: string;
+  paymentMethod:PaymentMethod;
 }
 
 export const getUserOrders = async (
@@ -44,6 +52,16 @@ export const createOrder = async (
     return response.data;
   } catch (error) {
     console.error('Error creating order:', error);
+    throw error;
+  }
+};
+
+export const checkOrderId = async (id: string): Promise<boolean> => {
+  try {
+    const response = await api.get(`/orders/checkId/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error checking order ID:', error);
     throw error;
   }
 };

@@ -29,9 +29,9 @@ public class ProductStatisticsService {
         });
     }
 
-    public void incrementPurchaseCount(Product product, BigDecimal price) {
+    public void incrementPurchaseCount(Product product,int quantity, BigDecimal price) {
         updateProductStatistics(product, stats -> {
-            stats.setPurchaseCount(stats.getPurchaseCount() + 1);
+            stats.setPurchaseCount(stats.getPurchaseCount() + quantity);
             stats.getPurchaseHistory().merge(LocalDate.now(), 1, Integer::sum);
             stats.setRevenue(stats.getRevenue().add(price));
         });

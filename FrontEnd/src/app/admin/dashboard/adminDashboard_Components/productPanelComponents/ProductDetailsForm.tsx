@@ -336,7 +336,7 @@ const ProductDetailsForm: React.FC<ProductDetailsFormProps> = ({
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                        {categories.map((category: any) => (
+                                        {categories.map((category) => (
                                             <SelectItem key={category.id} value={category.id}>
                                                 {category.name}
                                             </SelectItem>
@@ -393,7 +393,7 @@ const ProductDetailsForm: React.FC<ProductDetailsFormProps> = ({
                                     </FormControl>
                                     <SelectContent>
                                         <SelectItem value=" ">No Brand</SelectItem>
-                                        {brands.map((brand: any) => (
+                                        {brands.map((brand) => (
                                             <SelectItem key={brand.id} value={brand.id}>
                                                 {brand.name}
                                             </SelectItem>

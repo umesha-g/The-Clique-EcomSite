@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import {getAllBrands} from "@/api/brand-api";
 import {Switch} from "@/components/ui/switch";
 import {prefix} from "@/utils/apiConfig";
+import Image from "next/image";
 
 const BrandsPanel: React.FC = () => {
     const [brands, setBrands] = useState<BrandResponse[]>([]);
@@ -59,7 +60,7 @@ const BrandsPanel: React.FC = () => {
         } catch (error) {
             toast({
                 title: "Error",
-                description: "Failed to delete brand",
+                description: "Failed to delete brand"+ error,
                 variant: "destructive"
             });
         } finally {
@@ -105,10 +106,12 @@ const BrandsPanel: React.FC = () => {
                             <TableRow key={brand.id}>
                                 <TableCell>
                                     {brand.logoUrl && (
-                                        <img
+                                        <Image
                                             src={prefix + brand.logoUrl}
                                             alt={`${brand.name} logo`}
                                             className="w-10 h-10 object-contain"
+                                            width={100}
+                                            height={100}
                                         />
                                     )}
                                 </TableCell>

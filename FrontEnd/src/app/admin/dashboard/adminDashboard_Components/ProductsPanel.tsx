@@ -10,6 +10,7 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import {prefix} from "@/utils/apiConfig";
 import {Pagination} from "@/app/components/PaginationComponent";
+import Image from "next/image";
 
 const ProductsPanel: React.FC = () => {
     const [products, setProducts] = useState<ProductResponse[]>([]);
@@ -29,7 +30,7 @@ const ProductsPanel: React.FC = () => {
         } catch (error) {
             toast({
                 title: "Error",
-                description: "Failed to fetch products",
+                description: "Failed to fetch products"+error,
                 variant: "destructive"
             });
         }
@@ -72,7 +73,7 @@ const ProductsPanel: React.FC = () => {
         } catch (error) {
             toast({
                 title: "Error",
-                description: "Failed to delete product",
+                description: "Failed to delete product"+error,
                 variant: "destructive"
             });
         } finally {
@@ -82,7 +83,7 @@ const ProductsPanel: React.FC = () => {
     };
 
     return (
-            <Card className="rounded-none w-[1500px]">
+            <Card className="rounded-none w-[1500px] h-auto">
                 <CardHeader>
                     <CardTitle className={"text-xl"}>Products Management</CardTitle>
                 </CardHeader>
@@ -116,10 +117,12 @@ const ProductsPanel: React.FC = () => {
                             {products.map((product) => (
                                 <TableRow key={product.id}>
                                     <TableCell>
-                                        <img
+                                        <Image
                                             src={prefix + product.cardImageUrl}
                                             alt={product.name}
                                             className="w-12 h-12 object-cover rounded-none"
+                                            width={100}
+                                            height={100}
                                         />
                                     </TableCell>
                                     <TableCell>{product.name}</TableCell>
@@ -151,14 +154,15 @@ const ProductsPanel: React.FC = () => {
                         </TableBody>
                     </Table>
 
-                    <div className="mt-8 flex justify-center">
-                        <Pagination
-                            currentPage = {currentPage + 1}
-                            totalPages={totalPages}
-                            onPageChange={handlePageChange}
-                        />
-                    </div>
-
+                    {totalPages > 1 &&
+                        <div className="mt-8 flex justify-center">
+                            <Pagination
+                                currentPage = {currentPage + 1}
+                                totalPages={totalPages}
+                                onPageChange={handlePageChange}
+                            />
+                        </div>
+                    }
                     <AddEditProductDialog
                     open={isAddDialogOpen}
                     onOpenChange={setIsAddDialogOpen}

@@ -35,7 +35,6 @@ public class AuthController {
                         request.getCurrentPassword()
                 )
         );
-
         SecurityContextHolder.getContext().setAuthentication(authentication);
         authService.setAuthenticationCookie(response, authentication);
         return ResponseEntity.ok().body("User logged in successfully");
@@ -54,7 +53,6 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<?> logoutUser(HttpServletResponse response) {
-        // Clear the authentication cookie
         authService.clearAuthenticationCookie(response);
         return ResponseEntity.ok("User logged out successfully");
     }

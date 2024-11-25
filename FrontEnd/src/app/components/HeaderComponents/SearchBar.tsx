@@ -138,7 +138,7 @@ const SearchBar: React.FC = () => {
   );
 };
 
-const SearchButton: React.FC = ({}) => {
+const SearchButton: React.FC = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 

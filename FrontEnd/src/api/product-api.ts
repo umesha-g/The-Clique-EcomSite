@@ -7,6 +7,7 @@ export interface ProductCardResponse {
   name: string;
   price: number;
   rating: number;
+  reviewCount:number;
   cardImageUrl: string;
   purchaseCount: number;
   stock: number;
@@ -47,6 +48,15 @@ export const getProduct = async (id: string): Promise<ProductResponse> => {
     return response.data;
   } catch (error) {
     console.error('Error fetching product:', error);
+    throw error;
+  }
+};
+
+export const viewCount = async (id: string)=> {
+  try {
+     await api.post(`/products/${id}/view`);
+  } catch (error) {
+    console.error('Error increasing view count:', error);
     throw error;
   }
 };

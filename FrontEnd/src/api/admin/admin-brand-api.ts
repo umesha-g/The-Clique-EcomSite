@@ -29,8 +29,7 @@ export const createBrand = async (
   try {
     const formData = new FormData();
     Object.entries(brandRequest).forEach(([key, value]) => {
-      if (key === 'logoFile' && (!value || (value instanceof File && value.size === 0))) {
-      } else {
+      if (!(key === 'logoFile' && (!value || (value instanceof File && value.size === 0)))) {
         formData.append(key, value);
       }
     });
@@ -52,8 +51,7 @@ export const updateBrand = async (
   try {
     const formData = new FormData();
     Object.entries(brandRequest).forEach(([key, value]) => {
-      if (key === 'logoFile' && (!value || (value instanceof File && value.size === 0))) {
-      } else {
+      if (!(key === 'logoFile' && (!value || (value instanceof File && value.size === 0)))) {
         formData.append(key, value);
       }
     });
@@ -74,7 +72,7 @@ export const updateBrand = async (
 
 export const updateBrandState = async (
     id: string,
-    state:Boolean,
+    state:boolean,
 ): Promise<BrandResponse> => {
   try {
     const response = await api.put(

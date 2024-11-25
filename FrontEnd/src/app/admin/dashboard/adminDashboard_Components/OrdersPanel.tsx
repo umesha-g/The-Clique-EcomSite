@@ -6,7 +6,7 @@ import {
   updateOrderStatus,
 } from '@/api/admin/admin-order-api';
 import {Button} from '@/components/ui/button';
-import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from '@/components/ui/select';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from '@/components/ui/table';
 import React, {useCallback, useEffect, useState} from 'react';
@@ -65,9 +65,10 @@ const OrdersPanel: React.FC = () => {
   };
 
   return (
-    <Card className="rounded-none w-[1500px]">
+    <Card className="rounded-none w-[1500px] h-auto">
       <CardHeader>
         <CardTitle className={"text-xl"}>Orders Management</CardTitle>
+        <CardDescription>{totalElements} orders</CardDescription>
       </CardHeader>
       <CardContent>
         <div className={'flex justify-between mb-10'}>
@@ -83,17 +84,17 @@ const OrdersPanel: React.FC = () => {
             <SelectTrigger className="w-[200px] rounded-none">
               <SelectValue placeholder="Status"/>
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">All</SelectItem>
-              <SelectItem value="PENDING">Pending</SelectItem>
-              <SelectItem value="CONFIRMED">Confirmed</SelectItem>
-              <SelectItem value="PROCESSING">Processing</SelectItem>
-              <SelectItem value="SHIPPED">Shipped</SelectItem>
-              <SelectItem value="DELIVERED">Delivered</SelectItem>
-              <SelectItem value="CANCELLED">Canceled</SelectItem>
-              <SelectItem value="RETURNED">Returned</SelectItem>
-              <SelectItem value="REFUNDED">Refunded</SelectItem>
-              <SelectItem value="FAILED">Failed</SelectItem>
+            <SelectContent className={"rounded-none"}>
+              <SelectItem className={"rounded-none"} value="ALL">All</SelectItem>
+              <SelectItem className={"rounded-none"} value="PENDING">Pending</SelectItem>
+              <SelectItem className={"rounded-none"} value="CONFIRMED">Confirmed</SelectItem>
+              <SelectItem className={"rounded-none"} value="PROCESSING">Processing</SelectItem>
+              <SelectItem className={"rounded-none"} value="SHIPPED">Shipped</SelectItem>
+              <SelectItem className={"rounded-none"} value="DELIVERED">Delivered</SelectItem>
+              <SelectItem className={"rounded-none"} value="CANCELLED">Canceled</SelectItem>
+              <SelectItem className={"rounded-none"} value="RETURNED">Returned</SelectItem>
+              <SelectItem className={"rounded-none"} value="REFUNDED">Refunded</SelectItem>
+              <SelectItem className={"rounded-none"} value="FAILED">Failed</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -102,7 +103,6 @@ const OrdersPanel: React.FC = () => {
           <TableHeader>
             <TableRow>
               <TableHead>Order ID</TableHead>
-              <TableHead>Tracking Number</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Est. Delivery Date</TableHead>
               <TableHead>Order Amount</TableHead>
@@ -118,7 +118,6 @@ const OrdersPanel: React.FC = () => {
             {orders.map((order) => (
               <TableRow key={order.id}>
                 <TableCell>{order.id}</TableCell>
-                <TableCell>{order.trackingNumber}</TableCell>
                 <TableCell>{order.status}</TableCell>
                 <TableCell>{order.estimatedDeliveryDate}</TableCell>
                 <TableCell>Rs. {order.totalAmount}</TableCell>
@@ -159,19 +158,19 @@ const OrdersPanel: React.FC = () => {
                       handleStatusChange(order.id, value)
                     }
                   >
-                    <SelectTrigger className="w-[180px]">
+                    <SelectTrigger className="w-[180px] rounded-none">
                       <SelectValue placeholder="Change status" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="PENDING">Pending</SelectItem>
-                      <SelectItem value="CONFIRMED">Confirmed</SelectItem>
-                      <SelectItem value="PROCESSING">Processing</SelectItem>
-                      <SelectItem value="SHIPPED">Shipped</SelectItem>
-                      <SelectItem value="DELIVERED">Delivered</SelectItem>
-                      <SelectItem value="CANCELLED">Canceled</SelectItem>
-                      <SelectItem value="RETURNED">Returned</SelectItem>
-                      <SelectItem value="REFUNDED">Refunded</SelectItem>
-                      <SelectItem value="FAILED">Failed</SelectItem>
+                    <SelectContent className={"rounded-none"}>
+                      <SelectItem className={"rounded-none"} value="PENDING">Pending</SelectItem>
+                      <SelectItem className={"rounded-none"} value="CONFIRMED">Confirmed</SelectItem>
+                      <SelectItem className={"rounded-none"} value="PROCESSING">Processing</SelectItem>
+                      <SelectItem className={"rounded-none"} value="SHIPPED">Shipped</SelectItem>
+                      <SelectItem className={"rounded-none"} value="DELIVERED">Delivered</SelectItem>
+                      <SelectItem className={"rounded-none"} value="CANCELLED">Canceled</SelectItem>
+                      <SelectItem className={"rounded-none"} value="RETURNED">Returned</SelectItem>
+                      <SelectItem className={"rounded-none"} value="REFUNDED">Refunded</SelectItem>
+                      <SelectItem className={"rounded-none"} value="FAILED">Failed</SelectItem>
                     </SelectContent>
                   </Select>
                 </TableCell>
@@ -180,13 +179,15 @@ const OrdersPanel: React.FC = () => {
           </TableBody>
         </Table>
 
-        <div className="mt-8 flex justify-center">
-          <Pagination
-              currentPage = {currentPage + 1}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-          />
-        </div>
+        {totalPages > 1 &&
+          <div className="mt-8 flex justify-center">
+            <Pagination
+                currentPage = {currentPage + 1}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+            />
+          </div>
+        }
 
       </CardContent>
     </Card>

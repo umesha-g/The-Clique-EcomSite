@@ -6,13 +6,13 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { DiscountRequest, createDiscount, updateDiscount } from '@/api/admin/admin-discount-api';
+import {DiscountRequest, createDiscount, updateDiscount, DiscountResponse} from '@/api/admin/admin-discount-api';
 import DiscountDetailsForm from './DiscountDetailsForm';
 
 interface AddEditDiscountDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    discount: any | null; // Replace 'any' with your DiscountResponse type
+    discount: DiscountResponse | null; // Replace 'any' with your DiscountResponse type
     onSuccess: () => void;
 }
 
@@ -59,7 +59,7 @@ const AddEditDiscountDialog: React.FC<AddEditDiscountDialogProps> = ({
         } catch (error) {
             toast({
                 title: "Error",
-                description: "Failed to save discount details",
+                description: "Failed to save discount details"+error,
                 variant: "destructive"
             });
         }

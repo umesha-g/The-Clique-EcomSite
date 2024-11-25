@@ -29,7 +29,7 @@ const CategoriesPanel: React.FC = () => {
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to fetch categories",
+        description: "Failed to fetch categories" + error,
         variant: "destructive"
       });
     }
@@ -37,7 +37,7 @@ const CategoriesPanel: React.FC = () => {
 
   useEffect(() => {
     fetchCategories();
-  }, []);
+  },[] );
 
   const handleAddCategory = () => {
     setSelectedCategory(null);
@@ -67,7 +67,7 @@ const CategoriesPanel: React.FC = () => {
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to delete category",
+        description: "Failed to delete category" + error,
         variant: "destructive"
       });
     } finally {

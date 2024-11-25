@@ -13,7 +13,7 @@ import {
     FormMessage,
 } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
+import {DiscountRequest} from "@/api/admin/admin-discount-api";
 
 const formSchema = z.object({
     name: z.string().min(1, 'Name is required'),
@@ -29,8 +29,8 @@ const formSchema = z.object({
 });
 
 interface DiscountDetailsFormProps {
-    initialData: any | null; // Replace 'any' with your DiscountRequest type
-    onSubmit: (data: any) => void;
+    initialData: DiscountRequest | null;
+    onSubmit: (data: DiscountRequest) => void;
 }
 
 const DiscountDetailsForm: React.FC<DiscountDetailsFormProps> = ({

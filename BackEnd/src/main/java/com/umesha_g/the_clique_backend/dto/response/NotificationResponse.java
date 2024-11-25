@@ -9,7 +9,9 @@ import java.time.LocalDateTime;
 public class NotificationResponse {
     private String id;
     private String title;
-    private String message;
+    private String message_1;
+    private String message_2;
+    private String message_3;
     private String link;
     private boolean read;
     private NotificationType type;

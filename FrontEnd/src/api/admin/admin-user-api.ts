@@ -11,7 +11,7 @@ export interface UserRequest {
   existingDPUrl?: string;
 }
 
-enum Role {
+export enum Role {
   USER,
   ADMIN,
 }
@@ -33,8 +33,7 @@ export const createUser = async (
   try {
     const formData = new FormData();
     Object.entries(userRequest).forEach(([key, value]) => {
-      if (key === 'userDPFile' && (!value || (value instanceof File && value.size === 0))) {
-      } else {
+      if (!(key === 'userDPFile' && (!value || (value instanceof File && value.size === 0)))) {
         formData.append(key, value);
       }
     });
@@ -65,8 +64,7 @@ export const updateUserById = async (
   try {
     const formData = new FormData();
     Object.entries(userRequest).forEach(([key, value]) => {
-      if (key === 'userDPFile' && (!value || (value instanceof File && value.size === 0))) {
-      } else {
+      if (!(key === 'userDPFile' && (!value || (value instanceof File && value.size === 0)))) {
         formData.append(key, value);
       }
     });

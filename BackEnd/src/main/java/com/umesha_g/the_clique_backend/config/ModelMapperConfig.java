@@ -193,10 +193,12 @@ public class ModelMapperConfig {
             @Override
             protected void configure() {
                 map().setId(source.getId());
+                map().setSubTotal(source.getSubTotal());
                 map().setTotalAmount(source.getTotalAmount());
                 map().setShippingCost(source.getShippingCost());
                 map().setStatus(source.getStatus());
-                map().setTrackingNumber(source.getTrackingNumber());
+                map().setPaymentMethod(source.getPaymentMethod());
+                map().setEstimatedDeliveryDate(source.getEstimatedDeliveryDate());
                 map().setCreatedAt(source.getCreatedAt());
                 map().setUpdatedAt(source.getUpdatedAt());
                 using(addressToAddressResponseConverter).map(source.getShippingAddress(),destination.getShippingAddress());
@@ -355,6 +357,7 @@ public class ModelMapperConfig {
                 map().setName(source.getName());
                 map().setPrice(source.getPrice());
                 map().setRating(source.getRating());
+                map().setReviewCount(source.getReviewCount());
                 map().setCardImageUrl(source.getCardImageUrl());
                 map().setPurchaseCount(source.getPurchaseCount());
                 map().setStock(source.getStock());

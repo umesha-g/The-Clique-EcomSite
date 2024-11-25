@@ -1,5 +1,4 @@
 "use client";
-
 import {
     addToWishlist,
     getWishlist,
@@ -8,8 +7,9 @@ import {
 import { motion } from "framer-motion";
 import { Heart } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import {cn} from "@/lib/utils";
 import {Button} from "@/components/ui/button";
+import {useAuth} from "@/contexts/authContext";
+import {useRouter} from "next/navigation";
 
 interface WishlistHeartButtonProps {
     productId: string;
@@ -19,7 +19,9 @@ const ProductWishlistButton:React.FC<WishlistHeartButtonProps> = ({
                                                                     productId,
                                                                     }) => {
     const [isInWishlist, setIsInWishlist] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false)
+    const {user  } = useAuth();
+    const router = useRouter();
 
     useEffect(() => {
         const checkWishlistStatus = async () => {
@@ -40,21 +42,27 @@ const ProductWishlistButton:React.FC<WishlistHeartButtonProps> = ({
     }, [productId]);
 
     const toggleWishlist = async () => {
-        setIsLoading(true);
-        try {
-            let success;
-            if (isInWishlist) {
-                success = await removeFromWishlist(productId);
-            } else {
-                success = await addToWishlist(productId);
+        if(!user){
+            const callbackUrl = window.location.pathname;
+            router.push(`/auth?callbackUrl=${encodeURIComponent(callbackUrl)}`)
+        }
+        else {
+            setIsLoading(true);
+            try {
+                let success;
+                if (isInWishlist) {
+                    success = await removeFromWishlist(productId);
+                } else {
+                    success = await addToWishlist(productId);
+                }
+                if (success) {
+                    setIsInWishlist(!isInWishlist);
+                }
+            } catch (error) {
+                console.error("Error toggling wishlist:", error);
+            } finally {
+                setIsLoading(false);
             }
-            if (success) {
-                setIsInWishlist(!isInWishlist);
-            }
-        } catch (error) {
-            console.error("Error toggling wishlist:", error);
-        } finally {
-            setIsLoading(false);
         }
     };
 
@@ -80,7 +88,7 @@ const ProductWishlistButton:React.FC<WishlistHeartButtonProps> = ({
                     } transition-colors duration-300 `}
                 />
             </motion.div>
-            {isLoading ? "Adding..." : isInWishlist? "Remove From Wishlist" : "Add to Wishlist"}
+            { isInWishlist ? (isLoading ? "Removing..." : " Remove From Wishlist") : (isLoading ? "Adding..." : "Add to Wishlist")}
         </Button>
         </div>
     );

@@ -1,9 +1,8 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import { extractIdFromSlug } from "@/utils/productSlug";
-import { ProductGallery } from "../ProductComponents/ProductGallery";
-import { ProductInfo } from "../ProductComponents/ProductInfo";
+import { ProductGallery } from "@/app/product/[productSlug]/ProductComponents/ProductGallery";
+import { ProductInfo } from "@/app/product/[productSlug]/ProductComponents/ProductInfo";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -11,11 +10,12 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react";
 import CommonHeader from "@/app/components/Header";
 import {useProductWithCart} from "@/hooks/useProductWithCart";
+import {RelatedProducts} from "@/app/product/[productSlug]/ProductComponents/RelatedProducts";
 
-export default function ProductPage({ params }: { params: { slug: string } }) {
+export default function ProductPage({ params }: { params: { productSlug: string } }) {
     const [loading, setLoading] = useState(true);
     const router = useRouter();
-    const productId = extractIdFromSlug(params.slug);
+    const productId = extractIdFromSlug(params.productSlug);
     const { product, error } = useProductWithCart(productId);
 
     useEffect(() => {
@@ -75,10 +75,10 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
     }
 
     return (
-        <div >
-            <CommonHeader categoryVisibility={"visible"} searchBarWidth={"64"}/>
-            <div className="container mx-auto p-4 min-h-screen ">
-                <Card className="rounded-none mt-28">
+        <div className={""}>
+            <CommonHeader categoryVisibility={"visible"} searchBarWidth={"64"}  isSearchAvailable={true}/>
+            <div className="container mx-auto px-4 py-8 min-h-screen ">
+                <Card className="rounded-none mt-24">
                     <CardHeader className="px-6 py-4 border-b">
                         <nav className="flex text-sm text-gray-500 space-x-2">
                             <a href="/home" className="hover:text-gray-800">Home</a>
@@ -101,8 +101,8 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
                                 </CardContent>
                             </Card>
 
-                            <Card className="md:w-1/2 rounded-none shadow-sm">
-                                <CardContent className="p-4">
+                            <Card className="md:w-1/2 rounded-none shadow-sm ">
+                                <CardContent className="p-8">
                                     <ProductInfo
                                         product={product}
                                     />
@@ -118,8 +118,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
                         <h2 className="text-2xl font-bold text-gray-800">Related Products</h2>
                     </CardHeader>
                     <CardContent className="p-6">
-                        {/* RelatedProducts component would go here */}
-                        {/* <RelatedProducts products={relatedProducts} /> */}
+                        <RelatedProducts/>
                     </CardContent>
                 </Card>
             </div>

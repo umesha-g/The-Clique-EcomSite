@@ -3,6 +3,7 @@ package com.umesha_g.the_clique_backend.service;
 import com.umesha_g.the_clique_backend.dto.request.OrderRequest;
 import com.umesha_g.the_clique_backend.dto.response.OrderResponse;
 import com.umesha_g.the_clique_backend.exception.ResourceNotFoundException;
+import com.umesha_g.the_clique_backend.exception.UnauthorizedException;
 import com.umesha_g.the_clique_backend.model.entity.Cart;
 import com.umesha_g.the_clique_backend.model.entity.Order;
 import com.umesha_g.the_clique_backend.model.entity.OrderItem;
@@ -20,11 +21,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,14 +34,19 @@ public class OrderService {
     private  NotificationService notificationService;
     private  ModelMapper modelMapper;
     private  SecurityUtils securityUtils;
+    private ProductStatisticsService productStatisticsService;
+
+    private PlatformStatisticsService platformStatisticsService;
 
     @Autowired
-    public OrderService(OrderRepository orderRepository, CartService cartService, NotificationService notificationService, ModelMapper modelMapper, SecurityUtils securityUtils) {
+    public OrderService(OrderRepository orderRepository, CartService cartService, NotificationService notificationService, ModelMapper modelMapper, SecurityUtils securityUtils, ProductStatisticsService productStatisticsService, PlatformStatisticsService platformStatisticsService) {
         this.orderRepository = orderRepository;
         this.cartService = cartService;
         this.notificationService = notificationService;
         this.modelMapper = modelMapper;
         this.securityUtils = securityUtils;
+        this.productStatisticsService = productStatisticsService;
+        this.platformStatisticsService = platformStatisticsService;
     }
 
     @Transactional
@@ -53,10 +57,12 @@ public class OrderService {
         if (cart.getCartItems().isEmpty()) {
             throw new BadRequestException("Cart is empty");
         }
-        Period period = Period.ofDays(3);
+        Period period = Period.ofDays(4);
         LocalDate deliveryDate = LocalDate.now().plus(period);
 
         Order order = new Order();
+        order.setId(request.getId());
+        order.setPaymentMethod(request.getPaymentMethod());
         order.setUser(user);
         order.setEstimatedDeliveryDate(deliveryDate);
         order.setShippingAddress(user.getAddresses().stream()
@@ -64,32 +70,53 @@ public class OrderService {
                 .findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException("Address not found")));
 
-        // Transform cart items to order items
         List<OrderItem> orderItems = cart.getCartItems().stream()
                 .map(cartItem -> {
                     OrderItem orderItem = new OrderItem();
                     orderItem.setProduct(cartItem.getProduct());
+                    orderItem.setSelectedColour(cartItem.getSelectedColour());
+                    orderItem.setSelectedSize(cartItem.getSelectedSize());
                     orderItem.setQuantity(cartItem.getQuantity());
-                    orderItem.setSubTotal(cartItem.getProduct().getPrice().multiply(new BigDecimal(cartItem.getQuantity())));
+                    orderItem.setSubTotal(cartItem.getSubTotal());
                     orderItem.setOrder(order);
                     return orderItem;
                 })
                 .collect(Collectors.toList());
 
         order.setOrderItems(orderItems);
-        order.setTotalAmount(cart.getTotalAmount());
+        order.setSubTotal(cart.getTotalAmount());
+        order.setShippingCost(request.getShippingCost());
+        order.setTotalAmount(cart.getTotalAmount().add(request.getShippingCost()));
         order.setStatus(OrderStatus.PENDING);
 
         Order savedOrder = orderRepository.save(order);
 
-        // Clear the cart after successful order creation
+        for(OrderItem item : orderItems){
+            productStatisticsService.incrementPurchaseCount(item.getProduct(),item.getQuantity(),item.getSubTotal());
+        }
+
         cartService.clearCart();
 
-        String message = ("Order Placed Successfully \nTracking Number:" + savedOrder.getTrackingNumber() + "\nEstimated Delivery Date" + savedOrder.getEstimatedDeliveryDate().toString());
+        platformStatisticsService.addToTotalRevenue(savedOrder.getTotalAmount());
 
-        String link = ("/notifications");
-        // Send notification to user
-        notificationService.sendUserNotification(user.getId(),"New Order",message, NotificationType.NEW_ORDER,link);
+        String userLink = ("/user/"+user.getId()+"-"+user.getFirstName()+"/order/"+order.getId());
+
+        notificationService.sendUserNotification(user.getId(),
+                "Order Placed Successfully",
+                "Your Order #" + savedOrder.getId(),
+                "has been successfully placed",
+                "Estimated Delivery Date: " + savedOrder.getEstimatedDeliveryDate(),
+                NotificationType.SUCCESS,
+                userLink);
+
+        notificationService.sendAdminNotification(
+                "New Order",
+                "Order #" + savedOrder.getId(),
+                "Estimated Delivery Date: " + savedOrder.getEstimatedDeliveryDate(),
+                null,
+                NotificationType.SUCCESS,
+                null);
+
 
         return modelMapper.map(savedOrder, OrderResponse.class);
     }
@@ -102,20 +129,28 @@ public class OrderService {
         order.setStatus(status);
         Order updatedOrder = orderRepository.save(order);
 
-        // Send notification about order status update
-        notificationService.sendOrderStatusUpdate(updatedOrder);
+        String userLink = ("/user/"+updatedOrder.getUser().getId()+"-"+updatedOrder.getUser().getFirstName()+"/order/"+order.getId());
+
+        notificationService.sendUserNotification(
+                updatedOrder.getUser().getId(),
+                "Order Updated",
+                "Your Order #" + updatedOrder.getId(),
+                "has been updated",
+                "New Status : " +updatedOrder.getStatus(),
+                NotificationType.INFO,
+                userLink);
 
         return modelMapper.map(updatedOrder, OrderResponse.class);
     }
 
-    public OrderResponse getOrder(String id) throws ResourceNotFoundException, BadRequestException {
+    public OrderResponse getOrder(String id) throws ResourceNotFoundException {
         User user = securityUtils.getCurrentUser();
-        if (!Objects.equals(user.getCart().getId(), id)) {
-            throw new BadRequestException("Access Denied!");
-        } else {
-            Order order = orderRepository.findById(id).orElse(null);
+        Order order = orderRepository.findById(id).orElse(null);
+        assert order != null;
+        if(order.getUser().getId().equals(user.getId())) {
             return modelMapper.map(order, OrderResponse.class);
         }
+        throw new UnauthorizedException("Access Denied!");
     }
 
     public Page<OrderResponse> getUserOrders(Pageable pageable) throws ResourceNotFoundException {
@@ -124,13 +159,17 @@ public class OrderService {
         return orders.map(order -> modelMapper.map(order, OrderResponse.class));
     }
 
+    public Boolean checkOrderIds(String id) {
+        return orderRepository.existsById(id);
+    }
+
     public Page<OrderResponse> filterAllOrders(Pageable pageable , String searchTerm, OrderStatus status) {
-        Page<Order> orders = orderRepository.findByStatusAndSearch(status, searchTerm, searchTerm, pageable );
+        Page<Order> orders = orderRepository.findByStatusAndSearch(status, searchTerm, pageable );
         return orders.map(order -> modelMapper.map(order, OrderResponse.class));
     }
 
     public Page<OrderResponse> searchAllOrders(Pageable pageable , String searchTerm) {
-        Page<Order> orders = orderRepository.findByTrackingNumberContainingIgnoreCaseOrIdContainingIgnoreCase(searchTerm, searchTerm, pageable );
+        Page<Order> orders = orderRepository.findByIdContainingIgnoreCase(searchTerm, pageable );
         return orders.map(order -> modelMapper.map(order, OrderResponse.class));
     }
 }

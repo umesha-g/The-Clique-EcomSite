@@ -1,6 +1,8 @@
 import React, {useCallback} from 'react';
 import { useDropzone } from 'react-dropzone';
-import {ImageIcon, Upload} from "lucide-react";
+import {Upload} from "lucide-react";
+import Image from "next/image";
+import {prefix} from "@/utils/apiConfig";
 
 interface UserPictureDropzoneProps {
     onFileChange: (file: File | null) => void;
@@ -29,12 +31,12 @@ const UserPictureDropzone: React.FC<UserPictureDropzoneProps> = ({ onFileChange,
             <input {...getInputProps()} />
             {file ? (
                 <div className="flex items-center space-x-4">
-                    <img src={URL.createObjectURL(file)} alt="Brand Logo" className="w-16 h-16 object-contain" />
+                    <Image src={URL.createObjectURL(file)} alt="Brand Logo" className="w-16 h-16 object-contain" height={100} width={100} />
                     <p className="font-medium">{file.name}</p>
                 </div>
             ) : existingLogoUrl ? (
                 <div className="flex flex-col items-center">
-                    <img src={"http://localhost:8080"+existingLogoUrl} alt="Existing Brand Logo" className="w-20 h-20 object-contain" />
+                    <Image src={prefix +existingLogoUrl} alt="Existing Brand Logo" className="w-20 h-20 object-contain" height={100} width={100} />
                     <p className="text-gray-500 text-xs text-center">Existing DP</p>
                 </div>
             ) : (

@@ -1,13 +1,11 @@
-"use client";
-
 import { motion } from "framer-motion";
-import AddToCartButton from "./addToCartButton";
 import WishlistHeartButton from "./wishlistHeartButton";
 import {prefix} from "@/utils/apiConfig";
-import {ProductCardResponse} from "@/api/product-api";
+import {ProductCardResponse, viewCount} from "@/api/product-api";
 import {createProductSlug} from "@/utils/productSlug";
 import {FaStar} from "react-icons/fa";
 import {useRouter} from "next/navigation";
+import Image from "next/image";
 
 interface ProductCardProps {
   product: ProductCardResponse;
@@ -28,9 +26,16 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
+
+
 const ProductCard = ({ product }: ProductCardProps) => {
   const router = useRouter();
   const productSlug = createProductSlug(product.name, product.id);
+
+  const handleClick = async () => {
+    await viewCount(product.id);
+    router.push(`/product/${productSlug}`);
+  }
 
   const activeDiscount = product.directDiscount
       ? product.directDiscount
@@ -53,12 +58,14 @@ const ProductCard = ({ product }: ProductCardProps) => {
             className="bg-white rounded-none border p-3 sm:p-4 w-full flex-none"
         >
           <WishlistHeartButton productId={product.id}  className={"absolute z-10 top-4 right-4"}/>
-          <div onClick={() => router.push(`/product/${productSlug}`)} className="cursor-pointer">
+          <div onClick={handleClick} className="cursor-pointer">
             <div className="relative border-b w-full aspect-square">
-              <img
+              <Image
                   src={prefix + product.cardImageUrl}
                   alt={product.name}
                   className="w-full h-full object-cover rounded-none"
+                  width={100}
+                  height={100}
               />
             </div>
 
@@ -78,7 +85,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
                 ))}
               </div>
               <span className="text-xs sm:text-sm text-gray-500">
-              ({product.purchaseCount})
+              ({product.purchaseCount} sold)
             </span>
             </div>
 

@@ -66,8 +66,9 @@ const AddEditBrandDialog: React.FC<AddEditBrandDialogProps> = ({
         } catch (error) {
             toast({
                 title: "Error",
-                description: "Failed to save brand",
+                description: "Failed to save brand"+ error,
                 variant: "destructive"
+
             });
         }
     };

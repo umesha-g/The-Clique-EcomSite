@@ -12,6 +12,6 @@ import java.util.List;
 public interface NotificationRepository extends JpaRepository<Notification, String> {
     List<Notification> findByUserAndIsReadFalse(User user);
     List<Notification> findByUserOrderByCreatedAtDesc(User user, Pageable pageable);
-
+    List<Notification> findByUserId(String userId);
     List<Notification> findByUserIdAndIsReadOrderByCreatedAtDesc(String userId, boolean isRead);
 }

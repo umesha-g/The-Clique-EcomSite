@@ -1,10 +1,13 @@
 import {motion} from "framer-motion";
 import {Button} from "@/components/ui/button";
 import {MdDeleteOutline} from "react-icons/md";
-import {Minus, Plus} from "lucide-react";
+import {Minus, Plus, Trash2} from "lucide-react";
 import React from "react";
 import {CartItemResponse} from "@/api/cart-api";
 import {prefix} from "@/utils/apiConfig";
+import Image from "next/image";
+import {useRouter} from "next/navigation";
+import {createProductSlug} from "@/utils/productSlug";
 
 interface CartItemProps {
     item: CartItemResponse,
@@ -14,9 +17,12 @@ interface CartItemProps {
 }
 
 const CartItem: React.FC<CartItemProps> = ({ item, onIncrease, onDecrease, onRemove }) => {
+    const productSlug = createProductSlug(item.product.name, item.product.id);
+    const router = useRouter();
     const activeDiscount = item.product.directDiscount
         ? item.product.directDiscount
         : item.product.otherDiscount;
+
 
     return (
         <motion.div
@@ -26,11 +32,15 @@ const CartItem: React.FC<CartItemProps> = ({ item, onIncrease, onDecrease, onRem
             className="w-full border-b border-neutral-200 dark:border-neutral-700 py-4"
         >
             <div className="flex gap-4">
-                <div className="w-20 h-20 bg-neutral-100 dark:bg-neutral-800 rounded-none overflow-hidden">
-                    <img
+                <div className="w-24 h-24 bg-neutral-100 dark:bg-neutral-800 rounded-none border overflow-hidden cursor-pointer"
+                     onClick={() => router.push(`/product/${productSlug}`)}
+                >
+                    <Image
                         src={prefix + item.product.cardImageUrl}
                         alt={item.product.name}
                         className="w-full h-full object-cover"
+                        width={100}
+                        height={100}
                     />
                 </div>
 
@@ -43,15 +53,29 @@ const CartItem: React.FC<CartItemProps> = ({ item, onIncrease, onDecrease, onRem
                             </p>
                         </div>
                         <Button
-                            variant="ghost"
+                            variant="destructive"
                             className="h-10 w-10 p-0 rounded-none"
                             onClick={onRemove}
                         >
-                            <MdDeleteOutline className={"text-2xl"} />
+                            <Trash2 className={"text-3xl"} />
                         </Button>
                     </div>
 
                     <div className="flex justify-between items-center mt-2">
+
+                        <div className="mt-1 flex items-center space-x-2  justify-between">
+                            <span className={`text-black text-base sm:text-lg font-semibold`}>
+                              Rs.{(item.subTotal).toFixed(2)}
+                            </span>
+                        {/*{activeDiscount && (*/}
+                        {/*    <div className=" text-sm sm:text-base">*/}
+                        {/*        <span className="line-through text-gray-400">*/}
+                        {/*            Rs.{(item.product.price * item.quantity).toFixed(2)}*/}
+                        {/*        </span>*/}
+                        {/*    </div>*/}
+                        {/*)}*/}
+                        </div>
+
                         <div className="flex items-center border border-neutral-200 dark:border-neutral-700 rounded-none">
                             <Button
                                 variant="ghost"
@@ -72,18 +96,7 @@ const CartItem: React.FC<CartItemProps> = ({ item, onIncrease, onDecrease, onRem
                             </Button>
                         </div>
 
-                        <div className="mt-1 flex items-center space-x-2  justify-between">
-                            <span className={`${activeDiscount ? "text-red-500" : "text-black" } text-base sm:text-lg font-semibold`}>
-                              Rs.{(item.subTotal).toFixed(2)}
-                            </span>
-                            {activeDiscount && (
-                                <div className=" text-sm sm:text-base">
-                                    <span className="line-through text-gray-400">
-                                        Rs.{(item.product.price * item.quantity).toFixed(2)}
-                                    </span>
-                                </div>
-                            )}
-                        </div>
+
                     </div>
                 </div>
             </div>

@@ -5,7 +5,7 @@ import {
   UserResponse,
 } from '@/api/admin/admin-user-api';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import debounce from 'lodash/debounce';
 import {
@@ -22,6 +22,7 @@ import AddEditUserDialog from './UserPanelComponents/AddEditUserDialog';
 import DeleteConfirmationDialog from './DeleteConfirmationDialog';
 import {Pagination} from "@/app/components/PaginationComponent";
 import {prefix} from "@/utils/apiConfig";
+import Image from "next/image";
 
 const UsersPanel: React.FC = () => {
   const [users, setUsers] = useState<UserResponse[]>([]);
@@ -43,7 +44,7 @@ const UsersPanel: React.FC = () => {
 
   const fetchUsers = async (searchTerm: string = '') => {
     try {
-      const response = await getAllUsers(currentPage, 15, 'createdAt', searchTerm);
+      const response = await getAllUsers(currentPage, 10, 'createdAt', searchTerm);
       setUsers(response.content);
       setTotalPages(response.totalPages);
       setTotalElements(response.totalElements);
@@ -89,11 +90,11 @@ const UsersPanel: React.FC = () => {
         title: "Success",
         description: "User deleted successfully",
       });
-      fetchUsers(searchTerm);
+      await fetchUsers(searchTerm);
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to delete user",
+        description: "Failed to delete user"+error,
         variant: "destructive"
       });
     } finally {
@@ -107,9 +108,10 @@ const UsersPanel: React.FC = () => {
   };
 
   return (
-      <Card className="rounded-none w-[1500px]">
+      <Card className="rounded-none w-[1500px] h-auto">
         <CardHeader>
           <CardTitle className={"text-xl"}>Users Management</CardTitle>
+          <CardDescription>{totalElements -1} Users</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex justify-between mb-10">
@@ -141,9 +143,11 @@ const UsersPanel: React.FC = () => {
                   <TableRow key={user.id}>
                     <TableCell>{user.userDPUrl &&(
                         <div className={" flex ml-10"}>
-                            <img
+                            <Image
                                 src={prefix + user.userDPUrl}
                                 alt={`${user.firstName} DP`}
+                                width={100}
+                                height={100}
                                 className="w-12 rounded-full h-12 object-contain"
                             />
                         </div>)
@@ -178,13 +182,15 @@ const UsersPanel: React.FC = () => {
             </TableBody>
           </Table>
 
-          <div className="mt-8 flex justify-center">
-            <Pagination
-                currentPage = {currentPage + 1}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-            />
-          </div>
+          {totalPages > 1 &&
+            <div className="mt-8 flex justify-center">
+              <Pagination
+                  currentPage = {currentPage + 1}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+              />
+            </div>
+          }
 
           <AddEditUserDialog
               open={isAddDialogOpen}

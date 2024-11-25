@@ -61,7 +61,7 @@ const AddEditCategoryDialog: React.FC<AddEditCategoryDialogProps> = ({
         } catch (error) {
             toast({
                 title: "Error",
-                description: "Failed to save category details",
+                description: "Failed to save category details"+error,
                 variant: "destructive"
             });
         }

@@ -1,12 +1,15 @@
+"use client";
 import {Card} from "@/components/ui/card";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/components/ui/select";
 import {Slider} from "@/components/ui/slider";
 import {MiniCategoryResponse} from "@/api/admin/admin-category-api";
 import {MiniBrandResponse} from "@/api/admin/admin-brand-api";
-import {FilterState} from "@/app/search/page";
+import {FilterState} from "@/app/search/SearchComponents/searchMain";
 import {Gender} from "@/api/admin/admin-product-api";
 import {PriceRange} from "@/api/product-api";
 import {cn} from "@/lib/utils";
+import { useState, useCallback, useEffect } from 'react';
+import { debounce } from 'lodash';
 
 interface FiltersSidebarProps {
     filters: FilterState;
@@ -37,14 +40,37 @@ export const FiltersSidebar = ({
         label: gender.charAt(0) + gender.slice(1).toLowerCase()
     }));
 
-    const handlePriceRangeChange = (value: [number, number]) => {
-        onFiltersChange({ minPrice: value[0], maxPrice: value[1] });
+    // Local state for price range
+    const [localPriceRange, setLocalPriceRange] = useState<[number, number]>([
+        filters.minPrice || Math.floor(priceRange.minPrice),
+        filters.maxPrice || Math.ceil(priceRange.maxPrice)
+    ]);
+
+    // Update local price range when filters change
+    useEffect(() => {
+        setLocalPriceRange([
+            filters.minPrice || Math.floor(priceRange.minPrice),
+            filters.maxPrice || Math.ceil(priceRange.maxPrice)
+        ]);
+    }, [filters.minPrice, filters.maxPrice, priceRange.minPrice, priceRange.maxPrice]);
+
+    // Debounced function to update filters
+    const debouncedPriceUpdate = useCallback(
+        debounce((value: [number, number]) => {
+            onFiltersChange({ minPrice: value[0], maxPrice: value[1] });
+        }, 500),
+        [onFiltersChange]
+    );
+
+    // Handle price range change
+    const handlePriceRangeChange = (value: number[]) => {
+        const newValue: [number, number] = [value[0], value[1]];
+        setLocalPriceRange(newValue);
+        debouncedPriceUpdate(newValue);
     };
 
     const handleCategoryChange = (value: string) => {
         if (value === "all") {
-            // Remove categoryId from filters
-            const { categoryId, ...rest } = filters;
             onFiltersChange({ categoryId: undefined });
         } else {
             onFiltersChange({ categoryId: value });
@@ -53,8 +79,6 @@ export const FiltersSidebar = ({
 
     const handleBrandChange = (value: string) => {
         if (value === "all") {
-            // Remove brandId from filters
-            const { brandId, ...rest } = filters;
             onFiltersChange({ brandId: undefined });
         } else {
             onFiltersChange({ brandId: value });
@@ -63,24 +87,28 @@ export const FiltersSidebar = ({
 
     const handleGenderChange = (value: string) => {
         if (value === "all") {
-            // Remove gender from filters
-            const { gender, ...rest } = filters;
             onFiltersChange({ gender: undefined });
         } else {
             onFiltersChange({ gender: value as Gender });
         }
     };
 
+    // Cleanup debounce on unmount
+    useEffect(() => {
+        return () => {
+            debouncedPriceUpdate.cancel();
+        };
+    }, [debouncedPriceUpdate]);
+
     return (
         <Card className={cn(
-            "p-4 bg-neutral-100 rounded-none",
+            "p-4 bg-beige-100 rounded-none",
             "md:sticky md:top-24",
             className
         )}>
             <h2 className="text-xl font-semibold mb-4">Filters</h2>
 
             <div className="space-y-6">
-
                 <div className="mb-6">
                     <h3 className="font-medium mb-2">Price Range</h3>
                     <div className="space-y-4">
@@ -89,12 +117,12 @@ export const FiltersSidebar = ({
                             max={Math.ceil(priceRange.maxPrice)}
                             min={Math.floor(priceRange.minPrice)}
                             step={1}
-                            value={[filters.minPrice || Math.floor(priceRange.minPrice), filters.maxPrice || Math.ceil(priceRange.maxPrice)]}
+                            value={localPriceRange}
                             onValueChange={handlePriceRangeChange}
                         />
                         <div className="flex justify-between text-sm">
-                            <span>Rs.{filters.minPrice || Math.floor(priceRange.minPrice)}</span>
-                            <span>Rs.{filters.maxPrice || Math.ceil(priceRange.maxPrice)}</span>
+                            <span>Rs.{localPriceRange[0]}</span>
+                            <span>Rs.{localPriceRange[1]}</span>
                         </div>
                     </div>
                 </div>

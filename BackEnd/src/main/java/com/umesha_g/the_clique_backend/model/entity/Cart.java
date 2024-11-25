@@ -44,7 +44,7 @@ public class Cart {
 
     public void updateTotalAmount() {
         this.totalAmount = getCartItems().stream()
-                .map(item -> item.getProduct().getPrice()
+                .map(item -> item.getSubTotal()
                         .multiply(new BigDecimal(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }

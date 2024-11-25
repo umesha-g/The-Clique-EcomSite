@@ -17,6 +17,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -25,13 +27,15 @@ public class ReviewService {
     private  ProductRepository productRepository;
     private  ModelMapper modelMapper;
     private  SecurityUtils securityUtils;
+    private ProductStatisticsService productStatisticsService;
 
     @Autowired
-    public ReviewService(ReviewRepository reviewRepository, ProductRepository productRepository, ModelMapper modelMapper, SecurityUtils securityUtils) {
+    public ReviewService(ReviewRepository reviewRepository, ProductRepository productRepository, ModelMapper modelMapper, SecurityUtils securityUtils, ProductStatisticsService productStatisticsService) {
         this.reviewRepository = reviewRepository;
         this.productRepository = productRepository;
         this.modelMapper = modelMapper;
         this.securityUtils = securityUtils;
+        this.productStatisticsService = productStatisticsService;
     }
 
     public ReviewResponse createReview(ReviewRequest request) throws ResourceNotFoundException {
@@ -45,6 +49,8 @@ public class ReviewService {
         review.setUser(user);
 
         Review savedReview = reviewRepository.save(review);
+
+        productStatisticsService.updateRating(product,savedReview);
 
         updateProductRating(product.getId());
 
@@ -78,6 +84,8 @@ public class ReviewService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
+        List<Review> reviews = reviewRepository.findByProductId(productId);
+        product.setReviewCount(reviews.size());
         product.setRating(averageRating != null ? averageRating : 0.0);
         productRepository.save(product);
     }

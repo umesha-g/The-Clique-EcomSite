@@ -10,7 +10,7 @@ public class JwtConfig {
     private final long expiration;
     private final String tokenPrefix = "Bearer ";
     private final String headerString = "Authorization";
-    private final String cookieName = "THE_CLIQUE_TOKEN";
+    private final String cookieName = "authToken";
     private final boolean isSecure = false;
 
     public JwtConfig() {
