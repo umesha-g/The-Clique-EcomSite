@@ -158,7 +158,7 @@ export default function OrderConfirmationPage({ params }: OrderConfirmationPageP
                             </CardContent>
                         </Card>
 
-                        <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-x-4 ">
+                        <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 ">
                             <Button
                                 onClick={() => router.push(`/user/${params.userSlug}/order/${order.id}`)}
                                 className="rounded-none"
