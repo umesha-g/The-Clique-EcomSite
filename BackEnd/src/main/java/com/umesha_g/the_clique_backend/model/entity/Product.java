@@ -23,8 +23,10 @@ public class Product {
     private BigDecimal price;
     private Integer stock;
     private Double rating;
-    private int reviewCount;
+    private long reviewCount;
     private String description;
+    private long viewCount = 0L;
+    private long purchaseCount = 0L;
 
     @ManyToOne
     @JoinColumn(name = "brand_id")
@@ -55,9 +57,6 @@ public class Product {
 
     @ElementCollection
     private Set<String> colors;
-
-    private Long viewCount = 0L;
-    private Long purchaseCount = 0L;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
