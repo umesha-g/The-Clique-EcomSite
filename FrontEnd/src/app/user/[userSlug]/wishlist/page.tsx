@@ -5,14 +5,8 @@ import { getWishlist, removeFromWishlist } from "@/api/wishlist-api";
 import CommonHeader from "@/app/components/Header";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {Heart, ShoppingBag, Trash2} from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
+import {Heart, ShoppingBag} from "lucide-react";
 import {ProductCardResponse} from "@/api/product-api";
-import {FaStar} from "react-icons/fa";
-import {prefix} from "@/utils/apiConfig";
-import {ActiveDiscount, calculateDiscountedPrice} from "@/utils/DIscountCalculator";
 import WishlistItem from "@/app/user/[userSlug]/wishlist/wishlistComponents/WishlistItem";
 
 export default function WishlistPage() {
@@ -103,9 +97,9 @@ export default function WishlistPage() {
                             <span className="text-black">Wishlist</span>
                         </nav>
                     </CardHeader>
-                    <CardContent className="p-6">
-                        <div className={"mb-10"}>
-                            <CardTitle className="text-2xl">My Wishlist</CardTitle>
+                    <CardContent className="p-4 sm:p-6">
+                        <div className={"mb-8"}>
+                            <CardTitle className="text-xl sm:text-2xl">My Wishlist</CardTitle>
                             <p className="text-sm text-gray-500 mt-1">
                                 View and manage your wishlist
                             </p>
