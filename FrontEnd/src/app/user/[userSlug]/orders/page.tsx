@@ -124,7 +124,7 @@ export default function OrdersPage({ params }: OrdersPageProps) {
                     <CardContent className="p-6">
                         <div className="flex justify-between items-center">
                             <div>
-                                <CardTitle className="text-2xl">My Orders</CardTitle>
+                                <CardTitle className=" text-xl sm:text-2xl">My Orders</CardTitle>
                                 <p className="text-sm text-gray-500 mt-1">
                                     View and manage your orders
                                 </p>
@@ -157,36 +157,38 @@ export default function OrdersPage({ params }: OrdersPageProps) {
                                 {orders.map((order) => (
                                     <Card
                                         key={order.id}
-                                        className="rounded-none hover:shadow-md transition-shadow cursor-pointer"
+                                        className="rounded-none hover:bg-neutral-100 transition-all cursor-pointer"
                                         onClick={() => router.push(`/user/${params.userSlug}/order/${order.id}`)}
                                     >
                                         <CardContent className="p-4">
                                             <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
                                                 <div className="flex-1">
                                                     <div className="flex items-center space-x-4">
-                                                        <Package className="w-6 h-6 text-gray-500" />
+                                                        <Package className="w-8 h-8 sm:w-10 sm:h-10 text-beige-300" />
                                                         <div>
-                                                            <h3 className="font-medium">Order #{order.id}</h3>
+                                                            <h3 className="font-medium text-sm sm:text-lg text-balance w-48 md:w-64 lg:w-full">Order #{order.id}</h3>
                                                             <p className="text-sm text-gray-500">
                                                                 Placed on {new Date(order.createdAt).toLocaleDateString()}
                                                             </p>
                                                         </div>
                                                     </div>
-                                                    <div className="mt-2">
+                                                    <div className="mt-2 ml-12 sm:ml-14">
                                                         <p className="text-sm text-gray-600">
                                                             {order.orderItems.length} items • Total: ${order.totalAmount.toFixed(2)}
                                                         </p>
                                                     </div>
                                                 </div>
 
-                                                <div className="flex flex-col md:flex-row items-start md:items-center space-y-2 md:space-y-0 md:space-x-4">
-                                                    <div className="text-right">
+                                                <div className="flex flex-col md:flex-row items-start md:items-center ml-12 sm:ml-14 space-y-2 md:space-y-0 md:space-x-6">
+                                                    <div className="text-right space-x-2 flex md:flex-col">
                                                         <p className="text-sm font-medium">Estimated Delivery</p>
                                                         <p className="text-sm text-gray-500">
                                                             {new Date(order.estimatedDeliveryDate).toLocaleDateString()}
                                                         </p>
                                                     </div>
-                                                    <OrderStatusBadge status={order.status} />
+                                                    <div className={"mt-6"}>
+                                                        <OrderStatusBadge status={order.status} />
+                                                    </div>
                                                 </div>
                                             </div>
                                         </CardContent>
