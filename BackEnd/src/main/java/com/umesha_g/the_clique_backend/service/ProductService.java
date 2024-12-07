@@ -3,6 +3,7 @@ package com.umesha_g.the_clique_backend.service;
 import com.umesha_g.the_clique_backend.dto.request.ProductRequest;
 import com.umesha_g.the_clique_backend.dto.response.ProductCardResponse;
 import com.umesha_g.the_clique_backend.dto.response.ProductResponse;
+import com.umesha_g.the_clique_backend.dto.response.ProductSlugResponse;
 import com.umesha_g.the_clique_backend.exception.ResourceNotFoundException;
 import com.umesha_g.the_clique_backend.model.entity.Brand;
 import com.umesha_g.the_clique_backend.model.entity.Category;
@@ -17,14 +18,18 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 
@@ -124,6 +129,14 @@ public class ProductService {
         return products.map(product -> modelMapper.map(product,ProductCardResponse.class));
     }
 
+    public List<ProductSlugResponse> getAllProductSlugs() {
+        return productRepository.findAll().stream()
+                .map(product -> new ProductSlugResponse(
+                        product.getId(),
+                        product.getName())
+                ).collect(Collectors.toList());
+    }
+
     public Map<String, BigDecimal> getPriceRange() {
         Pair<BigDecimal, BigDecimal> priceRange = productRepository.findPriceRange();
         Map<String, BigDecimal> response = new HashMap<>();
@@ -134,6 +147,53 @@ public class ProductService {
 
     public Product getProductById (String id){
             return productRepository.findById(id).orElse(null);
+    }
+
+    public List<ProductCardResponse> getRelatedProducts(String productId, int limit) throws ResourceNotFoundException {
+        Product currentProduct = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+
+        Pageable pageable = PageRequest.of(0, limit);
+
+        List<Product> relatedProducts = productRepository.findRelatedProductsByCategoryRandomly(
+                currentProduct.getCategory().getId(),
+                productId,
+                pageable
+        );
+
+        return relatedProducts.stream()
+                .map(product -> modelMapper.map(product, ProductCardResponse.class))
+                .collect(Collectors.toList());
+    }
+
+    public Page<ProductCardResponse> getProductsByDiscountRange(
+            Double minDirectDiscount,
+            Double maxDirectDiscount,
+            Double minOtherDiscount,
+            Double maxOtherDiscount,
+            int page,
+            int size,
+            String sortBy
+    ) {
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(sortBy != null ? sortBy : "createdAt").descending()
+        );
+
+        Page<Product> productPage = productRepository.findProductsByDiscountRange(
+                minDirectDiscount,
+                maxDirectDiscount,
+                minOtherDiscount,
+                maxOtherDiscount,
+                pageable
+        );
+
+        return productPage.map(product -> modelMapper.map(product, ProductCardResponse.class));
+    }
+
+    public List<String> getProductNameSuggestions(String searchTerm) {
+        return productRepository.findTop5ProductNameSuggestions(searchTerm);
     }
 
     private Product advancedDetailsProcess (Product product, ProductRequest request) throws ResourceNotFoundException {

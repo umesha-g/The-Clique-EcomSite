@@ -139,7 +139,7 @@ const BrandsPanel: React.FC = () => {
                                         </Button>
                                         <Button
                                             onClick={() => handleDeleteClick(brand)}
-                                            variant="outline"
+                                            variant="destructive"
                                             size="icon"
                                             className="rounded-none"
                                         >

@@ -8,6 +8,7 @@ import {useRouter} from "next/navigation";
 interface AuthContextType {
     user: UserResponse | null;
     userLoading: boolean;
+    updateUserContext: (updates: Partial<UserResponse>) => void;
     error: Error | null;
     logout: () => Promise<void>;
     isGuest: boolean;
@@ -29,6 +30,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             .split('; ')
             .find(row => row.startsWith('isAuthenticated='))
             ?.split('=')[1] === 'true';
+    };
+
+    const updateUserContext = (updates: Partial<UserResponse>) => {
+        if (user) {
+            setUser(prevUser => ({
+                ...prevUser!,
+                ...updates
+            }));
+        }
     };
 
     useEffect(() => {
@@ -89,7 +99,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     return (
-        <AuthContext.Provider value={{ user, userLoading, error, logout, isGuest, isAdmin }}>
+        <AuthContext.Provider value={{updateUserContext, user, userLoading, error, logout, isGuest, isAdmin }}>
             {children}
         </AuthContext.Provider>
     );

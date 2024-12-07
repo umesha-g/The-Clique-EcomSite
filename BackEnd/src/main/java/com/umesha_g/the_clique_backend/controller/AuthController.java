@@ -7,8 +7,10 @@ import com.umesha_g.the_clique_backend.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,15 +31,25 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody UserRequest request,
                                               HttpServletResponse response) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getCurrentPassword()
-                )
-        );
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        authService.setAuthenticationCookie(response, authentication);
-        return ResponseEntity.ok().body("User logged in successfully");
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail(),
+                            request.getCurrentPassword()
+                    )
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            authService.setAuthenticationCookie(response, authentication);
+            return ResponseEntity.ok().build();
+        } catch (BadCredentialsException e) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body("Invalid email or password");
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An error occurred during login");
+        }
     }
 
     @PostMapping("/register")
@@ -48,12 +60,12 @@ public class AuthController {
                     .body("Error: Email is already in use!");
         }
         userService.createUser(request);
-        return ResponseEntity.ok("User registered successfully!");
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/logout")
     public ResponseEntity<?> logoutUser(HttpServletResponse response) {
         authService.clearAuthenticationCookie(response);
-        return ResponseEntity.ok("User logged out successfully");
+        return ResponseEntity.ok().build();
     }
 }

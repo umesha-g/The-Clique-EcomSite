@@ -2,7 +2,7 @@ import React from 'react';
 import { Clock, MapPin, Package } from 'lucide-react';
 import { OrderResponse } from '@/api/admin/admin-order-api';
 import OrderItemsSection from "./OrderItemsSection";
-import OrderTimeline from "./timeLine";
+import OrderTimeline from "./OrderTimeLine";
 
 interface OrderGeneralInfoProps {
     order: OrderResponse;
@@ -14,7 +14,7 @@ const OrderGeneralInfo: React.FC<OrderGeneralInfoProps> = ({ order }) => {
             <div className="bg-white border rounded-none p-4">
                 <h2 className="text-xl font-semibold mb-4">Order Information</h2>
 
-                <div className="hidden sm:block mb-6">
+                <div className="hidden sm:block md:hidden lg:block my-10">
                     <OrderTimeline status={order.status} />
                 </div>
 

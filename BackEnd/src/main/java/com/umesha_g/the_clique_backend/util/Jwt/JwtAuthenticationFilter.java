@@ -74,7 +74,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 processToken(jwt, request);
             }
 
-            // Add security headers
             addSecurityHeaders(response);
 
         } catch (ExpiredJwtException e) {
@@ -97,10 +96,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private String getJwtFromRequest(HttpServletRequest request) {
-        // First try to get from cookie
         String jwt = getJwtFromCookie(request);
 
-        // If not in cookie, try Authorization header
         if (jwt == null) {
             jwt = getJwtFromHeader(request);
         }
@@ -130,10 +127,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             Claims claims = tokenProvider.getClaimsFromToken(jwt);
             String username = claims.getSubject();
 
-            // Extract roles from claims
             List<SimpleGrantedAuthority> authorities = extractAuthorities(claims);
 
-            // Load user details and verify account status
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
             if (userDetails != null && userDetails.isEnabled()) {
@@ -141,10 +136,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                // Set authentication in context
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                // Log successful authentication
                 log.debug("Authenticated user: {}", username);
             }
         }

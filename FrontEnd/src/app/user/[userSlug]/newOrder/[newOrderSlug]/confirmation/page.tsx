@@ -5,10 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Package, MapPin, Clock } from 'lucide-react';
 import { getOrder } from '@/api/order-api';
-import CommonHeader from "@/app/components/Header";
+import CommonHeader from "@/app/components/CommonHeader";
 import { OrderResponse } from '@/api/admin/admin-order-api';
 import OrderStatusBadge from "@/app/user/[userSlug]/order/[id]/orderComponents/OrderStatusBadge";
 import {useCart} from "@/contexts/cartContext";
+import CommonFooter from "@/app/components/CommonFooter";
 
 interface OrderConfirmationPageProps {
     params: {
@@ -176,6 +177,9 @@ export default function OrderConfirmationPage({ params }: OrderConfirmationPageP
                     </CardContent>
                 </Card>
             </div>
+            <footer>
+                <CommonFooter height={"h-14"}/>
+            </footer>
         </div>
     );
 }

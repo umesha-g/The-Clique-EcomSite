@@ -22,6 +22,7 @@ export interface ProductResponse {
   price: number;
   stock: number;
   rating: number;
+  reviewCount:number;
   description: string;
   brand?: MiniBrandResponse;
   category: MiniCategoryResponse;
@@ -31,7 +32,9 @@ export interface ProductResponse {
   sizes: string[];
   colors: string[];
   purchaseCount: number;
+  viewCount:number;
   createdAt: Date;
+  updatedAt:Date;
   directDiscount?: MiniDiscountResponse;
   otherDiscount?: MiniDiscountResponse;
 }

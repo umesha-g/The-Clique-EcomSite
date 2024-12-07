@@ -1,3 +1,4 @@
+"use client";
 import { motion } from "framer-motion";
 import WishlistHeartButton from "./wishlistHeartButton";
 import {prefix} from "@/utils/apiConfig";
@@ -55,11 +56,11 @@ const ProductCard = ({ product }: ProductCardProps) => {
         <motion.div
             variants={itemVariants}
             whileHover={{ scale: 1.05 }}
-            className="bg-white rounded-none border p-3 sm:p-4 w-full flex-none"
+            className="bg-white rounded-none border p-2 sm:p-3 w-full flex-none"
         >
           <WishlistHeartButton productId={product.id}  className={"absolute z-10 top-4 right-4"}/>
           <div onClick={handleClick} className="cursor-pointer">
-            <div className="relative border-b w-full aspect-square">
+            <div className="relative border w-full aspect-square">
               <Image
                   src={prefix + product.cardImageUrl}
                   alt={product.name}

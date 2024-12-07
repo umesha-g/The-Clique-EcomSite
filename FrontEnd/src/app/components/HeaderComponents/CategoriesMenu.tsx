@@ -10,9 +10,10 @@ import {
 } from "@/components/ui/navigation-menu-left";
 import { cn } from "@/lib/utils";
 import {TbCategory} from "react-icons/tb";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {getAllCategories} from "@/api/category-api";
 import {MiniCategoryResponse} from "@/api/admin/admin-category-api";
+import {createCategorySlug} from "@/utils/categorySlug";
 
 const CategoriesMenu  = () => {
     const [categories, setCategories] = useState<MiniCategoryResponse[]>([]);
@@ -26,11 +27,15 @@ const CategoriesMenu  = () => {
         }
     };
 
+    useEffect(()=> {
+        fetchCategories();
+    },[]);
+
   return (
     <NavigationMenu>
       <NavigationMenuList className="rounded-none">
         <NavigationMenuItem className="rounded-none">
-          <NavigationMenuTrigger onMouseOver={()=>fetchCategories()} className="text-neutral-700 text-md rounded-none hover:text-neutral-900 focus:bg-transparent">
+          <NavigationMenuTrigger className="text-neutral-700 text-md rounded-none hover:text-neutral-900 focus:bg-transparent">
           <TbCategory className="w-5 h-5 text-neutral-700 hover:text-neutral-950 fill-transparent hover:fill-neutral-950 transition-all ease-in-out" />
           </NavigationMenuTrigger>
           <NavigationMenuContent className="rounded-none left-0">
@@ -39,7 +44,7 @@ const CategoriesMenu  = () => {
                 <ListItem
                   key={category.id}
                   title={category.name}
-                  href={`/category/${category.id}/`}
+                  href={`/category/${createCategorySlug(category.name,category.id)}/`}
                 >
                 </ListItem>
               ))}

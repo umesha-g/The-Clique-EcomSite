@@ -28,6 +28,7 @@ export interface OrderResponse {
   id: string;
   orderItems: OrderItemResponse[];
   shippingAddress: AddressResponse;
+  subTotal:number;
   totalAmount: number;
   shippingCost: number;
   status: OrderStatus;

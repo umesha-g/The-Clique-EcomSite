@@ -1,19 +1,19 @@
-import { extractIdFromSlug } from "@/utils/productSlug";
+import { extractIdFromSlug} from "@/utils/productSlug";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import CommonHeader from "@/app/components/Header";
+import CommonHeader from "@/app/components/CommonHeader";
 import {RelatedProducts} from "@/app/product/[productSlug]/ProductComponents/RelatedProducts";
-import {ProductResponse} from "@/api/admin/admin-product-api";
-import {getProduct} from "@/api/product-api";
+import { getProduct} from "@/api/product-api";
 import {ProductMain} from "@/app/product/[productSlug]/ProductComponents/productMain";
+import CommonFooter from "@/app/components/CommonFooter";
+import React from "react";
 
-export default async function ProductPage({params}: { params: { productSlug: string } }) {
+export default async function ProductPage({params}: { params: { productSlug: string }
+}) {
     const productId = extractIdFromSlug(params.productSlug);
-    let product: ProductResponse | null = null;
+    const product = await getProduct(productId);
 
-    try {
-        product = await getProduct(productId);
-    } catch (err) {
-        console.error(err);
+    if (!product) {
+        return <div>Product not found</div>;
     }
 
     if(product) {
@@ -37,7 +37,7 @@ export default async function ProductPage({params}: { params: { productSlug: str
                             </nav>
                         </CardHeader>
                         <CardContent className="p-4 md:p-8">
-                            <ProductMain productId={productId}/>
+                            <ProductMain productId={product.id}/>
                         </CardContent>
                     </Card>
 
@@ -46,10 +46,13 @@ export default async function ProductPage({params}: { params: { productSlug: str
                             <h2 className="text-2xl font-bold text-gray-800">Related Products</h2>
                         </CardHeader>
                         <CardContent className="p-6">
-                            <RelatedProducts/>
+                            <RelatedProducts productId={product.id}/>
                         </CardContent>
                     </Card>
                 </div>
+                <footer>
+                    <CommonFooter height={"h-14"}/>
+                </footer>
             </div>
         );
     }

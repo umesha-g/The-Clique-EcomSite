@@ -3,15 +3,20 @@ package com.umesha_g.the_clique_backend.config;
 import com.umesha_g.the_clique_backend.dto.request.*;
 import com.umesha_g.the_clique_backend.dto.response.*;
 import com.umesha_g.the_clique_backend.model.entity.*;
+import com.umesha_g.the_clique_backend.model.entity.admin.ProductStatistics;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 import org.modelmapper.convention.MatchingStrategies;
+import org.modelmapper.spi.MappingContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.time.LocalDate;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Configuration
@@ -26,10 +31,8 @@ public class ModelMapperConfig {
                 .setFieldMatchingEnabled(true)
                 .setFieldAccessLevel(org.modelmapper.config.Configuration.AccessLevel.PRIVATE);
 
-        // Request DTO mappings
         configureRequestMappings(modelMapper);
 
-        // Response DTO mappings
         configureResponseMappings(modelMapper);
 
         return modelMapper;
@@ -140,7 +143,7 @@ public class ModelMapperConfig {
                     mapper.map(User::getLastName, UserResponse::setLastName);
                     mapper.map(User::getPhoneNumber, UserResponse::setPhoneNumber);
                     mapper.map(User::getRole, UserResponse::setRole);
-                    mapper.map(User::getCreatedAt,UserResponse::setCreatedAt);
+                    mapper.map(User::getCreatedAt, UserResponse::setCreatedAt);
                 });
 
         // Converter for handling product -> product card response
@@ -161,7 +164,7 @@ public class ModelMapperConfig {
             @Override
             protected void configure() {
                 map().setId(source.getId());
-                using(productListToCardResponseConverter).map(source.getProducts(),destination.getProducts());
+                using(productListToCardResponseConverter).map(source.getProducts(), destination.getProducts());
             }
         });
 
@@ -174,7 +177,7 @@ public class ModelMapperConfig {
                 map().setQuantity(source.getQuantity());
                 map().setSelectedColour(source.getSelectedColour());
                 map().setSelectedSize(source.getSelectedSize());
-                using(productToProductCardResponseConverter).map(source.getProduct(),destination.getProduct());
+                using(productToProductCardResponseConverter).map(source.getProduct(), destination.getProduct());
             }
         });
 
@@ -201,8 +204,8 @@ public class ModelMapperConfig {
                 map().setEstimatedDeliveryDate(source.getEstimatedDeliveryDate());
                 map().setCreatedAt(source.getCreatedAt());
                 map().setUpdatedAt(source.getUpdatedAt());
-                using(addressToAddressResponseConverter).map(source.getShippingAddress(),destination.getShippingAddress());
-                using(orderItemToOrderItemResponseConverter).map(source.getOrderItems(),destination.getOrderItems());
+                using(addressToAddressResponseConverter).map(source.getShippingAddress(), destination.getShippingAddress());
+                using(orderItemToOrderItemResponseConverter).map(source.getOrderItems(), destination.getOrderItems());
             }
         });
 
@@ -215,7 +218,7 @@ public class ModelMapperConfig {
                 map().setQuantity(source.getQuantity());
                 map().setSelectedColour(source.getSelectedColour());
                 map().setSelectedSize(source.getSelectedSize());
-                using(productToProductCardResponseConverter).map(source.getProduct(),destination.getProduct());
+                using(productToProductCardResponseConverter).map(source.getProduct(), destination.getProduct());
             }
         });
 
@@ -237,7 +240,7 @@ public class ModelMapperConfig {
                 map().setId(source.getId());
                 map().setTotalAmount(source.getTotalAmount());
                 map().setCreatedAt(source.getCreatedAt());
-                using(cartItemToCartItemResponseConverter).map(source.getCartItems(),destination.getCartItems());
+                using(cartItemToCartItemResponseConverter).map(source.getCartItems(), destination.getCartItems());
             }
         });
 
@@ -257,8 +260,8 @@ public class ModelMapperConfig {
                 .addMappings(mapper -> {
                     mapper.map(Discount::getId, MiniDiscountResponse::setId);
                     mapper.map(Discount::getName, MiniDiscountResponse::setName);
-                    mapper.map(Discount::getDiscountPercentage,MiniDiscountResponse::setDiscountPercentage);
-                    mapper.map(Discount::isActive,MiniDiscountResponse::setActive);
+                    mapper.map(Discount::getDiscountPercentage, MiniDiscountResponse::setDiscountPercentage);
+                    mapper.map(Discount::isActive, MiniDiscountResponse::setActive);
                 });
 
         // Converter for handling order discount -> mini discount response
@@ -274,14 +277,14 @@ public class ModelMapperConfig {
                 map().setDescription(source.getDescription());
                 map().setLogoUrl(source.getLogoUrl());
                 map().setActive(source.isActive());
-                using(discountToMiniDiscountResponseConverter).map(source.getDiscount(),destination.getDiscount());
+                using(discountToMiniDiscountResponseConverter).map(source.getDiscount(), destination.getDiscount());
             }
         });
 
-        modelMapper.createTypeMap(Brand.class,MiniBrandResponse.class)
+        modelMapper.createTypeMap(Brand.class, MiniBrandResponse.class)
                 .addMappings(mapper -> {
-                    mapper.map(Brand::getId,MiniBrandResponse::setId);
-                    mapper.map(Brand::getName,MiniBrandResponse::setName);
+                    mapper.map(Brand::getId, MiniBrandResponse::setId);
+                    mapper.map(Brand::getName, MiniBrandResponse::setName);
                 });
 
         // Converter for handling order brand -> mini brand response
@@ -295,14 +298,14 @@ public class ModelMapperConfig {
                 map().setId(source.getId());
                 map().setName(source.getName());
                 map().setDescription(source.getDescription());
-                using(discountToMiniDiscountResponseConverter).map(source.getDiscount(),destination.getDiscount());
+                using(discountToMiniDiscountResponseConverter).map(source.getDiscount(), destination.getDiscount());
             }
         });
 
         modelMapper.createTypeMap(Category.class, MiniCategoryResponse.class)
                 .addMappings(mapper -> {
-                    mapper.map(Category::getId,MiniCategoryResponse::setId);
-                    mapper.map(Category::getName,MiniCategoryResponse::setName);
+                    mapper.map(Category::getId, MiniCategoryResponse::setId);
+                    mapper.map(Category::getName, MiniCategoryResponse::setName);
                 });
 
         // Converter for handling order category -> mini category response
@@ -310,15 +313,15 @@ public class ModelMapperConfig {
                 ctx.getSource() == null ? null : modelMapper.map(ctx.getSource(), MiniCategoryResponse.class);
 
         //File Reference mapping
-        modelMapper.createTypeMap(FileReference.class,FileRefResponse.class)
+        modelMapper.createTypeMap(FileReference.class, FileRefResponse.class)
                 .addMappings(mapper -> {
-                    mapper.map(FileReference::getId,FileRefResponse::setId);
-                    mapper.map(FileReference::getStandardUrl,FileRefResponse::setStandardUrl);
-                    mapper.map(FileReference::isCardImage,FileRefResponse::setCardImage);
-                    mapper.map(FileReference::getDisplayOrder,FileRefResponse::setDisplayOrder);
-                    mapper.map(FileReference::getStatus,FileRefResponse::setStatus);
+                    mapper.map(FileReference::getId, FileRefResponse::setId);
+                    mapper.map(FileReference::getStandardUrl, FileRefResponse::setStandardUrl);
+                    mapper.map(FileReference::isCardImage, FileRefResponse::setCardImage);
+                    mapper.map(FileReference::getDisplayOrder, FileRefResponse::setDisplayOrder);
+                    mapper.map(FileReference::getStatus, FileRefResponse::setStatus);
 
-        });
+                });
 
         // Product mappings
         modelMapper.addMappings(new PropertyMap<Product, ProductResponse>() {
@@ -329,20 +332,21 @@ public class ModelMapperConfig {
                 map().setPrice(source.getPrice());
                 map().setStock(source.getStock());
                 map().setRating(source.getRating());
+                map().setReviewCount(source.getReviewCount());
                 map().setDescription(source.getDescription());
-                using(brandToMiniBrandResponseConverter).map(source.getBrand(),destination.getBrand());
-                using(categoryToMiniCategoryResponseConverter).map(source.getCategory(),destination.getCategory());
+                using(brandToMiniBrandResponseConverter).map(source.getBrand(), destination.getBrand());
+                using(categoryToMiniCategoryResponseConverter).map(source.getCategory(), destination.getCategory());
                 map().setDetailImageUrls(source.getDetailImageUrls());
                 map().setCardImageUrl(source.getCardImageUrl());
                 map().setGender(source.getGender());
                 map().setSizes(source.getSizes());
                 map().setColors(source.getColors());
-                // map().setViewCount(source.getViewCount());
+                map().setViewCount(source.getViewCount());
                 map().setPurchaseCount(source.getPurchaseCount());
                 map().setCreatedAt(source.getCreatedAt());
-                // map().setUpdatedAt(source.getUpdatedAt());
-                using(discountToMiniDiscountResponseConverter).map(source.getDirectDiscount(),destination.getDirectDiscount());
-                using(discountToMiniDiscountResponseConverter).map(source.getOtherDiscount(),destination.getOtherDiscount());
+                map().setUpdatedAt(source.getUpdatedAt());
+                using(discountToMiniDiscountResponseConverter).map(source.getDirectDiscount(), destination.getDirectDiscount());
+                using(discountToMiniDiscountResponseConverter).map(source.getOtherDiscount(), destination.getOtherDiscount());
             }
         });
 
@@ -361,9 +365,51 @@ public class ModelMapperConfig {
                 map().setCardImageUrl(source.getCardImageUrl());
                 map().setPurchaseCount(source.getPurchaseCount());
                 map().setStock(source.getStock());
-                using(discountToMiniDiscountResponseConverter).map(source.getDirectDiscount(),destination.getDirectDiscount());
-                using(discountToMiniDiscountResponseConverter).map(source.getOtherDiscount(),destination.getOtherDiscount());
+                using(discountToMiniDiscountResponseConverter).map(source.getDirectDiscount(), destination.getDirectDiscount());
+                using(discountToMiniDiscountResponseConverter).map(source.getOtherDiscount(), destination.getOtherDiscount());
             }
         });
+
+        Converter<Map<LocalDate, Integer>, Map<LocalDate, Integer>> mapDeepCopyConverter =
+                new Converter<Map<LocalDate, Integer>, Map<LocalDate, Integer>>() {
+                    @Override
+                    public Map<LocalDate, Integer> convert(MappingContext<Map<LocalDate, Integer>, Map<LocalDate, Integer>> context) {
+                        Map<LocalDate, Integer> sourceMap = context.getSource();
+                        if (sourceMap == null) {
+                            return null;
+                        }
+
+                        // Create a new HashMap with the same entries
+                        Map<LocalDate, Integer> destinationMap = new HashMap<>();
+                        for (Map.Entry<LocalDate, Integer> entry : sourceMap.entrySet()) {
+                            destinationMap.put(entry.getKey(), entry.getValue());
+                        }
+
+                        return destinationMap;
+                    }
+                };
+
+
+        modelMapper.createTypeMap(ProductStatistics.class, ProductStatisticsResponse.class)
+                .addMappings(mapper -> {
+                    mapper.map(ProductStatistics::getId, ProductStatisticsResponse::setId);
+                    mapper.map(src -> src.getProduct().getId(), ProductStatisticsResponse::setProductId);
+                    mapper.map(ProductStatistics::getDate, ProductStatisticsResponse::setDate);
+                    mapper.map(ProductStatistics::getViewCount, ProductStatisticsResponse::setViewCount);
+                    mapper.map(ProductStatistics::getPurchaseCount, ProductStatisticsResponse::setPurchaseCount);
+                    mapper.map(ProductStatistics::getRevenue, ProductStatisticsResponse::setRevenue);
+                    mapper.map(ProductStatistics::getAverageRating, ProductStatisticsResponse::setAverageRating);
+                    mapper.map(ProductStatistics::getReviewCount, ProductStatisticsResponse::setReviewCount);
+                    mapper.map(ProductStatistics::getCreatedAt, ProductStatisticsResponse::setCreatedAt);
+                    mapper.map(ProductStatistics::getUpdatedAt, ProductStatisticsResponse::setUpdatedAt);
+
+//                    // Use custom converter for view history
+//                    mapper.using(mapDeepCopyConverter)
+//                            .map(ProductStatistics::getViewHistory, ProductStatisticsResponse::setViewHistory);
+//
+//                    // Use custom converter for purchase history
+//                    mapper.using(mapDeepCopyConverter)
+//                            .map(ProductStatistics::getPurchaseHistory, ProductStatisticsResponse::setPurchaseHistory);
+                });
     }
 }

@@ -3,7 +3,8 @@ import {api} from "@/utils/apiConfig";
 
 export const login = async (request: UserRequest): Promise<void> => {
   try {
-    await api.post('/auth/login', request);
+    const response= await api.post('/auth/login', request);
+    return response.data;
   } catch (error) {
     console.error('Error logging in:', error);
     throw error;

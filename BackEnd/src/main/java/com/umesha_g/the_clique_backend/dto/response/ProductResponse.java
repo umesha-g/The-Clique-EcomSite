@@ -15,7 +15,7 @@ public class ProductResponse {
     private BigDecimal price;
     private Integer stock;
     private Double rating;
-    private int reviewCount;
+    private long reviewCount;
     private String description;
     private MiniBrandResponse brand;
     private MiniCategoryResponse category;
@@ -24,10 +24,10 @@ public class ProductResponse {
     private Gender gender;
     private Set<String> sizes;
     private Set<String> colors;
-    //private Long viewCount;
+    private Long viewCount;
     private Long purchaseCount;
     private LocalDateTime createdAt;
-    //private LocalDateTime updatedAt;
+    private LocalDateTime updatedAt;
     private MiniDiscountResponse directDiscount;
     private MiniDiscountResponse otherDiscount;
 }

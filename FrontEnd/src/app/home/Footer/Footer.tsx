@@ -2,25 +2,25 @@ import React from "react";
 import { FaFacebook, FaInstagram } from "react-icons/fa";
 
 const HomeFooter: React.FC = () => (
-  <div className=" text-white py-8 font-light">
+  <div className=" bg-neutral-800 text-white py-14 font-light">
     <div className="container mx-auto px-4">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
         <div>
           <h4 className="text-lg font-semibold mb-4">Shop</h4>
           <ul className="space-y-2">
             <li>
-              <a href="#" className="hover:underline">
+              <a href="/search" className="hover:underline">
                 New Arrivals
               </a>
             </li>
             <li>
-              <a href="#" className="hover:underline">
+              <a href="/search?sort=purchaseCount%2Cdesc" className="hover:underline">
                 Bestsellers
               </a>
             </li>
             <li>
-              <a href="#" className="hover:underline">
-                Sale
+              <a href="/deals" className="hover:underline">
+                Deals
               </a>
             </li>
           </ul>

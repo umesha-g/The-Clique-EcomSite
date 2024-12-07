@@ -10,6 +10,7 @@ import com.umesha_g.the_clique_backend.model.entity.OrderItem;
 import com.umesha_g.the_clique_backend.model.entity.User;
 import com.umesha_g.the_clique_backend.model.enums.NotificationType;
 import com.umesha_g.the_clique_backend.model.enums.OrderStatus;
+import com.umesha_g.the_clique_backend.model.enums.Role;
 import com.umesha_g.the_clique_backend.repository.OrderRepository;
 import com.umesha_g.the_clique_backend.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +36,6 @@ public class OrderService {
     private  ModelMapper modelMapper;
     private  SecurityUtils securityUtils;
     private ProductStatisticsService productStatisticsService;
-
     private PlatformStatisticsService platformStatisticsService;
 
     @Autowired
@@ -99,6 +99,10 @@ public class OrderService {
 
         platformStatisticsService.addToTotalRevenue(savedOrder.getTotalAmount());
 
+        platformStatisticsService.incrementTotalOrders();
+
+
+
         String userLink = ("/user/"+user.getId()+"-"+user.getFirstName()+"/order/"+order.getId());
 
         notificationService.sendUserNotification(user.getId(),
@@ -147,7 +151,10 @@ public class OrderService {
         User user = securityUtils.getCurrentUser();
         Order order = orderRepository.findById(id).orElse(null);
         assert order != null;
-        if(order.getUser().getId().equals(user.getId())) {
+        if(user.getRole().equals(Role.ADMIN)){
+            return modelMapper.map(order, OrderResponse.class);
+        }
+        else if(order.getUser().getId().equals(user.getId())) {
             return modelMapper.map(order, OrderResponse.class);
         }
         throw new UnauthorizedException("Access Denied!");

@@ -1,15 +1,15 @@
-"use client";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import axios from "axios";
-import { X as CloseIcon, Search as SearchIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
-import React, { useEffect, useRef, useState } from "react";
-import { useDebounce } from "use-debounce";
+'use client';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Search as SearchIcon, X as CloseIcon } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import React, { useEffect, useRef, useState } from 'react';
+import { useDebounce } from 'use-debounce';
+import { getProductNameSuggestions } from '@/api/product-api';
 
 const SearchBar: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null); // Ref for the container
@@ -19,22 +19,8 @@ const SearchBar: React.FC = () => {
   const handleSearchSubmit = (searchTerm: string) => {
     if (searchTerm) {
       router.push(`/search?q=${encodeURIComponent(searchTerm)}`);
-    }
-    else {
+    } else {
       router.push(`/search`);
-    }
-  };
-
-  const getSearchSuggestions = async (query: string): Promise<string[]> => {
-    try {
-      const response = await axios.get(
-        `http://localhost:8080/api/products/searchSuggestions?q=${query}`,
-        { withCredentials: true }
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Failed to fetch suggestions:", error);
-      return [];
     }
   };
 
@@ -42,10 +28,10 @@ const SearchBar: React.FC = () => {
     if (debouncedSearchTerm.length > 0) {
       const fetchSuggestions = async () => {
         try {
-          const data = await getSearchSuggestions(debouncedSearchTerm);
+          const data = await getProductNameSuggestions(debouncedSearchTerm);
           setSuggestions(data);
         } catch (error) {
-          console.error("Failed to fetch suggestions:", error);
+          console.error('Failed to fetch suggestions:', error);
         }
       };
       fetchSuggestions();
@@ -68,9 +54,9 @@ const SearchBar: React.FC = () => {
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 
@@ -84,12 +70,17 @@ const SearchBar: React.FC = () => {
     handleSearchSubmit(suggestion);
   };
 
+  const handleCloseClick = () => {
+    setSuggestions([]);
+    setSearchTerm('')
+  };
+
   return (
     <div
       className="border-none outline-none w-full border-neutral-700"
       ref={containerRef}
     >
-      {" "}
+      {' '}
       {/* Attach ref here */}
       <form
         onSubmit={handleSubmit}
@@ -102,7 +93,7 @@ const SearchBar: React.FC = () => {
           type="text"
           placeholder="Search..."
           className="pl-10 pr-4 py-2 rounded-full border-neutral-700 placeholder:text-neutral-700 placeholder:font-literata text-md font-literata text-neutral-700 w-full "
-          style={{ boxShadow: "none" }}
+          style={{ boxShadow: 'none' }}
         />
         <SearchIcon
           className="absolute hidden lg:block left-3 top-1/2 transform -translate-y-1/2 text-neutral-700"
@@ -110,22 +101,22 @@ const SearchBar: React.FC = () => {
         />
         {suggestions.length > 0 && (
           <Button
-            type="button"
             variant="ghost"
-            onClick={() => setSuggestions([])}
-            className="absolute rounded-xl right-2 top-1/2 -translate-y-1/2"
+            size={"sm"}
+            onClick={() => handleCloseClick()}
+            className="absolute rounded-full w-5 h-5 right-2 top-1/2 -translate-y-1/2"
           >
-            <CloseIcon size={16} className="hover:text-neutral-800" />
+            <CloseIcon size={10} className="hover:text-neutral-800" />
           </Button>
         )}
         {suggestions.length > 0 && (
-          <Card className="absolute z-10 rounded-lg w-full mt-1">
+          <Card className="absolute z-10 rounded-none w-full mt-1">
             <ul>
               {suggestions.map((suggestion, index) => (
                 <li
                   key={index}
                   onClick={() => handleSuggestionClick(suggestion)}
-                  className="px-4 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                  className="px-4 py-2 rounded-none hover:bg-gray-100 dark:hover:bg-gray-700 text-sm text-neutral-600 cursor-pointer"
                 >
                   {suggestion}
                 </li>
@@ -155,9 +146,9 @@ const SearchButton: React.FC = () => {
     }
   };
   useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 

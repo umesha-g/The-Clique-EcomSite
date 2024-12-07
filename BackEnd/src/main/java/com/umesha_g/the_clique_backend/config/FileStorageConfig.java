@@ -21,7 +21,7 @@ public class FileStorageConfig {
     private String userDpDir;
     private long maxFileSize = 5242880; // 5MB
     private List<String> allowedFileTypes = Arrays.asList("image/jpeg", "image/png", "image/webp", "image/jpg");
-    private int imageQuality = 90; // JPEG compression quality
+    private int imageQuality = 90;
     private ImageSize thumbnailSize = new ImageSize(300, 300);
     private ImageSize standardSize = new ImageSize(1000, 1000);
 

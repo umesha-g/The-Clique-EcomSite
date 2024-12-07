@@ -24,7 +24,8 @@ import UsersPanel from './UsersPanel';
 import {MdOutlineBrandingWatermark, MdOutlineDiscount} from "react-icons/md";
 import {OverviewPanel} from "./OverviewPanel";
 import {LuBarChart3} from "react-icons/lu";
-import CommonHeader from "@/app/components/Header";
+import CommonHeader from "@/app/components/CommonHeader";
+import CommonFooter from "@/app/components/CommonFooter";
 
 const DashboardMain: React.FC = () => {
     const [activeTab, setActiveTab] = useState('overview');
@@ -146,7 +147,7 @@ const DashboardMain: React.FC = () => {
                                 <span className="sr-only">Toggle Sidebar</span>
                             </SidebarTrigger>
                         </div>
-                        <div className="flex mt-24 mx-auto p-6 rounded-none">
+                        <div className="flex mt-24 mx-auto p-6  rounded-none">
                             <AnimatePresence mode="wait">
                                 <motion.div
                                     key={activeTab}

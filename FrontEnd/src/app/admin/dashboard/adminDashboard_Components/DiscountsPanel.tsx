@@ -169,7 +169,7 @@ const DiscountsPanel: React.FC = () => {
                         </Button>
                         <Button
                             onClick={() => handleDeleteClick(discount)}
-                            variant="outline"
+                            variant="destructive"
                             size="icon"
                             className="rounded-none"
                         >

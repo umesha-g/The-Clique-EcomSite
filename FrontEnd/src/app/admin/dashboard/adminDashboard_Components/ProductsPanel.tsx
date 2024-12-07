@@ -11,6 +11,7 @@ import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/c
 import {prefix} from "@/utils/apiConfig";
 import {Pagination} from "@/app/components/PaginationComponent";
 import Image from "next/image";
+import {useRouter} from "next/navigation";
 
 const ProductsPanel: React.FC = () => {
     const [products, setProducts] = useState<ProductResponse[]>([]);
@@ -21,6 +22,7 @@ const ProductsPanel: React.FC = () => {
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<ProductResponse | null>(null);
     const { toast } = useToast();
+    const router = useRouter();
 
     const fetchProducts = async () => {
         try {
@@ -115,8 +117,8 @@ const ProductsPanel: React.FC = () => {
                         </TableHeader>
                         <TableBody>
                             {products.map((product) => (
-                                <TableRow key={product.id}>
-                                    <TableCell>
+                                <TableRow className={"cursor-pointer"} key={product.id}>
+                                    <TableCell onClick={() => router.push(`/admin/dashboard/product/${product.id}/`)}>
                                         <Image
                                             src={prefix + product.cardImageUrl}
                                             alt={product.name}
@@ -125,12 +127,12 @@ const ProductsPanel: React.FC = () => {
                                             height={100}
                                         />
                                     </TableCell>
-                                    <TableCell>{product.name}</TableCell>
-                                    <TableCell>Rs.{product.price}</TableCell>
-                                    <TableCell>{product.stock}</TableCell>
-                                    <TableCell>{product.category.name}</TableCell>
-                                    <TableCell>{product.brand?.name}</TableCell>
-                                    <TableCell>{product.rating}</TableCell>
+                                    <TableCell onClick={() => router.push(`/admin/dashboard/product/${product.id}/`)}>{product.name}</TableCell>
+                                    <TableCell onClick={() => router.push(`/admin/dashboard/product/${product.id}/`)}>Rs.{product.price}</TableCell>
+                                    <TableCell onClick={() => router.push(`/admin/dashboard/product/${product.id}/`)}>{product.stock}</TableCell>
+                                    <TableCell onClick={() => router.push(`/admin/dashboard/product/${product.id}/`)}>{product.category.name}</TableCell>
+                                    <TableCell onClick={() => router.push(`/admin/dashboard/product/${product.id}/`)}>{product.brand?.name}</TableCell>
+                                    <TableCell onClick={() => router.push(`/admin/dashboard/product/${product.id}/`)}>{product.rating}</TableCell>
                                     <TableCell className="space-x-2">
                                         <Button
                                             className={"rounded-none"}
@@ -142,7 +144,7 @@ const ProductsPanel: React.FC = () => {
                                         </Button>
                                         <Button
                                             className={"rounded-none"}
-                                            variant="outline"
+                                            variant="destructive"
                                             size="icon"
                                             onClick={() => handleDeleteClick(product)}
                                         >

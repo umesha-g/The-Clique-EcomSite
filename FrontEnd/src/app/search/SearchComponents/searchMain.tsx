@@ -203,7 +203,7 @@ const SearchMain = () => {
   }, [updateFilters]);
 
   return (
-      <div className="flex-col flex">
+      <div className="flex-col min-h-screen flex">
         <Card className="mt-20 border-0 ">
           <CardContent className="p-0 sm:p-4">
             <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8 w-full min-h-screen">

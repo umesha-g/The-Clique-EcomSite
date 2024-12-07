@@ -57,7 +57,7 @@ const CommonHeader: React.FC<CommonHeaderProps> = ({
           </div>
         </div>
         <Logo />
-        <div className="flex items-center space-x-6 content-center justify-end">
+        <div className="flex items-center space-x-4 sm:space-x-6 content-center justify-end">
           {user && <NotificationsButton/>}
           {user && !isAdmin && <CartDrawer/>}
           <UserMenu/>

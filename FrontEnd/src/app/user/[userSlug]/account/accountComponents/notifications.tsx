@@ -41,7 +41,7 @@ export const NotificationTab = () => {
     };
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-4 overflow-scroll h-[700px]">
             {notifications.map((notification) => (
                 <div
                     key={notification.id}

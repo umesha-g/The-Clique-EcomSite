@@ -13,7 +13,7 @@ const OrderStatusBadge = ({ status }: OrderStatusProps) => {
             [OrderStatus.PROCESSING]: { color: 'bg-purple-500' },
             [OrderStatus.SHIPPED]: { color: 'bg-indigo-500', icon: <Truck className="w-4 h-4 mr-1" /> },
             [OrderStatus.DELIVERED]: { color: 'bg-green-500' },
-            [OrderStatus.CANCELLED]: { color: 'bg-red-500' },
+            [OrderStatus.CANCELLED]: { color: 'bg-black' },
             [OrderStatus.RETURNED]: { color: 'bg-orange-500' },
             [OrderStatus.REFUNDED]: { color: 'bg-pink-500' },
             [OrderStatus.FAILED]: { color: 'bg-red-700' }
@@ -24,7 +24,7 @@ const OrderStatusBadge = ({ status }: OrderStatusProps) => {
 
     const config = getStatusConfig(status);
     return (
-        <Badge className={`${config.color} text-white rounded-full mt-4 sm:mt-0 flex items-center`}>
+        <Badge className={`${config.color} text-white py-2 px-3 rounded-full mt-4 sm:mt-0 flex items-center`}>
             {config.icon}
             {status}
         </Badge>

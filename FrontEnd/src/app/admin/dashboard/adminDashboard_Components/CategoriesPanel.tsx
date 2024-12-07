@@ -117,7 +117,7 @@ const CategoriesPanel: React.FC = () => {
                         </Button>
                         <Button
                             onClick={() => handleDeleteClick(category)}
-                            variant="outline"
+                            variant="destructive"
                             className="rounded-none"
                             size="icon"
                         >

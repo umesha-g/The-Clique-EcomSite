@@ -1,6 +1,5 @@
 import {motion} from "framer-motion";
 import {Button} from "@/components/ui/button";
-import {MdDeleteOutline} from "react-icons/md";
 import {Minus, Plus, Trash2} from "lucide-react";
 import React from "react";
 import {CartItemResponse} from "@/api/cart-api";
@@ -19,20 +18,16 @@ interface CartItemProps {
 const CartItem: React.FC<CartItemProps> = ({ item, onIncrease, onDecrease, onRemove }) => {
     const productSlug = createProductSlug(item.product.name, item.product.id);
     const router = useRouter();
-    const activeDiscount = item.product.directDiscount
-        ? item.product.directDiscount
-        : item.product.otherDiscount;
-
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            // initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="w-full border-b border-neutral-200 dark:border-neutral-700 py-4"
+            className="w-full border hover:bg-neutral-100 transition-all p-2 mt-2"
         >
             <div className="flex gap-4">
-                <div className="w-24 h-24 bg-neutral-100 dark:bg-neutral-800 rounded-none border overflow-hidden cursor-pointer"
+                <div className="w-24 h-24 bg-neutral-100 rounded-none border overflow-hidden cursor-pointer"
                      onClick={() => router.push(`/product/${productSlug}`)}
                 >
                     <Image
@@ -46,42 +41,19 @@ const CartItem: React.FC<CartItemProps> = ({ item, onIncrease, onDecrease, onRem
 
                 <div className="flex-1 flex flex-col justify-between">
                     <div className="flex justify-between items-start">
-                        <div>
-                            <h3 className="font-medium text-base">{item.product.name}</h3>
-                            <p className=" text-sm text-neutral-500 mt-1">
+                        <div className={"max-w-40 overflow-hidden"}>
+                            <h3 className="font-semibold text-base ">{item.product.name}</h3>
+                            <p className=" text-xs text-neutral-500 mt-1">
                                 Size: {item.selectedSize} | Color: {item.selectedColour.slice(8)}
                             </p>
                         </div>
-                        <Button
-                            variant="destructive"
-                            className="h-10 w-10 p-0 rounded-none"
-                            onClick={onRemove}
-                        >
-                            <Trash2 className={"text-3xl"} />
-                        </Button>
-                    </div>
-
-                    <div className="flex justify-between items-center mt-2">
-
-                        <div className="mt-1 flex items-center space-x-2  justify-between">
-                            <span className={`text-black text-base sm:text-lg font-semibold`}>
-                              Rs.{(item.subTotal).toFixed(2)}
-                            </span>
-                        {/*{activeDiscount && (*/}
-                        {/*    <div className=" text-sm sm:text-base">*/}
-                        {/*        <span className="line-through text-gray-400">*/}
-                        {/*            Rs.{(item.product.price * item.quantity).toFixed(2)}*/}
-                        {/*        </span>*/}
-                        {/*    </div>*/}
-                        {/*)}*/}
-                        </div>
-
-                        <div className="flex items-center border border-neutral-200 dark:border-neutral-700 rounded-none">
+                        <div className="flex items-center border border-neutral-200 rounded-none">
                             <Button
                                 variant="ghost"
                                 size="sm"
                                 className="h-8 w-8 p-0 rounded-none"
                                 onClick={onDecrease}
+                                disabled={item.quantity <= 1}
                             >
                                 <Minus className="h-3 w-3" />
                             </Button>
@@ -91,12 +63,26 @@ const CartItem: React.FC<CartItemProps> = ({ item, onIncrease, onDecrease, onRem
                                 size="sm"
                                 className="h-8 w-8 p-0 rounded-none"
                                 onClick={onIncrease}
+                                disabled={0 == item.product.stock}
                             >
                                 <Plus className="h-3 w-3" />
                             </Button>
                         </div>
+                    </div>
 
-
+                    <div className="flex justify-between items-center mt-2">
+                        <div className="mt-1 flex items-center space-x-2  justify-between">
+                            <span className={`text-base`}>
+                              Rs.{(item.subTotal).toFixed(2)}
+                            </span>
+                        </div>
+                        <Button
+                            variant="destructive"
+                            className="h-10 w-10 p-0 rounded-none"
+                            onClick={onRemove}
+                        >
+                            <Trash2 className={"text-3xl"} />
+                        </Button>
                     </div>
                 </div>
             </div>

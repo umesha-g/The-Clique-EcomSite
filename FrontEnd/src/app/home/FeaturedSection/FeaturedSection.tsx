@@ -50,15 +50,15 @@ const FeaturedSection: React.FC = () => (
       </motion.a>
 
       <motion.a
-        href="#"
+        href="/deals"
         whileHover={{ scale: 1.025 }}
-        className="bg-neutral-500 h-64 md:h-[260px]"
+        className="bg-neutral-500 items-center flex h-64 md:h-[260px]"
       >
-        <div className=" mx-16 h-full flex flex-col justify-center text-center text-white">
-          <h3 className="text-xl lg:text-3xl mb-3 font-semibold">
+        <div className=" mx-auto border-2 p-14 sm:p-14 md:p-2 xl:p-14 flex flex-col justify-center text-center text-white">
+          <h3 className="text-2xl sm:text-lg md:tex-xl lg:text-3xl mb-3 font-semibold">
             Daily Deals
           </h3>
-          <p className="mb-4 font-light text-base lg:text-xl">
+          <p className="mb-4 font-light text-base sm:text-sm lg:text-lg">
             Up to 70% Off & Free Shipping
           </p>
         </div>

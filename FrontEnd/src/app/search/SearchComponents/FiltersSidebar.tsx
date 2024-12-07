@@ -31,8 +31,11 @@ export const FiltersSidebar = ({
         {value: "createdAt", label: "Newest First"},
         {value: "price,asc", label: "Price: Low to High"},
         {value: "price,desc", label: "Price: High to Low"},
-        {value: "rating,desc", label: "Highest Rated"},
-        {value: "purchaseCount,desc", label: "Most Popular"},
+        {value: "rating,desc", label: "Top Rated"},
+        {value: "purchaseCount,desc", label: "Best Selling"},
+        { value: "viewCount,desc", label: "Most Viewed" },
+        {value: "name,asc", label: "Name: A-Z" },
+        {value: "name,desc", label: "Name: Z-A" },
     ];
 
     const genderOptions = Object.values(Gender).map(gender => ({

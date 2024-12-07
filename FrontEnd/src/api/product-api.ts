@@ -2,6 +2,11 @@ import {Gender, ProductResponse} from './admin/admin-product-api';
 import {api} from "@/utils/apiConfig";
 import {MiniDiscountResponse} from "@/api/discount-api";
 
+export interface ProductSlugResponse {
+  id: string;
+  name: string;
+}
+
 export interface ProductCardResponse {
   id: string;
   name: string;
@@ -32,6 +37,26 @@ export interface PriceRange {
   maxPrice: number;
 }
 
+export interface ProductDiscountRangeParams {
+  minDirectDiscount?: number;
+  maxDirectDiscount?: number;
+  minOtherDiscount?: number;
+  maxOtherDiscount?: number;
+  page?: number;
+  size?: number;
+  sortBy?: string;
+}
+
+export async function getAllProductSlugs(): Promise<ProductSlugResponse[]> {
+  try {
+    const response = await api.get<ProductSlugResponse[]>('/products/slugs');
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch product slugs:', error);
+    return [];
+  }
+}
+
 export const getProductPriceRange = async (): Promise<PriceRange> => {
   try {
     const response = await api.get('/products/price-range');
@@ -48,6 +73,16 @@ export const getProduct = async (id: string): Promise<ProductResponse> => {
     return response.data;
   } catch (error) {
     console.error('Error fetching product:', error);
+    throw error;
+  }
+};
+
+export const getRelatedProduct = async (id: string): Promise<ProductCardResponse[]> => {
+  try {
+    const response = await api.get(`products/${id}/related`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching related product:', error);
     throw error;
   }
 };
@@ -95,5 +130,65 @@ export const getAllProductsByCategory = async (
   } catch (error) {
     console.error('Error fetching products by category:', error);
     throw error;
+  }
+};
+
+export const getBestSellingProducts = async (
+    startDate?: string,
+    endDate?: string,
+): Promise< ProductCardResponse[]> => {
+  try {
+    const response = await api.get('/products/best-selling', {
+      params: { startDate, endDate }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching best-selling products:', error);
+    throw error;
+  }
+};
+
+export const getTrendingProducts = async (
+    startDate?: string,
+    endDate?: string,
+): Promise<ProductCardResponse[]> => {
+  try {
+    const response = await api.get('/products/trending', {
+      params: { startDate, endDate}
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching trending products:', error);
+    throw error;
+  }
+};
+
+export const getProductsByDiscountRange = async (
+    params: ProductDiscountRangeParams
+): Promise<{
+  content: ProductCardResponse[];
+  totalPages: number;
+  totalElements: number;
+}> => {
+  try {
+    const response = await api.get(`/products/deals`, { params });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching products by discount range:', error);
+    throw error;
+  }
+};
+
+export const getProductNameSuggestions = async (
+    searchTerm: string = ''
+): Promise<string[]> => {
+  try {
+    const response = await api.get(`/products/suggestions`, {
+      params: { q: searchTerm }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching product name suggestions:', error);
+    return [];
   }
 };

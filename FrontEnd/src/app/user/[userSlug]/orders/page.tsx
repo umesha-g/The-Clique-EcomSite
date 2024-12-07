@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Package, ArrowUpDown, Search } from 'lucide-react';
-import CommonHeader from "@/app/components/Header";
+import CommonHeader from "@/app/components/CommonHeader";
 import { OrderResponse, OrderStatus } from '@/api/admin/admin-order-api';
 import { getUserOrders } from '@/api/order-api';
 import OrderStatusBadge from "@/app/user/[userSlug]/order/[id]/orderComponents/OrderStatusBadge";
@@ -17,6 +17,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import {Pagination} from "@/app/components/PaginationComponent";
+import CommonFooter from "@/app/components/CommonFooter";
 
 interface OrdersPageProps {
     params: {
@@ -206,6 +207,9 @@ export default function OrdersPage({ params }: OrdersPageProps) {
                     </CardContent>
                 </Card>
             </div>
+            <footer>
+                <CommonFooter height={"h-14"}/>
+            </footer>
         </div>
     );
 }

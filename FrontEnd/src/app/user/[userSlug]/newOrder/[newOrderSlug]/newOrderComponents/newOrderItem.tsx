@@ -95,7 +95,7 @@ export const NewOrderItem: React.FC<CartItemProps> = ({
                                 cartItem.selectedColour,
                                 cartItem.selectedSize
                             )}
-                            disabled={cartItem.quantity >= cartItem.product.stock}
+                            disabled={0 == cartItem.product.stock}
                         >
                             <Plus className="h-3 w-3" />
                         </Button>

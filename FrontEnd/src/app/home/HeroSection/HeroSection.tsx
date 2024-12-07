@@ -43,17 +43,19 @@ const HeroSection: React.FC = () => {
           className={`container mx-auto px-4 transition-all ${textcolors[currentTextColor]}`}
         >
           <div
-            //className={`p-4 relative top-36 bg-opacity-60 ${bgcolors[currentBgColor]} md:bg-transparent md:p-0 md:top-5`}
-            className="p-4 md:p-0 relative top-32 md:top-5"
+            className={`p-6 md:border-2 relative w-[330px] md:w-fit top-36 bg-opacity-100 ${bgcolors[currentBgColor]} md:bg-transparent md:p-0 md:top-5`}
+            //className="p-4 md:p-0 relative top-32 md:top-5"
           >
-            <h1
-              className={`text-4xl md:text-5xl lg:text-6xl xl:text-8xl font-bold mb-4 `}
-            >
-              Unleash Your <br className="block" /> Confidence
-            </h1>
-            <p className="text-lg md:text-xl lg:text-2xl xl:text-3xl mb-6">
-              Explore Fashion
-            </p>
+            <div className={"border-2 md:border-0 p-4"}>
+              <h1
+                className={`text-4xl md:text-5xl lg:text-6xl xl:text-8xl font-bold mb-4 `}
+              >
+                Unleash Your <br className="block" /> Confidence
+              </h1>
+              <p className="text-lg md:text-xl lg:text-2xl xl:text-3xl mb-6">
+                Explore Fashion
+              </p>
+            </div>
           </div>
         </motion.div>
       </div>

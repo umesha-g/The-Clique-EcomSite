@@ -1,11 +1,12 @@
 package com.umesha_g.the_clique_backend.controller.admin;
 
-import com.umesha_g.the_clique_backend.model.entity.admin.PlatformStatistics;
-import com.umesha_g.the_clique_backend.repository.PlatformStatisticsRepository;
+import com.umesha_g.the_clique_backend.dto.response.PlatformStatisticsResponse;
+import com.umesha_g.the_clique_backend.service.PlatformStatisticsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,21 +18,36 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/admin/platform-statistics")
+@PreAuthorize("hasRole('ADMIN')")
 public class AdminPlatformStatisticsController {
 
-    private PlatformStatisticsRepository platformStatisticsRepository;
+    private PlatformStatisticsService platformStatisticsService;
 
     @Autowired
-    public AdminPlatformStatisticsController(PlatformStatisticsRepository platformStatisticsRepository) {
-        this.platformStatisticsRepository = platformStatisticsRepository;
+    public AdminPlatformStatisticsController( PlatformStatisticsService platformStatisticsService) {
+        this.platformStatisticsService = platformStatisticsService;
     }
 
     @GetMapping
-    public ResponseEntity<List<PlatformStatistics>> getPlatformStatistics(
+    public ResponseEntity<List<PlatformStatisticsResponse>> getPlatformStatistics(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ) {
+        List<PlatformStatisticsResponse> statistics = platformStatisticsService
+                .getPlatformStatisticsByDateRange(startDate, endDate);
 
-        List<PlatformStatistics> statistics = platformStatisticsRepository.findAll();
         return ResponseEntity.ok(statistics);
     }
+
+    @GetMapping("/aggregate")
+    public ResponseEntity<PlatformStatisticsResponse> getAggregatedPlatformStatistics(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ) {
+        PlatformStatisticsResponse aggregatedStatistics = platformStatisticsService
+                .aggregatePlatformStatistics(startDate, endDate);
+
+        return ResponseEntity.ok(aggregatedStatistics);
+    }
+
 }

@@ -20,9 +20,10 @@ import { AddressBook } from './accountComponents/addressBook';
 import { NotificationTab } from './accountComponents/notifications';
 import { UserReviews } from './accountComponents/reviews';
 import { cn } from "@/lib/utils";
-import CommonHeader from "@/app/components/Header";
+import CommonHeader from "@/app/components/CommonHeader";
 import { useIsMobile } from '@/hooks/use-mobile';
 import {Icons} from "./accountComponents/icons";
+import CommonFooter from "@/app/components/CommonFooter";
 
 const TABS = [
     {
@@ -94,9 +95,9 @@ export default function AccountPage() {
     );
 
     return (
-        <div className="min-h-screen bg-background">
+        <div className="bg-white">
             <CommonHeader categoryVisibility="hidden" searchBarWidth="0"  isSearchAvailable={false}/>
-            <div className="container mx-auto px-4 py-8">
+            <div className="container min-h-screen mx-auto px-4 py-8">
                 <div className="grid grid-cols-1 mt-24 md:grid-cols-4 gap-6">
                     {isMobile && (
                         <div className="fixed top-4 left-4 z-50">
@@ -141,6 +142,9 @@ export default function AccountPage() {
                     </div>
                 </div>
             </div>
+            <footer>
+                <CommonFooter height={"h-14"}/>
+            </footer>
         </div>
     );
 }

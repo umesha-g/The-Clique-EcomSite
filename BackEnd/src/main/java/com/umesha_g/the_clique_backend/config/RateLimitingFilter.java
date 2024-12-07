@@ -59,14 +59,10 @@ public class RateLimitingFilter extends OncePerRequestFilter {
     }
 
     private String getClientIdentifier(HttpServletRequest request) {
-        // Get client IP, considering X-Forwarded-For header
         String clientIp = request.getHeader("X-Forwarded-For");
         if (clientIp == null || clientIp.isEmpty()) {
             clientIp = request.getRemoteAddr();
         }
-
-        // might want to combine this with other identifiers
-        // like user ID if authenticated, or API key
         return clientIp;
     }
 }

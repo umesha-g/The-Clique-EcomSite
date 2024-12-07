@@ -82,13 +82,16 @@ public class UserService {
         return userRepository.existsByEmail(email);
     }
 
-    public UserResponse updateUser(UserRequest request) throws ResourceNotFoundException {
+    public UserResponse updateUser(UserRequest request) throws ResourceNotFoundException, FileStorageException {
         User currentUser = securityUtils.getCurrentUser();
         if (request.getNewPassword() != null) {
              if (!passwordEncoder.matches(request.getCurrentPassword(), currentUser.getPassword())) {
                 throw new UserException.InvalidPasswordException("Current password is incorrect");
             }
-            currentUser.setPassword(passwordEncoder.encode(request.getNewPassword()));
+             currentUser.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        }
+        if (!currentUser.getUserDPUrl().isEmpty() && request.getUserDPFile() !=null && !currentUser.getUserDPUrl().substring(14).equals("default-dp.jpg")){
+            fileStorageService.deleteFile(currentUser.getUserDPUrl().substring(14));
         }
         return updateUserProcess(currentUser,request);
     }
@@ -108,8 +111,7 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
-        if (!user.getUserDPUrl().isEmpty() && request.getUserDPFile() !=null){
-            System.out.println("file name = "+ user.getUserDPUrl().substring(14));
+        if (!user.getUserDPUrl().isEmpty() && request.getUserDPFile() !=null && !user.getUserDPUrl().substring(14).equals("default-dp.jpg")){
             fileStorageService.deleteFile(user.getUserDPUrl().substring(14));
         }
         return updateUserProcess(user,request);

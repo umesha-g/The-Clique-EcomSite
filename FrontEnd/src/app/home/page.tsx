@@ -6,13 +6,14 @@ import HomeFooter from "./Footer/Footer";
 import HeroSection from "./HeroSection/HeroSection";
 import TestimonialSection from "./TesimonialSection/TestimonialSection";
 import TrendingSection from "./TrendingSection/TrendingSection";
-import CommonHeader from "@/app/components/Header";
+import CommonHeader from "@/app/components/CommonHeader";
+import CommonFooter from "@/app/components/CommonFooter";
+import AttentionAlert from "@/app/home/HeroSection/AttentionAlert";
 
 const HomePage: React.FC = () => {
     const [isReloaded, setIsReloaded] = useState(false);
 
     useEffect(() => {
-        // Only run on client-side
         if (typeof window !== 'undefined') {
             const searchParams = new URLSearchParams(window.location.search);
 
@@ -35,7 +36,10 @@ const HomePage: React.FC = () => {
                                   isSearchAvailable={true}/>
 
                     <main className="relative">
+
+
                         <section>
+                            <AttentionAlert/>
                             <HeroSection/>
                         </section>
 
@@ -56,8 +60,9 @@ const HomePage: React.FC = () => {
                         </section>
                     </main>
 
-                    <footer className="py-8 bg-neutral-800">
+                    <footer className="">
                         <HomeFooter/>
+                        <CommonFooter height={"h-14"}/>
                     </footer>
                 </div>
             </div>

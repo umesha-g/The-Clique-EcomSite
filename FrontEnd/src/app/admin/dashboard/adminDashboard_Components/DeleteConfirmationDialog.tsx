@@ -24,8 +24,8 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
                                                                                type,
                                                                            }) => {
     return (
-        <AlertDialog open={open} onOpenChange={onOpenChange}>
-            <AlertDialogContent>
+        <AlertDialog open={open} onOpenChange={onOpenChange} >
+            <AlertDialogContent className={"rounded-none"}>
                 <AlertDialogHeader>
                     <AlertDialogTitle>Delete {type}</AlertDialogTitle>
                     <AlertDialogDescription>
@@ -33,8 +33,8 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel>No</AlertDialogCancel>
-                    <AlertDialogAction onClick={onConfirm}>Yes</AlertDialogAction>
+                    <AlertDialogCancel className={"rounded-none"}>No</AlertDialogCancel>
+                    <AlertDialogAction className={"rounded-none"} onClick={onConfirm}>Yes</AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>

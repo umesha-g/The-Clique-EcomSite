@@ -1,7 +1,8 @@
 "use client";
-import {Suspense} from "react";
+import React, {Suspense} from "react";
 import dynamic from "next/dynamic";
-import CommonHeader from "@/app/components/Header";
+import CommonHeader from "@/app/components/CommonHeader";
+import CommonFooter from "@/app/components/CommonFooter";
 
 const SearchPage = () => {
     const SearchMain = dynamic(() => import('@/app/search/SearchComponents/searchMain'), {
@@ -15,6 +16,9 @@ const SearchPage = () => {
         }>
             <CommonHeader categoryVisibility="hidden" searchBarWidth="96"  isSearchAvailable={true}/>
             <SearchMain />
+            <footer>
+                <CommonFooter height={"h-14"}/>
+            </footer>
         </Suspense>
     );
 };

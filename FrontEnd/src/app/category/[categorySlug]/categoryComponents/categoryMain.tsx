@@ -61,7 +61,7 @@ export default function CategoryMain({
     };
 
     return (
-        <div className="container mx-auto px-4 py-8">
+        <div className="container min-h-screen mx-auto px-4 py-8">
             <Card className="mb-4 mt-20 md:mt-28 rounded-none">
                 <CardHeader className={"px-6 py-4 border-b"}>
                     <div className={""}>

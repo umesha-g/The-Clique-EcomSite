@@ -15,9 +15,10 @@ import { updateUser } from '@/api/user-api';
 import { useAuth } from '@/contexts/authContext';
 import { toast } from "@/hooks/use-toast";
 import { Eye, EyeOff } from 'lucide-react';
+import ProfilePictureUploader from "./userProfileUpdater";
 
 export const UserProfile: React.FC = () => {
-    const { user, userLoading } = useAuth();
+    const { user, userLoading,updateUserContext } = useAuth();
     const [editProfile, setEditProfile] = useState(false);
     const [editPassword, setEditPassword] = useState(false);
     const [showPasswords, setShowPasswords] = useState({
@@ -29,7 +30,8 @@ export const UserProfile: React.FC = () => {
         firstName: user?.firstName || '',
         lastName: user?.lastName || '',
         email: user?.email || '',
-        phoneNumber: user?.phoneNumber || ''
+        phoneNumber: user?.phoneNumber || '',
+        userDPUrl: user?.userDPUrl || ''
     });
     const [passwordData, setPasswordData] = useState({
         currentPassword: '',
@@ -54,10 +56,19 @@ export const UserProfile: React.FC = () => {
                 firstName: user.firstName,
                 lastName: user.lastName,
                 email: user.email,
-                phoneNumber: user.phoneNumber || ''
+                phoneNumber: user.phoneNumber || '',
+                userDPUrl: user.userDPUrl || ''
             });
         }
     }, [user]);
+
+    const handleProfilePictureUpdate = (newPictureUrl: string) => {
+        setProfileData(prev => ({
+            ...prev,
+            userDPUrl: newPictureUrl
+        }));
+        updateUserContext({ userDPUrl: newPictureUrl });
+    };
 
     const validateProfile = () => {
         try {
@@ -208,7 +219,6 @@ export const UserProfile: React.FC = () => {
 
     return (
         <div className="space-y-6">
-            {/* Profile Information Card */}
             <Card className="w-full rounded-none">
                 <CardHeader>
                     <CardTitle>Personal Information</CardTitle>
@@ -217,6 +227,12 @@ export const UserProfile: React.FC = () => {
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
+                    <div className={"my-10 ml-5 justify-start flex"}>
+                    <ProfilePictureUploader
+                        currentPictureUrl={profileData.userDPUrl}
+                        onPictureUpdate={handleProfilePictureUpdate}
+                    />
+                    </div>
                     {!editProfile ? (
                         <div className="space-y-4">
                             <div className="grid grid-cols-2 gap-4">

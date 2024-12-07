@@ -169,7 +169,7 @@ const UsersPanel: React.FC = () => {
                         </Button>
                         <Button
                             onClick={() => handleDeleteClick(user)}
-                            variant="outline"
+                            variant="destructive"
                             className="rounded-none"
                             size="icon"
                         >

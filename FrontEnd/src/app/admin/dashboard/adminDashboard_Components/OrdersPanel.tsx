@@ -5,15 +5,15 @@ import {
   OrderStatusRequest,
   updateOrderStatus,
 } from '@/api/admin/admin-order-api';
-import {Button} from '@/components/ui/button';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from '@/components/ui/select';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from '@/components/ui/table';
 import React, {useCallback, useEffect, useState} from 'react';
 import {Input} from "@/components/ui/input";
 import debounce from "lodash/debounce";
-import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {Pagination} from "@/app/components/PaginationComponent";
+import {useRouter} from "next/navigation";
+import {Badge} from "@/components/ui/badge";
 
 const OrdersPanel: React.FC = () => {
   const [orders, setOrders] = useState<OrderResponse[]>([]);
@@ -22,6 +22,22 @@ const OrdersPanel: React.FC = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const [status,setStatus] = useState("ALL");
+
+  const getStatusColor = (status: OrderStatus) => {
+    switch(status) {
+      case OrderStatus.PENDING: return 'bg-yellow-500';
+      case OrderStatus.CONFIRMED: return 'bg-blue-500';
+      case OrderStatus.PROCESSING: return 'bg-purple-500';
+      case OrderStatus.SHIPPED: return 'bg-indigo-500';
+      case OrderStatus.DELIVERED: return 'bg-green-500';
+      case OrderStatus.CANCELLED: return 'bg-black';
+      case OrderStatus.RETURNED: return 'bg-orange-500';
+      case OrderStatus.REFUNDED: return 'bg-pink-500';
+      case OrderStatus.FAILED: return 'bg-red-700';
+      default: return 'bg-gray-500';
+    }
+  };
+  const router = useRouter();
 
   const debouncedSearch = useCallback(
       debounce((term: string, status : string) => {
@@ -105,10 +121,8 @@ const OrdersPanel: React.FC = () => {
               <TableHead>Order ID</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Est. Delivery Date</TableHead>
-              <TableHead>Order Amount</TableHead>
-              <TableHead>Shipping Cost</TableHead>
               <TableHead>Total Amount</TableHead>
-              <TableHead>Ordered Items</TableHead>
+              <TableHead>Quantity</TableHead>
               <TableHead>Delivery Address</TableHead>
               <TableHead>Order Created At</TableHead>
               <TableHead>Action</TableHead>
@@ -116,42 +130,24 @@ const OrdersPanel: React.FC = () => {
           </TableHeader>
           <TableBody>
             {orders.map((order) => (
-              <TableRow key={order.id}>
-                <TableCell>{order.id}</TableCell>
-                <TableCell>{order.status}</TableCell>
-                <TableCell>{order.estimatedDeliveryDate}</TableCell>
-                <TableCell>Rs. {order.totalAmount}</TableCell>
-                <TableCell>Rs. {order.shippingCost}</TableCell>
-                <TableCell>Rs. {order.totalAmount + order.shippingCost}</TableCell>
-                <TableCell>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button variant="link">{order.orderItems.length > 0 ? (order.orderItems.length) : (0) } items</Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-60" >
-                        {Array.isArray(order.orderItems) && order.orderItems.length > 0 ? (
-                            order.orderItems.map((item) => (
-                        <p key={item.product.id}>{item.product.name} Rs.{item.product.price} {item.quantity}</p>))):("")}
-                      </PopoverContent>
-                    </Popover>
+              <TableRow className={"cursor-pointer"} key={order.id} >
+                <TableCell onClick={() => router.push(`/admin/dashboard/order/${order.id}/`)}># {order.id}</TableCell>
+                <TableCell onClick={() => router.push(`/admin/dashboard/order/${order.id}/`)}>
+                  <Badge
+                    className={`${getStatusColor(order.status)} px-3 py-1 rounded-full`}
+                >
+                  {order.status}
+                  </Badge>
                 </TableCell>
-                <TableCell>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="link">{order.shippingAddress.addressType} Address</Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-60">
-                      <p >{order.shippingAddress.receiverName}</p>
-                      <p className={'mb-2'}>{order.shippingAddress.phoneNumber}</p>
-                      <p>{order.shippingAddress.addressLine},</p>
-                      <p>{order.shippingAddress.city},</p>
-                      <p>{order.shippingAddress.province},</p>
-                      <p>{order.shippingAddress.country}.</p>
-                      <p className={'mb-2'}>{order.shippingAddress.postalCode}</p>
-                    </PopoverContent>
-                  </Popover>
+                <TableCell onClick={() => router.push(`/admin/dashboard/order/${order.id}/`)}>{order.estimatedDeliveryDate}</TableCell>
+                <TableCell onClick={() => router.push(`/admin/dashboard/order/${order.id}/`)}>Rs. {order.totalAmount}</TableCell>
+                <TableCell onClick={() => router.push(`/admin/dashboard/order/${order.id}/`)}>
+                      <p >{order.orderItems.length > 0 ? (order.orderItems.length) : (0) } items</p>
                 </TableCell>
-                <TableCell>{order.createdAt}</TableCell>
+                <TableCell onClick={() => router.push(`/admin/dashboard/order/${order.id}/`)}>
+                      <p>{order.shippingAddress.city}, {order.shippingAddress.province}</p>
+                </TableCell>
+                <TableCell onClick={() => router.push(`/admin/dashboard/order/${order.id}/`)} >{order.createdAt.slice(0,10)} @ {order.createdAt.slice(11,19) }</TableCell>
                 <TableCell>
                   <Select
                     onValueChange={(value) =>

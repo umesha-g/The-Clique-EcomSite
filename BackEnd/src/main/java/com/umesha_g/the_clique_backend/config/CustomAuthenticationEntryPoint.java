@@ -48,7 +48,6 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
             ipAddress = request.getRemoteAddr();
         }
 
-        // You can add logging here
         // log.warn("Unauthorized access attempt from IP: {} to path: {}", ipAddress, request.getRequestURI());
 
         objectMapper.writeValue(response.getOutputStream(), errorDetails);

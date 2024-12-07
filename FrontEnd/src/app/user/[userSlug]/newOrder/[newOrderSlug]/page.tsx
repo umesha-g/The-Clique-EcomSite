@@ -10,10 +10,11 @@ import { checkOrderId, createOrder, PaymentMethod } from "@/api/order-api";
 import { decrementQuantity, incrementQuantity, removeFromCart } from "@/api/cart-api";
 import { calculateDiscountedPrice } from "@/utils/DIscountCalculator";
 
-import CommonHeader from "@/app/components/Header";
+import CommonHeader from "@/app/components/CommonHeader";
 import { OrderSummary } from './newOrderComponents/orderSummary';
 import { ShippingAddress } from './newOrderComponents/shippingAddress';
 import { PaymentMethod as PaymentMethodComponent } from './newOrderComponents/paymentMethod';
+import CommonFooter from "@/app/components/CommonFooter";
 
 interface OrderPlacementPageProps {
     params: {
@@ -232,6 +233,9 @@ export default function OrderPlacementPage({ params }: OrderPlacementPageProps) 
                     </CardContent>
                 </Card>
             </div>
+            <footer>
+                <CommonFooter height={"h-14"}/>
+            </footer>
         </div>
     );
 }

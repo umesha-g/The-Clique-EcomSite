@@ -9,7 +9,6 @@ interface OrderItemsSectionProps {
 }
 
 const OrderItemsSection: React.FC<OrderItemsSectionProps> = ({ order }) => {
-    const subtotal = order.totalAmount - order.shippingCost;
 
     return (
         <div className="bg-white rounded-none p-4 border">
@@ -59,7 +58,7 @@ const OrderItemsSection: React.FC<OrderItemsSectionProps> = ({ order }) => {
             <div className="space-y-2 mt-4">
                 <div className="flex justify-between">
                     <span>Subtotal</span>
-                    <span>${subtotal.toFixed(2)}</span>
+                    <span>${order.subTotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                     <span>Shipping</span>

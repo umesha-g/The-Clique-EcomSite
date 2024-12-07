@@ -3,12 +3,13 @@ import React, { useState, useEffect } from 'react';
 import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getOrder } from '@/api/order-api';
-import CommonHeader from "@/app/components/Header";
+import CommonHeader from "@/app/components/CommonHeader";
 import OrderHeader from "./orderComponents/OrderHeader";
 import OrderStatusBadge from "./orderComponents/OrderStatusBadge";
 import OrderGeneralInfo from "./orderComponents/OrderGeneralInfo";
 import { OrderResponse, OrderStatus } from '@/api/admin/admin-order-api';
 import { useRouter } from 'next/navigation';
+import CommonFooter from "@/app/components/CommonFooter";
 
 interface OrderDetailsPageProps {
     params: {
@@ -95,7 +96,7 @@ export default function OrderDetailsPage({ params }: OrderDetailsPageProps) {
                 searchBarWidth="64"
                 isSearchAvailable={true}
             />
-            <div className="container mx-auto p-4 mt-0">
+            <div className="container mx-auto p-4 mt-0 min-h-screen">
                 <Card className="rounded-none overflow-hidden mt-20 md:mt-28">
                     <CardHeader className="px-6 py-4 border">
                             <nav className="flex text-sm text-gray-500 space-x-2 ">
@@ -120,6 +121,9 @@ export default function OrderDetailsPage({ params }: OrderDetailsPageProps) {
                     </CardContent>
                 </Card>
             </div>
+            <footer>
+                <CommonFooter height={"h-14"}/>
+            </footer>
         </div>
     );
 }

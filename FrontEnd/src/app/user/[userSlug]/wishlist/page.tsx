@@ -2,12 +2,13 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getWishlist, removeFromWishlist } from "@/api/wishlist-api";
-import CommonHeader from "@/app/components/Header";
+import CommonHeader from "@/app/components/CommonHeader";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {Heart, ShoppingBag} from "lucide-react";
 import {ProductCardResponse} from "@/api/product-api";
 import WishlistItem from "@/app/user/[userSlug]/wishlist/wishlistComponents/WishlistItem";
+import CommonFooter from "@/app/components/CommonFooter";
 
 export default function WishlistPage() {
     const [wishlistItems, setWishlistItems] = useState<ProductCardResponse[]>([]);
@@ -130,6 +131,9 @@ export default function WishlistPage() {
                     </CardContent>
                 </Card>
             </div>
+            <footer>
+                <CommonFooter height={"h-14"}/>
+            </footer>
         </div>
     );
 }

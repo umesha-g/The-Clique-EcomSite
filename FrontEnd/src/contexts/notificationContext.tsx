@@ -1,5 +1,5 @@
 "use client";
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { webSocketService } from '@/utils/webSocketService';
 import {getUnreadNotifications, markAsRead, NotificationResponse, NotificationType} from "@/api/notification-api";
 import {useAuth} from "@/contexts/authContext";
@@ -9,6 +9,8 @@ type NotificationsContextType = {
     notifications: NotificationResponse[];
     unreadCount: number;
     setMarkAsRead: (id: string) => Promise<void>;
+    refreshNotifications: () => Promise<void>;
+    setRefetchCallback: (callback: (() => Promise<void>) | null) => void;
     soundEnabled: boolean;
     toggleSound: () => void;
 };
@@ -25,7 +27,8 @@ export const NotificationsProvider: React.FC<{
 }> = ({ children}) => {
     const [notifications, setNotifications] = useState<NotificationResponse[]>([]);
     const [soundEnabled, setSoundEnabled] = useState(true);
-    const{user} = useAuth();
+    const [refetchCallback, setRefetchCallback] = useState<(() => Promise<void>) | null>(null);
+    const {user} = useAuth();
     const { toast } = useToast()
 
     const playNotificationSound = () => {
@@ -48,7 +51,6 @@ export const NotificationsProvider: React.FC<{
     };
 
     const showToast = (notification: NotificationResponse) => {
-
         const toastVariant = getToastVariant(notification.type);
 
         toast({
@@ -58,8 +60,24 @@ export const NotificationsProvider: React.FC<{
         })
     };
 
+    const refreshNotifications = useCallback(async () => {
+        try {
+            const data = await getUnreadNotifications();
+            if (data) {
+                setNotifications(data);
+            }
+
+            if (refetchCallback) {
+                await refetchCallback();
+            }
+        } catch (error) {
+            console.error('Failed to fetch notifications:', error);
+            setNotifications([]);
+        }
+    }, [refetchCallback]);
+
     useEffect(() => {
-        webSocketService.connect(user?.id);
+        webSocketService.connect(user);
 
         const unsubscribe = webSocketService.subscribe((notification) => {
             setNotifications(prev => [notification, ...prev]);
@@ -68,7 +86,7 @@ export const NotificationsProvider: React.FC<{
             showToast(notification);
         });
 
-        fetchUnreadNotifications();
+        refreshNotifications();
 
         return () => {
             unsubscribe();
@@ -76,27 +94,17 @@ export const NotificationsProvider: React.FC<{
         };
     }, [user?.id]);
 
-    const fetchUnreadNotifications = async () => {
-        try {
-            const data = await getUnreadNotifications();
-            if (data) {
-                setNotifications(data);
-            }
-        } catch (error) {
-            console.error('Failed to fetch notifications:', error);
-        }
-    };
-
     const setMarkAsRead = async (id: string) => {
         try {
             const data = await markAsRead(id);
 
             if (data) {
-                setNotifications(prev =>
-                    prev.map(notif =>
-                        notif.id === id ? { ...notif, read: true } : notif
-                    )
+                const updatedNotifications = notifications.map(notif =>
+                    notif.id === id ? { ...notif, read: true } : notif
                 );
+                setNotifications(updatedNotifications);
+
+                await refreshNotifications();
             }
         } catch (error) {
             console.error('Failed to mark notification as read:', error);
@@ -115,6 +123,8 @@ export const NotificationsProvider: React.FC<{
                 notifications,
                 unreadCount,
                 setMarkAsRead,
+                refreshNotifications,
+                setRefetchCallback,
                 soundEnabled,
                 toggleSound
             }}

@@ -1,32 +1,32 @@
-import { Client } from '@stomp/stompjs';
-import { NotificationResponse } from "@/api/notification-api";
+import {Client} from '@stomp/stompjs';
+import {NotificationResponse} from "@/api/notification-api";
 import SockJS from "sockjs-client";
+import { UserResponse} from "@/api/admin/admin-user-api";
+import {prefix} from "@/utils/apiConfig";
 
 class WebSocketService {
     private client: Client | null = null;
     private subscribers: ((notification: NotificationResponse) => void)[] = [];
     private connectionId: string = '';
 
-    connect(userId?: string) {
-        this.connectionId = `${userId}-${Date.now()}`;
+    connect(user: UserResponse|null) {
+        this.connectionId = `${user?.id}-${Date.now()}`;
 
-        console.log(`Initializing WebSocket connection for ${userId || 'admin'} (${this.connectionId})`);
+        console.log(`Initializing WebSocket connection for ${user?.id || 'admin'} (${this.connectionId})`);
 
         this.client = new Client({
-            webSocketFactory: () => new SockJS('http://192.168.1.100:8080/ws'),
+            webSocketFactory: () => new SockJS(prefix+'/ws'),
             debug: (str) => {
                 console.log(`[WebSocket ${this.connectionId}] ${str}`);
             },
             onConnect: () => {
                 console.log(`[${this.connectionId}] Connected to WebSocket`);
 
-                if (userId) {
-                    this.client?.subscribe(`/user/${userId}/notifications`, (message) => {
-                        console.log(`[${this.connectionId}] Received user notification:`, message.body);
-                        const notification: NotificationResponse = JSON.parse(message.body);
-                        this.notifySubscribers(notification);
-                    });
-                }
+                this.client?.subscribe(`/user/${user?.id}/notifications`, (message) => {
+                    console.log(`[${this.connectionId}] Received user notification:`, message.body);
+                    const notification: NotificationResponse = JSON.parse(message.body);
+                    this.notifySubscribers(notification);
+                });
 
                 this.client?.subscribe('/admin/notifications', (message) => {
                     console.log(`[${this.connectionId}] Received admin notification:`, message.body);
