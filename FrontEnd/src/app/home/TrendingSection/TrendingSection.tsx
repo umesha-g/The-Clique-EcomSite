@@ -25,7 +25,7 @@ const TrendingSection: React.FC = () => {
 
   return (
     <div className=" flex-col flex p-4 border">
-      <h2 className="text-xl md:text-2xl font-semibold mb-2 self-center ">
+      <h2 className="text-xl md:text-2xl font-semibold mb-2 self-center text-balance text-center">
         Trending Outfits
       </h2>
       <p className="mb-12 self-center  text-center">

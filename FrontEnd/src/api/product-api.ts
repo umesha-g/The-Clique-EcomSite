@@ -77,7 +77,7 @@ export const getProduct = async (id: string): Promise<ProductResponse> => {
   }
 };
 
-export const getRelatedProduct = async (id: string): Promise<ProductCardResponse[]> => {
+export const getRelatedProduct = async (id?: string): Promise<ProductCardResponse[]> => {
   try {
     const response = await api.get(`products/${id}/related`);
     return response.data;

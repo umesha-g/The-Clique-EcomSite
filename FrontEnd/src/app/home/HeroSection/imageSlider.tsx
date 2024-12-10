@@ -63,7 +63,7 @@ const ImageSlider: React.FC = () => {
             priority={true}
             layout="responsive"
             objectFit="contain"
-            className="absolute right-0 top-0 md:-mt-20 lg:-mt-32"
+            className="absolute right-0 top-0 mt-16 md:-mt-20 lg:-mt-32"
           />
         </motion.div>
       </AnimatePresence>

@@ -54,7 +54,7 @@ const FeaturedSection: React.FC = () => (
         whileHover={{ scale: 1.025 }}
         className="bg-neutral-500 items-center flex h-64 md:h-[260px]"
       >
-        <div className=" mx-auto border-2 p-14 sm:p-14 md:p-2 xl:p-14 flex flex-col justify-center text-center text-white">
+        <div className=" mx-auto border-2 p-8 sm:p-14 md:p-2 xl:p-14 flex flex-col justify-center text-center text-white">
           <h3 className="text-2xl sm:text-lg md:tex-xl lg:text-3xl mb-3 font-semibold">
             Daily Deals
           </h3>

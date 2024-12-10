@@ -1,16 +1,19 @@
+"use client";
 import ProductGrid from "@/app/components/ProductGrid";
-import {getRelatedProduct, ProductCardResponse} from "@/api/product-api";
+import { ProductCardResponse} from "@/api/product-api";
 
 type relatedProductsProps = {
-    productId: string;
+    products: ProductCardResponse[];
+    loading : boolean;
 }
-export const RelatedProducts:React.FC<relatedProductsProps> = async ({productId}:relatedProductsProps) => {
-    let products: ProductCardResponse[] = [];
+export const RelatedProducts:React.FC<relatedProductsProps> = ({products , loading}) => {
 
-    try {
-        products = await getRelatedProduct(productId);
-    } catch (error) {
-        console.error("Error fetching Related Products:", error);
+    if(loading){
+        return(
+            <div className="flex justify-center items-center h-64">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
+            </div>
+        )
     }
 
     return (

@@ -14,7 +14,7 @@ import {
     AccordionTrigger,
 } from "@/components/ui/accordion";
 import { ProductResponse } from "@/api/admin/admin-product-api";
-import { useState } from "react";
+import React, {useEffect, useState} from "react";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import {
@@ -24,6 +24,10 @@ import {
 import AddToCartButton from "@/app/components/addToCartButton";
 import ProductWishlistButton from "@/app/product/[productSlug]/ProductComponents/ProductWishlistButton";
 import {ActiveDiscount, calculateDiscountedPrice} from "@/utils/DIscountCalculator";
+import {BrandResponse} from "@/api/admin/admin-brand-api";
+import {getBrandById} from "@/api/brand-api";
+import {prefix} from "@/utils/apiConfig";
+import Image from "next/image";
 
 interface ProductInfoProps {
     product: ProductResponse;
@@ -33,16 +37,55 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({ product }) => {
     const [selectedColor, setSelectedColor] = useState(product.colors[0]);
     const [selectedSize, setSelectedSize] = useState(product.sizes[0]);
     const [quantity, setQuantity] = useState(1);
+    const[brand,setBrand] = useState<BrandResponse | null>(null)
+
+    useEffect(() => {
+        const fetchCategory = async () => {
+            if(product.brand){
+                try {
+                    const response = await getBrandById(product.brand.id);
+                    setBrand(response);
+                } catch (error) {
+                    console.error("Error fetching categories:", error);
+                }
+            } else{
+                setBrand(null);
+            }
+        };
+
+        fetchCategory();
+    }, []);
 
     return (
         <div className="space-y-6">
             <div className="space-y-4">
-                <div className={"flex space-x-4 content-center"}>
-                    <h1 className="text-2xl font-bold text-gray-900">{product.name}</h1>
-                    {(product.stock > 0) ?
-                        (<p className={`bg-green-600  text-white  py-1 px-3 rounded-full`}>{product.stock} In Stock</p>)
-                        : (<p className={`bg-red-600  text-white  py-1 px-3 rounded-full`}>Out Of Stock</p>)
+                <div className={"flex-col space-x-4 justify-start"}>
+                    {brand &&
+                        <div className={"flex space-x-2 mb-4 border items-center w-full sm:w-fit py-1 px-2"} >
+                            <Image
+                                src={`${prefix + brand.logoUrl}`}
+                                alt="brand logo"
+                                className="object-cover object-center"
+                                width={80}
+                                height={80}
+                            />
+                            <div className={"flex-col"}>
+                                <p className={"text-sm font-semibold"}>
+                                    {brand.name}
+                                </p>
+                                <p className={"text-xs text-neutral-600"}>
+                                    {brand.description}
+                                </p>
+                            </div>
+                        </div>
                     }
+                    <div className={"grid grid-cols-4 space-x-4 items-center"}>
+                        <h1 className="text-2xl col-span-3 font-bold text-gray-900">{product.name}</h1>
+                        {(product.stock > 0) ?
+                            (<p className={`bg-green-600 text-balance text-white w-32 text-center py-1 px-3 rounded-full`}>{product.stock} In Stock</p>)
+                            : (<p className={`bg-red-600 text-balance text-white w-32 text-center py-1 px-3 rounded-full`}>Out Of Stock</p>)
+                        }
+                    </div>
                 </div>
                 <div className="flex items-center space-x-4">
                     <div className="flex">
