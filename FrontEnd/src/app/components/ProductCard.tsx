@@ -15,10 +15,11 @@ interface ProductCardProps {
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
-    opacity: 1,
+    opacity: 2,
     transition: {
       staggerChildren: 0.1,
     },
+
   },
 };
 
@@ -26,8 +27,6 @@ const itemVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0 },
 };
-
-
 
 const ProductCard = ({ product }: ProductCardProps) => {
   const router = useRouter();
@@ -56,52 +55,53 @@ const ProductCard = ({ product }: ProductCardProps) => {
         <motion.div
             variants={itemVariants}
             whileHover={{ scale: 1.05 }}
-            className="bg-white rounded-none border p-2 sm:p-3 w-full flex-none"
+            className="bg-white rounded-none border w-full flex-none"
         >
           <WishlistHeartButton productId={product.id}  className={"absolute z-10 top-4 right-4"}/>
           <div onClick={handleClick} className="cursor-pointer">
-            <div className="relative border w-full aspect-square">
+            <div className="relative border border-white w-full aspect-square">
               <Image
                   src={prefix + product.cardImageUrl}
                   alt={product.name}
                   className="w-full h-full object-cover rounded-none"
-                  width={100}
-                  height={100}
+                  width={200}
+                  height={200}
               />
             </div>
+            <div className={"p-1 m-1 border items-center flex flex-col"}>
+              <h3 className="mb-1 text-base sm:text-lg font-semibold line-clamp-2">{product.name}</h3>
 
-            <h3 className="my-2 text-sm sm:text-base line-clamp-2">{product.name}</h3>
-
-            <div className="flex items-center gap-1 mb-2">
-              <div className="flex">
-                {[...Array(5)].map((_, i) => (
-                    <FaStar
-                        key={i}
-                        className={`w-3 h-3 sm:w-4 sm:h-4 ${
-                            i < Math.floor(product.rating)
-                                ? "text-yellow-400"
-                                : "text-gray-300"
-                        }`}
-                    />
-                ))}
+              <div className="flex items-center gap-1 ">
+                <div className="flex">
+                  {[...Array(5)].map((_, i) => (
+                      <FaStar
+                          key={i}
+                          className={`w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 ${
+                              i < Math.floor(product.rating)
+                                  ? "text-yellow-400"
+                                  : "text-gray-300"
+                          }`}
+                      />
+                  ))}
+                </div>
+                <span className="text-xs text-gray-500">
+                ({product.purchaseCount} sold)
+              </span>
               </div>
-              <span className="text-xs sm:text-sm text-gray-500">
-              ({product.purchaseCount} sold)
-            </span>
-            </div>
 
-            <div className="mt-1 flex items-center justify-between">
-            <span className="text-red-500 text-base sm:text-lg font-semibold">
-              Rs. {discountedPrice}
-            </span>
-              {activeDiscount && (
-                  <div className="space-x-1 sm:space-x-2 text-sm sm:text-base">
-                <span className="line-through text-gray-400">
-                  {product.price}
-                </span>
-                    <span>-{activeDiscount.discountPercentage}%</span>
-                  </div>
-              )}
+              <div className="flex items-center justify-between">
+              <span className="text-neutral-600 text-sm sm:text-base ">
+                Rs. {discountedPrice}
+              </span>
+                {activeDiscount && (
+                    <div className="space-x-1 sm:space-x-2 text-xs sm:text-sm">
+                  <span className="line-through text-red-500">
+                    {product.price}
+                  </span>
+                      <span>-{activeDiscount.discountPercentage}%</span>
+                    </div>
+                )}
+              </div>
             </div>
           </div>
         </motion.div>

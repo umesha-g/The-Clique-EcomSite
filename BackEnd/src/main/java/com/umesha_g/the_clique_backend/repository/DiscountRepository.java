@@ -10,5 +10,6 @@ import java.util.List;
 @Repository
 public interface DiscountRepository extends JpaRepository<Discount, String> {
     List<Discount> findByIsActiveTrue();
-    List<Discount> findByEndDateBeforeAndIsActiveTrue(LocalDate dateTime);
+    List<Discount> findByEndDateBeforeAndIsActiveTrue(LocalDate endDate);
+    List<Discount> findByStartDateBeforeAndEndDateAfterAndIsActiveFalse(LocalDate startDate, LocalDate endDate);
 }

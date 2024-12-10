@@ -85,8 +85,8 @@ const WishlistHeartButton = ({
           size={24}
           className={`${
             isInWishlist
-              ? "fill-red-500 text-red-500"
-              : "fill-none text-gray-400"
+              ? "fill-red-500 text-red-600"
+              : "fill-none text-white"
           } transition-colors duration-300`}
         />
       </motion.div>

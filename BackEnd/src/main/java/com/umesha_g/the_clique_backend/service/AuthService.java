@@ -43,7 +43,7 @@ public class AuthService {
         response.addCookie(frontendCookie);
 
         response.setHeader("Access-Control-Allow-Credentials", "true");
-        response.setHeader("Access-Control-Allow-Origin", "http://192.168.1.100");
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
     }
 
     public void clearAuthenticationCookie(HttpServletResponse response) {

@@ -44,13 +44,13 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({ images }) => {
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                         >
-                            <div className="w-20 aspect-square relative">
+                            <div className="w-16 lg:w-28 aspect-square relative">
                                 <Image
                                     src={`${prefix + img}`}
                                     alt={`Product view ${index + 1}`}
                                     className="object-cover object-center"
                                     fill
-                                    sizes="80px"
+                                    sizes="100px"
                                 />
                             </div>
                         </motion.div>

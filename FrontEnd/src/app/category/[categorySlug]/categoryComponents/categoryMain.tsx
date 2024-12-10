@@ -77,7 +77,7 @@ export default function CategoryMain({
                     </div>
 
                 </CardHeader>
-                <CardContent className={"p-2"}>
+                <CardContent className={"p-4"}>
                     <CardTitle className={"mt-4"}>{category?.name}</CardTitle>
                     <CardDescription>{category?.description}</CardDescription>
                     <p className="text-gray-600 mt-8">

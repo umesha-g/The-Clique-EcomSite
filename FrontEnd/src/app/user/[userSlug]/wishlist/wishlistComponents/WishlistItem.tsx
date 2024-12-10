@@ -25,7 +25,7 @@ const WishlistItem = ({
                             src={prefix + item.cardImageUrl}
                             alt={item.name}
                             fill
-                            className="object-cover rounded-md"
+                            className="object-cover rounded-none"
                         />
                     </div>
                     <div className={"ml-3 sm:ml-5 sm:flex sm:justify-center"}>
