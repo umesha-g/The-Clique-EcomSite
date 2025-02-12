@@ -4,7 +4,7 @@ import { FaFacebook, FaInstagram } from "react-icons/fa";
 const HomeFooter: React.FC = () => (
   <div className=" bg-neutral-800 text-white py-14 font-light">
     <div className="container mx-auto px-4">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+      <div className="ml-5 md:ml-0 grid grid-cols-2 md:grid-cols-4 gap-8">
         <div>
           <h4 className="text-lg font-semibold mb-4">Shop</h4>
           <ul className="space-y-2">
@@ -29,19 +29,19 @@ const HomeFooter: React.FC = () => (
           <h4 className="text-lg font-semibold mb-4">About</h4>
           <ul className="space-y-2">
             <li>
-              <a href="#" className="hover:underline">
-                Our Story
+              <a href="/about" className="hover:underline">
+                The Story
               </a>
             </li>
             <li>
-              <a href="#" className="hover:underline">
+              <p className="hover:underline">
                 Careers
-              </a>
+              </p>
             </li>
             <li>
-              <a href="#" className="hover:underline">
+              <p className="hover:underline">
                 Press
-              </a>
+              </p>
             </li>
           </ul>
         </div>
@@ -49,19 +49,19 @@ const HomeFooter: React.FC = () => (
           <h4 className="text-lg font-semibold mb-4">Customer Service</h4>
           <ul className="space-y-2">
             <li>
-              <a href="#" className="hover:underline">
+              <p className="hover:underline">
                 Contact Us
-              </a>
+              </p>
             </li>
             <li>
-              <a href="#" className="hover:underline">
+              <p className="hover:underline">
                 Shipping
-              </a>
+              </p>
             </li>
             <li>
-              <a href="#" className="hover:underline">
+              <p className="hover:underline">
                 Returns
-              </a>
+              </p>
             </li>
           </ul>
         </div>

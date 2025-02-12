@@ -77,7 +77,7 @@ const WishlistHeartButton = ({
       disabled={isLoading}
     >
       <motion.div
-        initial={{ scale: 1 }}
+        initial={{ scale: 1 }} 
         animate={{ scale: isInWishlist ? [1, 2, 1] : 1 }}
         transition={{ duration: 0.3 }}
       >
@@ -85,8 +85,8 @@ const WishlistHeartButton = ({
           size={24}
           className={`${
             isInWishlist
-              ? "fill-red-500 text-red-600"
-              : "fill-none text-white"
+              ? "fill-red-500 text-red-800"
+              : "fill-neutral-300 text-neutral-700"
           } transition-colors duration-300`}
         />
       </motion.div>

@@ -1,7 +1,7 @@
 import {Client} from '@stomp/stompjs';
 import {NotificationResponse} from "@/api/notification-api";
 import SockJS from "sockjs-client";
-import { UserResponse} from "@/api/admin/admin-user-api";
+import { Role, UserResponse} from "@/api/admin/admin-user-api";
 import {prefix} from "@/utils/apiConfig";
 
 class WebSocketService {
@@ -11,28 +11,27 @@ class WebSocketService {
 
     connect(user: UserResponse|null) {
         this.connectionId = `${user?.id}-${Date.now()}`;
-
         console.log(`Initializing WebSocket connection for ${user?.id || 'admin'} (${this.connectionId})`);
 
         this.client = new Client({
-            webSocketFactory: () => new SockJS(prefix+'/ws'),
+            webSocketFactory: () => new SockJS('/ws'),
             debug: (str) => {
                 console.log(`[WebSocket ${this.connectionId}] ${str}`);
             },
             onConnect: () => {
                 console.log(`[${this.connectionId}] Connected to WebSocket`);
 
-                this.client?.subscribe(`/user/${user?.id}/notifications`, (message) => {
-                    console.log(`[${this.connectionId}] Received user notification:`, message.body);
-                    const notification: NotificationResponse = JSON.parse(message.body);
-                    this.notifySubscribers(notification);
-                });
-
-                this.client?.subscribe('/admin/notifications', (message) => {
-                    console.log(`[${this.connectionId}] Received admin notification:`, message.body);
-                    const notification: NotificationResponse = JSON.parse(message.body);
-                    this.notifySubscribers(notification);
-                });
+                if (user?.role == Role.ADMIN) {
+                    this.client?.subscribe('/admin/notifications', (message) => {
+                        const notification: NotificationResponse = JSON.parse(message.body);
+                        this.notifySubscribers(notification);
+                    });
+                } else if (user?.role == Role.USER) {
+                    this.client?.subscribe(`/user/${user?.id}/notifications`, (message) => {
+                        const notification: NotificationResponse = JSON.parse(message.body);
+                        this.notifySubscribers(notification);
+                    });
+                }
             },
             onDisconnect: () => {
                 console.log(`[${this.connectionId}] Disconnected from WebSocket`);

@@ -37,7 +37,6 @@ const HomePage: React.FC = () => {
 
                     <main className="relative">
 
-
                         <section>
                             <AttentionAlert/>
                             <HeroSection/>

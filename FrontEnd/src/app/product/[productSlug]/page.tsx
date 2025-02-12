@@ -74,7 +74,7 @@ export default function ProductPage({ params }: { params: { productSlug: string 
         <div >
             <CommonHeader categoryVisibility={"visible"} searchBarWidth={"64"} isSearchAvailable={true}/>
             <div className="container mx-auto p-4 min-h-screen ">
-                <Card className="rounded-none mt-28">
+                <Card className="rounded-none mt-20 md:mt-28">
                     <CardHeader className="px-6 py-4 border-b">
                         <nav className="flex text-sm text-gray-500 space-x-2">
                             <a href="/home" className="hover:text-gray-800">Home</a>
@@ -90,14 +90,14 @@ export default function ProductPage({ params }: { params: { productSlug: string 
                         </nav>
                     </CardHeader>
                     <CardContent className="p-4 md:p-6">
-                        <div className="flex flex-col md:flex-row gap-8">
-                            <Card className="md:w-1/2 rounded-none mb-4">
+                        <div className="flex flex-col md:flex-row gap-4 md:gap-8">
+                            <Card className="md:w-1/2 h-auto rounded-none">
                                 <CardContent className="p-4">
                                     <ProductGallery images={product.detailImageUrls} />
                                 </CardContent>
                             </Card>
 
-                            <Card className="md:w-1/2 rounded-none ">
+                            <Card className="md:w-1/2 h-auto rounded-none ">
                                 <CardContent className="p-4">
                                     <ProductInfo
                                         product={product}
@@ -108,12 +108,12 @@ export default function ProductPage({ params }: { params: { productSlug: string 
                     </CardContent>
                 </Card>
 
-                {relatedProducts &&
+                {relatedProducts && 
                     <Card className="mt-8 rounded-none ">
                         <CardHeader className="px-6 py-4 border-b">
                             <h2 className="text-2xl font-bold text-gray-800">Related Products</h2>
                         </CardHeader>
-                        <CardContent className="p-6">
+                        <CardContent className="p-4 md:p-6">
                             <RelatedProducts products={relatedProducts} loading={relatedLoading}/>
                         </CardContent>
                     </Card> }

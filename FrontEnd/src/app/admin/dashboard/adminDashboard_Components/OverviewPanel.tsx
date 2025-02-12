@@ -127,7 +127,7 @@ export const OverviewPanel: React.FC = () => {
               <div className={"border p-4"}  >
                 <div className="text-sm text-muted-foreground">Total Revenue</div>
                 <div className="text-2xl font-bold">
-                  ${aggregatedStats.totalRevenue.toLocaleString()}
+                  Rs.{aggregatedStats.totalRevenue.toLocaleString()}
                 </div>
               </div>
               <div className={"border p-4"}>

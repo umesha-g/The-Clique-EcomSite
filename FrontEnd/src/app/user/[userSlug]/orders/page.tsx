@@ -122,9 +122,9 @@ export default function OrdersPage({ params }: OrdersPageProps) {
                         </nav>
                     </CardHeader>
 
-                    <CardContent className="p-6">
-                        <div className="flex justify-between items-center">
-                            <div>
+                    <CardContent className="p-4 sm:p-6">
+                        <div className="flex justify-between items-start">
+                            <div className={"mb-8"}>
                                 <CardTitle className=" text-xl sm:text-2xl">My Orders</CardTitle>
                                 <p className="text-sm text-gray-500 mt-1">
                                     View and manage your orders
@@ -142,10 +142,14 @@ export default function OrdersPage({ params }: OrdersPageProps) {
                             </Select>
                         </div>
                         {orders.length === 0 ? (
-                            <div className="text-center py-12">
+                            <div className="flex flex-col items-center justify-center space-y-4 py-16">
                                 <Package className="w-16 h-16 text-beige-300 mx-auto mb-4" />
-                                <h3 className="text-lg font-medium">No Orders Found</h3>
-                                <p className="text-gray-500 mt-2">You haven't placed any orders yet.</p>
+                                <h2 className="text-xl font-semibold text-gray-800">
+                                    No Orders Found
+                                </h2>
+                                <p className="text-gray-500 text-center mt-2">
+                                    You haven't placed any orders yet.
+                                    </p>
                                 <Button
                                     onClick={() => router.push('/home')}
                                     className="mt-4 rounded-full"
@@ -154,7 +158,7 @@ export default function OrdersPage({ params }: OrdersPageProps) {
                                 </Button>
                             </div>
                         ) : (
-                            <div className="space-y-4 mt-10">
+                            <div className="space-y-4 mt-8">
                                 {orders.map((order) => (
                                     <Card
                                         key={order.id}
@@ -175,7 +179,7 @@ export default function OrdersPage({ params }: OrdersPageProps) {
                                                     </div>
                                                     <div className="mt-2 ml-12 sm:ml-14">
                                                         <p className="text-sm text-gray-600">
-                                                            {order.orderItems.length} items • Total: ${order.totalAmount.toFixed(2)}
+                                                            {order.orderItems.length} items • Total: Rs.{order.totalAmount.toFixed(2)}
                                                         </p>
                                                     </div>
                                                 </div>

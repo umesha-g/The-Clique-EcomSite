@@ -6,15 +6,14 @@ const TestimonialSection: React.FC = () => (
       <div className={"border max-w-[1500px] p-6"}>
         <h2 className="text-xl md:text-2xl font-semibold mb-6">Testimonials</h2>
         <blockquote className="text-lg font-playfair italic font-thin px-5 mb-4">
-          Exercitation photo booth stumptown tote bag Banksy, elit small batch
-          freegan sed
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
         </blockquote>
         <div className=" flex justify-center items-center">
           <Avatar className=" ring-1 ring-offset-2 ring-neutral-800 h-10 w-10 mr-5">
             <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
-          <p className="font-semibold">Sarah Connor</p>
+          <p className="font-semibold">Morty Smith</p>
         </div>
       </div>
   </div>

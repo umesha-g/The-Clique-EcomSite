@@ -6,9 +6,9 @@ import ImageSlider from "./imageSlider";
 const HeroSection: React.FC = () => {
   const bgcolors = ["bg-neutral-400", "bg-beige-300", "bg-neutral-300"];
   const textcolors = [
-    "text-neutral-300 md:text-neutral-700 ",
-    "text-beige-700 md:text-beige-800",
-    "text-neutral-500 md:text-neutral-500 ",
+    "text-neutral-700 ",
+    "text-beige-800",
+    "text-neutral-500 ",
   ];
   const [currentBgColor, setCurrentBgColor] = useState(0);
   const [currentTextColor, setCurrentTextColor] = useState(0);

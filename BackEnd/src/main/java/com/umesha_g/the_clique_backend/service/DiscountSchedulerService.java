@@ -58,23 +58,4 @@ public class DiscountSchedulerService {
                     });
         }
     }
-
-//    @Scheduled(cron = "0 0 * * * *") // Run every hour
-//    @Transactional
-//    public void checkAndUpdateNewDiscounts() {
-//        LocalDate now = LocalDate.now();
-//        List<Discount> expiredDiscounts = discountRepository.findByStartDateBeforeAndEndDateAfterAndIsActiveFalse(now,now);
-//
-//        for (Discount discount : expiredDiscounts) {
-//            // Activate discount
-//            discount.setActive(true);
-//            discountRepository.save(discount);
-//
-//            productRepository.findByOtherDiscount(discount)
-//                    .forEach(product -> {
-//                        product.setOtherDiscount(null);
-//                        productRepository.save(product);
-//                    });
-//        }
-//    }
 }

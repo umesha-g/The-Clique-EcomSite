@@ -129,7 +129,7 @@ export default function OrderConfirmationPage({ params }: OrderConfirmationPageP
                                             <p className="text-sm text-gray-600">
                                                 {order.orderItems.length} items
                                                 <br />
-                                                Total: ${order.totalAmount.toFixed(2)}
+                                                Total: Rs.{order.totalAmount.toFixed(2)}
                                             </p>
                                         </div>
                                     </div>

@@ -41,15 +41,13 @@ export function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL('/home', request.url));
     }
 
-    if (path.startsWith('/admin') && !isTokenValid) {
+    if (path.startsWith('/admin') && !(isTokenValid && userRole === 'ROLE_ADMIN')) {
         const redirectUrl = new URL('/home', request.url);
-        redirectUrl.searchParams.set('callbackUrl', path);
         return NextResponse.redirect(redirectUrl);
     }
 
-    if (path.startsWith('/user') && !isTokenValid) {
+    if (path.startsWith('/user') && !(isTokenValid && userRole === 'ROLE_USER')) {
         const redirectUrl = new URL('/home', request.url);
-        redirectUrl.searchParams.set('callbackUrl', path);
         return NextResponse.redirect(redirectUrl);
     }
 

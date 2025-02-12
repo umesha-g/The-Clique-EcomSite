@@ -45,7 +45,7 @@ const OrderItemsSection: React.FC<OrderItemsSectionProps> = ({ order }) => {
                                     <p className="text-sm text-gray-500">Quantity: {item.quantity}</p>
                                 </div>
                                 <p className="font-bold">
-                                    ${item.subTotal.toFixed(2)}
+                                    Rs.{item.subTotal.toFixed(2)}
                                 </p>
                             </div>
                         </div>
@@ -58,16 +58,16 @@ const OrderItemsSection: React.FC<OrderItemsSectionProps> = ({ order }) => {
             <div className="space-y-2 mt-4">
                 <div className="flex justify-between">
                     <span>Subtotal</span>
-                    <span>${order.subTotal.toFixed(2)}</span>
+                    <span>Rs.{order.subTotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                     <span>Shipping</span>
-                    <span>${order.shippingCost.toFixed(2)}</span>
+                    <span>Rs.{order.shippingCost.toFixed(2)}</span>
                 </div>
                 <Separator className="my-2" />
                 <div className="flex justify-between font-bold text-lg">
                     <span>Total</span>
-                    <span>${order.totalAmount.toFixed(2)}</span>
+                    <span>Rs.{order.totalAmount.toFixed(2)}</span>
                 </div>
             </div>
         </div>

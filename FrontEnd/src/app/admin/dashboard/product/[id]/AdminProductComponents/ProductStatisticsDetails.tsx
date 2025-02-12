@@ -135,7 +135,7 @@ const ProductStatisticsDetails: React.FC<{ productId: string }> = ({ productId }
                         <DollarSign className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">${totalRevenue.toLocaleString()}</div>
+                        <div className="text-2xl font-bold">Rs.{totalRevenue.toLocaleString()}</div>
                     </CardContent>
                 </Card>
             </div>

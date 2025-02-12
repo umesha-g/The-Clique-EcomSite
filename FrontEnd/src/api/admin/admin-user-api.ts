@@ -12,8 +12,8 @@ export interface UserRequest {
 }
 
 export enum Role {
-  USER,
-  ADMIN,
+  USER ="USER",
+  ADMIN = "ADMIN",
 }
 
 export interface UserResponse {

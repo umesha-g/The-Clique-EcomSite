@@ -14,6 +14,8 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({ images }) => {
     const [touchStart, setTouchStart] = useState(0);
     const [touchEnd, setTouchEnd] = useState(0);
     const minSwipeDistance = 50;
+    const [isLeftSwipe , setLeftSwipe] = useState<boolean>();
+    const [isRightSwipe , setRightSwipe] = useState<boolean>();
 
     const handleTouchStart = (e: React.TouchEvent) => {
         setTouchStart(e.targetTouches[0].clientX);
@@ -27,8 +29,8 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({ images }) => {
         if (!touchStart || !touchEnd) return;
 
         const distance = touchStart - touchEnd;
-        const isLeftSwipe = distance > minSwipeDistance;
-        const isRightSwipe = distance < -minSwipeDistance;
+        setLeftSwipe( distance > minSwipeDistance);
+        setRightSwipe( distance < -minSwipeDistance);
 
         if (isLeftSwipe && selectedImageIndex < images.length - 1) {
             setSelectedImageIndex(prev => prev + 1);
@@ -43,7 +45,7 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({ images }) => {
     return (
         <div className="w-full space-y-4">
             <motion.div
-                className="relative w-full aspect-square border p-6 bg-gray-100 overflow-hidden"
+                className="relative w-full aspect-square border overflow-hidden"
                 onTouchStart={handleTouchStart}
                 onTouchMove={handleTouchMove}
                 onTouchEnd={handleTouchEnd}
@@ -51,9 +53,9 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({ images }) => {
                 <AnimatePresence>
                     <motion.div
                         key={selectedImageIndex}
-                        initial={{ opacity: 0, x: 100 }}
+                        initial={{ opacity: 0, x: (isLeftSwipe? 100 : -100) }}
                         animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -100 }}
+                        exit={{ opacity: 0, x: (isLeftSwipe? -100 : 100) }}
                         transition={{ duration: 0.2 }}
                         className="absolute inset-0"
                     >
@@ -70,7 +72,7 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({ images }) => {
             </motion.div>
 
             <ScrollArea className="w-full whitespace-nowrap">
-                <div className="grid grid-flow-col md:grid-cols-3 md:grid-rows-2 xl:grid-rows-1 xl:grid-cols-6 gap-2 p-2">
+                <div className="grid grid-cols-6 grid-rows-1 md:grid-cols-3 md:grid-rows-2 xl:grid-rows-1 xl:grid-cols-6 gap-2 p-2">
                     {images.map((img, index) => (
                         <motion.div
                             key={index}

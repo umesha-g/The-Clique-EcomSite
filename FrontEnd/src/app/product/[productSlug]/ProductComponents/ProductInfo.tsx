@@ -79,11 +79,11 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({ product }) => {
                             </div>
                         </div>
                     }
-                    <div className={"grid grid-cols-4 space-x-4 items-center"}>
-                        <h1 className="text-2xl col-span-3 font-bold text-gray-900">{product.name}</h1>
+                    <div className={"grid grid-cols-3 items-center"}>
+                        <h1 className="text-2xl font-bold col-span-2 text-gray-900">{product.name}</h1>
                         {(product.stock > 0) ?
-                            (<p className={`bg-green-600 text-balance text-white w-32 text-center py-1 px-3 rounded-full`}>{product.stock} In Stock</p>)
-                            : (<p className={`bg-red-600 text-balance text-white w-32 text-center py-1 px-3 rounded-full`}>Out Of Stock</p>)
+                            (<p className={`bg-green-600 text-balance text-white w-28 text-center py-1 px-3 rounded-full`}>{product.stock} In Stock</p>)
+                            : (<p className={`bg-red-600 text-balance text-white w-28 text-center py-1 px-3 rounded-full`}>Out Of Stock</p>)
                         }
                     </div>
                 </div>

@@ -14,11 +14,13 @@ const SearchPage = () => {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
             </div>
         }>
-            <CommonHeader categoryVisibility="hidden" searchBarWidth="96"  isSearchAvailable={true}/>
-            <SearchMain />
-            <footer>
-                <CommonFooter height={"h-14"}/>
-            </footer>
+            <div className ="min-h-screen">
+                <CommonHeader categoryVisibility="hidden" searchBarWidth="96"  isSearchAvailable={true}/>
+                <SearchMain />
+                <footer>
+                    <CommonFooter height={"h-14"}/>
+                </footer>
+            </div>
         </Suspense>
     );
 };

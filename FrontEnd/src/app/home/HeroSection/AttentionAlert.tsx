@@ -31,8 +31,11 @@ const AttentionAlert = () => {
                 <AlertDialogHeader>
                     <AlertDialogTitle>Attention !</AlertDialogTitle>
                     <AlertDialogDescription>
-                        This Site is made for Test Purpose Only. All Products in This site are Fake.
-                        Please feel free to explore The Clique. Thank you for visiting.
+                       Welcome to my practice e-commerce site! Please note that this website is for learning and practice purposes only. The products displayed are not real, and purchases you make will not be delivered.
+
+<br></br> I kindly ask that you <span className="text-red-500"> avoid providing any real personal or payment information.</span> Feel free to explore the features and enjoy browsing.
+
+Thank you for visiting!
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>

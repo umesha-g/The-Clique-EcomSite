@@ -20,6 +20,7 @@ const AuthForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
+  const [activeTab, setActiveTab] = useState('login'); // Add state for active tab
 
   const router = useRouter();
   const { toast } = useToast();
@@ -37,15 +38,12 @@ const AuthForm: React.FC = () => {
         duration: 2000,
       });
 
-      // Clear form fields
       setEmail('');
       setCurrentPassword('');
 
-      // Determine redirect URL
       const params = new URLSearchParams(window.location.search);
       const callbackUrl = params.get('callbackUrl') || '/home';
 
-      // Slight delay to show toast
       setTimeout(() => {
         router.push(callbackUrl);
         router.refresh();
@@ -81,14 +79,11 @@ const AuthForm: React.FC = () => {
         duration: 5000,
       });
 
-      // Clear form fields
       setName('');
       setEmail('');
       setNewPassword('');
 
-      const tabsList = document.querySelector('[role="tablist"]');
-      const loginTab = tabsList?.querySelector('[value="login"]') as HTMLElement;
-      loginTab?.click();
+      setActiveTab('login');
 
     } catch (error: any) {
       console.error('Registration failed:', error);
@@ -134,7 +129,12 @@ const AuthForm: React.FC = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Tabs defaultValue="login" className="w-full">
+                <Tabs 
+                  value={activeTab} 
+                  onValueChange={setActiveTab} 
+                  defaultValue="login" 
+                  className="w-full"
+                >
                   <TabsList className="grid w-full grid-cols-2 rounded-none">
                     <TabsTrigger className="rounded-none" value="login">Login</TabsTrigger>
                     <TabsTrigger className="rounded-none" value="register">Register</TabsTrigger>
@@ -231,8 +231,8 @@ const AuthForm: React.FC = () => {
                 </Tabs>
               </CardContent>
               <CardFooter>
-                <p className="text-sm text-center text-red-500 font-semibold w-full">
-                  This Site is made for Test Purpose Only. All Products in This site are Fake.
+                <p className="text-sm text-center text-red-500 w-full">
+                  This Site is made for Practice Purpose Only. Please do not provide Real Personal data.
                 </p>
               </CardFooter>
             </Card>

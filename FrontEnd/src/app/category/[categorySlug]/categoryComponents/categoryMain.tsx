@@ -79,7 +79,7 @@ export default function CategoryMain({
                 </CardHeader>
                 <CardContent className={"p-4"}>
                     <CardTitle className={"mt-4"}>{category?.name}</CardTitle>
-                    <CardDescription>{category?.description}</CardDescription>
+                    <CardDescription className="mt-4">{category?.description}</CardDescription>
                     <p className="text-gray-600 mt-8">
                         Showing {products.length} of {totalElements} products
                     </p>

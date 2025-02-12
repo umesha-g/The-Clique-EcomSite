@@ -111,7 +111,7 @@ const CartDrawer = () => {
                         <div className="border-t mt-auto  pt-4">
                             <div className="flex justify-between items-center mb-4">
                                 <span className="text-sm text-neutral-500">Subtotal</span>
-                                <span className="font-medium">${totalPrice.toFixed(2)}</span>
+                                <span className="font-medium">Rs.{totalPrice.toFixed(2)}</span>
                             </div>
                             <Button onClick={()=> handleProceedToCheckout()} className="w-full rounded-none" size="lg">
                                 Proceed to Checkout

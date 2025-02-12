@@ -39,7 +39,7 @@ const CommonHeader: React.FC<CommonHeaderProps> = ({
 
   return (
     <header
-      className={`left-0 right-0 fixed z-50 transition-all ease-in-out bg-white ${isBgTransparent} `}
+      className={`left-0 right-0 fixed z-50 transition-all h-14 lg:h-[70px] items-center flex ease-in-out bg-white ${isBgTransparent} `}
     >
       <nav className="container relative mx-auto pr-5 py-4 flex items-center justify-between">
         <div className="flex flex-row-reverse lg:flex-row space-x-6 items-center">

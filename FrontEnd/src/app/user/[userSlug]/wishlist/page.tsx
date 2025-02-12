@@ -107,22 +107,22 @@ export default function WishlistPage() {
                         </div>
                         {wishlistItems.length === 0 ? (
                             <div className="flex flex-col items-center justify-center space-y-4 py-16">
-                                <Heart className="h-16 w-16 text-beige-200" />
-                                <h2 className="text-2xl font-bold text-gray-800">
+                                <Heart className="h-16 w-16 text-beige-300 mx-auto mb-4" />
+                                <h2 className="text-xl font-semibold text-gray-800">
                                     Your Wishlist is Empty
                                 </h2>
-                                <p className="text-gray-500 text-center">
+                                <p className="text-gray-500 text-center mt-2">
                                     Explore our products and add items you love to your wishlist.
                                 </p>
                                 <Button
                                     onClick={() => router.push("/home")}
-                                    className="rounded-full"
+                                    className="mt-4 rounded-full"
                                 >
                                     <ShoppingBag className="mr-2 h-4 w-4" /> Continue Shopping
                                 </Button>
                             </div>
                         ) : (
-                            <div className="space-y-4">
+                            <div className="space-y-4 mt-8">
                                 {wishlistItems.map((item) => (
                                     <WishlistItem key={item.id} item={item} onRemove={handleRemoveFromWishlist}/>
                                 ))}

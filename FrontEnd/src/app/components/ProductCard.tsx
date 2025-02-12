@@ -63,13 +63,14 @@ const ProductCard = ({ product }: ProductCardProps) => {
               <Image
                   src={prefix + product.cardImageUrl}
                   alt={product.name}
-                  className="w-full h-full object-cover rounded-none"
-                  width={200}
-                  height={200}
+                  className="w-full h-full object-cover object-center rounded-none"
+                  fill
+                  sizes="(max-width: 768px) 50vw, 25vw"
+                  priority
               />
             </div>
-            <div className={"p-1 m-1 border items-center flex flex-col"}>
-              <h3 className="mb-1 text-base sm:text-lg font-semibold line-clamp-2">{product.name}</h3>
+            <div className={"p-1 m-1 border text-center items-center flex flex-col"}>
+              <h3 className="mb-1 text-sm text-balance sm:text-base font-semibold line-clamp-2">{product.name}</h3>
 
               <div className="flex items-center gap-1 ">
                 <div className="flex">

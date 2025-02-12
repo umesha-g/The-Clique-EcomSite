@@ -25,7 +25,7 @@ const WishlistItem = ({
                             src={prefix + item.cardImageUrl}
                             alt={item.name}
                             fill
-                            className="object-cover rounded-none"
+                            className="object-cover rounded-nano"
                         />
                     </div>
                     <div className={"ml-3 sm:ml-5 sm:flex sm:justify-center"}>
@@ -61,17 +61,17 @@ const WishlistItem = ({
                         {item.directDiscount || item.otherDiscount ? (
                             <div className="flex flex-col  items-end sm:items-center sm:space-x-4">
                                     <span className="text-sm sm:text-xl font-semibold text-primary">
-                                      ${calculateDiscountedPrice(item).toFixed(2)}
+                                      Rs.{calculateDiscountedPrice(item).toFixed(2)}
                                     </span>
                                 <div className="flex flex-col sm:flex-row items-end sm:items-center mt-1">
                                       <span className="line-through text-gray-500 text-xs sm:text-base">
-                                        ${item.price.toFixed(2)}
+                                        Rs.{item.price.toFixed(2)}
                                       </span>
                                 </div>
                             </div>
                         ) : (
                             <span className="sm:text-xl font-semibold">
-                                ${item.price.toFixed(2)}
+                                Rs.{item.price.toFixed(2)}
                             </span>
                         )}
                     </div>
